@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "$0")/common"
+if ! command -v mise >/dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then step 'Installing mise' brew install mise;
+  else echo 'Install mise from https://mise.jdx.dev and rerun bin/setup.' >&2; exit 1; fi
+fi
+step 'Trusting the project toolchain' mise trust --yes .mise.toml
+step 'Installing pinned tools' mise install --yes
+step 'Installing dependencies' mise exec -- npm ci
+step 'Installing the test browser' mise exec -- npx playwright install chromium

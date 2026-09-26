@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Notice from '../components/Notice.astro';
+import Book from '../components/Book.astro';
+import { categories } from '../lib/categories';
+const notices = (await getCollection('notices')).sort((a,b) => {
+  return a.data.order - b.data.order || (a.data.date || '9999').localeCompare(b.data.date || '9999') || a.id.localeCompare(b.id);
+});
+---
+<Layout>
+  <section class="intro"><p class="eyebrow">EL TAULER DE LES FAMÍLIES</p><h1>Les coses que<br />ens importen.</h1><p class="intro-description">Els avisos de la classe i de l’escola,<br class="desktop-break" /> junts perquè no se’ns escapi res.</p></section>
+  <nav class="useful-links" aria-label="Enllaços útils"><a href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18"/></svg><span>Calendari escolar <small>2026–27</small></span><span aria-hidden="true">↗</span></a></nav>
+  <section id="avisos" aria-label="Avisos">
+    <div class="board-toolbar">
+      {notices.length > 0 ? <nav class="filters" aria-label="Filtra els avisos" hidden>
+        <button data-filter="tot" aria-pressed="true">Tots els avisos</button>
+        {Object.entries(categories).map(([key,label]) => <button data-filter={key} aria-pressed="false">{label}</button>)}
+      </nav> : <h2 class="board-label">Tots els avisos</h2>}
+      <span class="notice-count" role="status">{notices.length} {notices.length === 1 ? 'avís' : 'avisos'}</span>
+    </div>
+    {notices.length === 0 ? <div class="empty-state"><span class="empty-icon"><Book /></span><h2>Encara no hi ha cap avís</h2><p>Quan hi hagi novetats de la classe o de l’escola,<br class="desktop-break" /> les trobaràs aquí.</p></div> : <><div class="notices">{notices.map(notice => <Notice notice={notice} />)}</div><div class="filter-empty" hidden><h2>No hi ha avisos d’aquesta categoria</h2><button id="reset-filter">Mostra tots els avisos</button></div></>}
+  </section>
+  <script>
+    const filters = document.querySelector<HTMLElement>('.filters');
+    if (filters) {
+      filters.hidden = false;
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('.notice'));
+      const buttons = Array.from(filters.querySelectorAll<HTMLButtonElement>('button'));
+      function filter(category: string) {
+        let count = 0;
+        cards.forEach(card => { card.hidden = category !== 'tot' && card.dataset.category !== category; if (!card.hidden) count++; });
+        buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === category)));
+        document.querySelector('.notice-count')!.textContent = `${count} ${count === 1 ? 'avís' : 'avisos'}`;
+        document.querySelector<HTMLElement>('.filter-empty')!.hidden = count !== 0;
+      }
+      buttons.forEach(button => button.addEventListener('click', () => filter(button.dataset.filter!)));
+      document.querySelector('#reset-filter')?.addEventListener('click', () => { filter('tot'); buttons[0].focus(); });
+    }
+  </script>
+</Layout>

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "$0")/common"
+ensure_runtime "$@"
+step 'Checking scripts' bash -n bin/common bin/setup bin/ci bin/dev
+step 'Checking Astro and TypeScript' npm run check
+step 'Building the public website' npm run build
+step 'Testing the board and scripts' npm test
