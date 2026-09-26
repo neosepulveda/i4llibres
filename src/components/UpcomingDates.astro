@@ -2,23 +2,25 @@
 import type { CollectionEntry } from 'astro:content';
 import CalendarLinks from './CalendarLinks.astro';
 import { eventTimeLabel } from '../lib/calendar';
-import { categories } from '../lib/categories';
-interface Props { notices: CollectionEntry<'notices'>[] }
-const { notices } = Astro.props;
+import { messages, type Language } from '../lib/i18n';
+interface Props { notices: CollectionEntry<'notices'>[]; language: Language }
+const { notices, language } = Astro.props;
+const t = messages[language];
+const categories = t.categories;
 const events = notices.filter(notice => notice.data.event).sort((a,b) => a.data.event!.start.localeCompare(b.data.event!.start));
-const format = (value: string, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('ca-ES', { ...options, timeZone:'Europe/Madrid' }).format(new Date(value.length === 10 ? value + 'T12:00:00Z' : value));
+const format = (value: string, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(language, { ...options, timeZone:'Europe/Madrid' }).format(new Date(value.length === 10 ? value + 'T12:00:00Z' : value));
 ---
 {events.length > 0 && <section class="upcoming" aria-labelledby="upcoming-title">
-  <h2 id="upcoming-title">Properes dates</h2>
+  <h2 id="upcoming-title">{t.upcoming}</h2>
   {events.map(({id,data}) => {
     const event = data.event!;
     return <details class="upcoming-event" data-end={event.end} data-all-day={String(!!event.allDay)}>
       <summary>
         <time datetime={event.start}><strong>{format(event.start,{day:'numeric'})}</strong><span>{format(event.start,{month:'short'})}</span></time>
-        <span class="upcoming-text"><span class={`upcoming-category ${data.category}`}>{categories[data.category]}</span><strong>{event.title || data.title}</strong><span class="upcoming-time">{format(event.start,{weekday:'long'})} · {eventTimeLabel(event)}</span></span>
+        <span class="upcoming-text"><span class={`upcoming-category ${data.category}`}>{categories[data.category]}</span><strong>{event.title || data.title}</strong><span class="upcoming-time">{format(event.start,{weekday:'long'})} · {eventTimeLabel(event, language)}</span></span>
         <span class="expand" aria-hidden="true">+</span>
       </summary>
-      <div class="upcoming-body"><p>{event.allDay ? event.description : event.location}</p><h3>Afegeix-ho al teu calendari</h3><CalendarLinks id={id} title={data.title} event={event} /></div>
+      <div class="upcoming-body"><p>{event.allDay ? event.description : event.location}</p><h3>{t.addYours}</h3><CalendarLinks id={id} title={data.title} event={event} language={language} /></div>
     </details>;
   })}
 </section>}

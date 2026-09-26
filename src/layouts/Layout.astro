@@ -1,18 +1,33 @@
 ---
 import Book from '../components/Book.astro';
 import '../styles/site.css';
+import { messages, languagePath, type Language } from '../lib/i18n';
+interface Props { language: Language }
+const { language } = Astro.props;
+const t = messages[language];
+const paths = {ca:languagePath(import.meta.env.BASE_URL,'ca'),es:languagePath(import.meta.env.BASE_URL,'es'),en:languagePath(import.meta.env.BASE_URL,'en')};
 ---
 <!doctype html>
-<html lang="ca">
+<html lang={language}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="description" content="El tauler de les famílies d’I4B, la classe dels Llibres. Avisos de la classe i de l’Escola La Mar Bella." />
-    <title>Els Llibres · El tauler d’I4B</title>
+    <meta name="description" content={t.description} />
+    <title>{t.pageTitle}</title>
     <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.svg`} />
+    <script is:inline define:vars={{language,paths}}>
+      // Only the neutral entry URL follows a saved preference. Explicit language links win.
+      if (language === 'ca' && new URLSearchParams(location.search).get('lang') !== 'ca') {
+        try {
+          const saved = localStorage.getItem('llibres-language');
+          if (saved === 'es' || saved === 'en') location.replace(paths[saved] + location.search + location.hash);
+        } catch {}
+      }
+    </script>
     <script is:inline>
+
       (() => {
         let theme;
         try { theme = localStorage.getItem('llibres-theme'); } catch {}
@@ -21,25 +36,36 @@ import '../styles/site.css';
     </script>
   </head>
   <body>
-    <a class="skip" href="#avisos">Ves als avisos</a>
+    <a class="skip" href="#avisos">{t.skip}</a>
     <div class="shell">
       <header class="site-header">
-        <a class="brand" href={import.meta.env.BASE_URL}><span class="brand-mark"><Book /></span><span>Els Llibres<small>I4B · Escola La Mar Bella</small></span></a>
-        <div class="header-right"><span class="course">Curs 2026–27</span><button id="theme-toggle" hidden aria-label="Activa el mode fosc">
+        <a class="brand" href={paths[language]}><span class="brand-mark"><Book /></span><span>Els Llibres<small>I4B · Escola La Mar Bella</small></span></a>
+        <div class="header-right"><details class="language-picker"><summary aria-label="Idioma / Language"><span>{language.toUpperCase()}</span><svg class="language-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary><nav aria-label="Idioma / Language">
+          <a href={`${paths.ca}?lang=ca`} data-language="ca" lang="ca" hreflang="ca" aria-current={language === 'ca' ? 'page' : undefined}>Català</a>
+          <a href={paths.es} data-language="es" lang="es" hreflang="es" aria-current={language === 'es' ? 'page' : undefined}>Castellano</a>
+          <a href={paths.en} data-language="en" lang="en" hreflang="en" aria-current={language === 'en' ? 'page' : undefined}>English</a>
+        </nav></details>
+<span class="course">{t.course}</span><button id="theme-toggle" hidden aria-label={t.dark} data-dark={t.dark} data-light={t.light}>
           <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>
           <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
         </button></div>
       </header>
       <main><slot /></main>
-      <footer><Book /><p>Un petit tauler per estar al dia.<span>Preparat amb cura per les delegades d’I4B.</span></p><span class="footer-class">I4B / LLIBRES</span></footer>
+      <footer><Book /><p>{t.footer}<span>{t.credits}</span></p><span class="footer-class">I4B / LLIBRES</span></footer>
     </div>
     <script>
-      const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle')!;
+      document.querySelectorAll<HTMLAnchorElement>('[data-language]').forEach(link => {
+        link.addEventListener('click', () => {
+          try { localStorage.setItem('llibres-language', link.dataset.language!); } catch {}
+        });
+      });
+      const toggle =
+ document.querySelector<HTMLButtonElement>('#theme-toggle')!;
       const system = matchMedia('(prefers-color-scheme: dark)');
       let manuallySelected = false;
       try { manuallySelected = ['clar', 'fosc'].includes(localStorage.getItem('llibres-theme') || ''); } catch {}
       function updateLabel() {
-        toggle.setAttribute('aria-label', `Activa el mode ${document.documentElement.dataset.theme === 'fosc' ? 'clar' : 'fosc'}`);
+        toggle.setAttribute('aria-label', document.documentElement.dataset.theme === 'fosc' ? toggle.dataset.light! : toggle.dataset.dark!);
       }
       toggle.hidden = false;
       updateLabel();

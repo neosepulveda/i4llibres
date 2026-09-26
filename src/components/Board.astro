@@ -1,0 +1,47 @@
+---
+import { localizedNotices } from '../lib/localized-notices';
+import { messages, type Language } from '../lib/i18n';
+import Layout from '../layouts/Layout.astro';
+import Notice from './Notice.astro';
+import Book from './Book.astro';
+import UpcomingDates from './UpcomingDates.astro';
+interface Props { language?: Language }
+const { language = 'ca' } = Astro.props;
+const t = messages[language];
+const categories = t.categories;
+const entries = await localizedNotices(language);
+const notices = entries.map(entry => entry.notice);
+---
+<Layout language={language}>
+  <section class="intro"><p class="eyebrow">{t.eyebrow}</p><h1>{t.heading}</h1><p class="intro-description">{t.intro}</p></section>
+  <UpcomingDates notices={notices} language={language} />
+  <nav class="useful-links" aria-label={t.useful}><a href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18"/></svg><span>{t.schoolCalendar} <small>2026–27</small></span><span aria-hidden="true">↗</span></a></nav>
+  <section id="avisos" aria-label={t.notices}>
+    <div class="board-toolbar">
+      {notices.length > 0 ? <nav class="filters" aria-label={t.filter} hidden>
+        <button data-filter="tot" aria-pressed="true">{t.all}</button>
+        {Object.entries(categories).map(([key,label]) => <button data-filter={key} aria-pressed="false">{label}</button>)}
+      </nav> : <h2 class="board-label">{t.all}</h2>}
+      <span class="notice-count" role="status" data-singular={t.singular} data-plural={t.plural}>{notices.length} {notices.length === 1 ? t.singular : t.plural}</span>
+    </div>
+    {notices.length === 0 ? <div class="empty-state"><span class="empty-icon"><Book /></span><h2>{t.empty}</h2><p>{t.emptyBody}</p></div> : <><div class="notices">{entries.map(({notice,content}) => <Notice notice={notice} content={content} language={language} />)}</div><div class="filter-empty" hidden><h2>{t.noCategory}</h2><button id="reset-filter">{t.reset}</button></div></>}
+  </section>
+  <script>
+    const filters = document.querySelector<HTMLElement>('.filters');
+    if (filters) {
+      filters.hidden = false;
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('.notice'));
+      const buttons = Array.from(filters.querySelectorAll<HTMLButtonElement>('button'));
+      function filter(category: string) {
+        let count = 0;
+        cards.forEach(card => { card.hidden = category !== 'tot' && card.dataset.category !== category; if (!card.hidden) count++; });
+        buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === category)));
+        const counter = document.querySelector<HTMLElement>('.notice-count')!;
+        counter.textContent = `${count} ${count === 1 ? counter.dataset.singular : counter.dataset.plural}`;
+        document.querySelector<HTMLElement>('.filter-empty')!.hidden = count !== 0;
+      }
+      buttons.forEach(button => button.addEventListener('click', () => filter(button.dataset.filter!)));
+      document.querySelector('#reset-filter')?.addEventListener('click', () => { filter('tot'); buttons[0].focus(); });
+    }
+  </script>
+</Layout>

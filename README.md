@@ -50,7 +50,7 @@ event:
   description: "Reunió informativa del menjador."
 ```
 
-Indiqueu el desfasament horari correcte de Barcelona per a la data: +02:00 a l’estiu, +01:00 a l’hivern. La web genera un enllaç de Google Calendar i un fitxer .ics per a Apple Calendar, Outlook i altres aplicacions. Els fitxers utilitzen UTC per conservar l’hora exacta en importar-los. Són còpies puntuals: les modificacions al tauler no actualitzen automàticament els calendaris personals.
+Indiqueu el desfasament horari correcte de Barcelona per a la data: +02:00 a l’estiu, +01:00 a l’hivern. La web genera un enllaç de Google Calendar i un fitxer .ics per a Apple Calendar, Outlook i altres aplicacions. Els esdeveniments amb hora utilitzen UTC per conservar l’hora exacta en importar-los; els de tot el dia utilitzen dates sense fus horari. Són còpies puntuals: les modificacions al tauler no actualitzen automàticament els calendaris personals.
 
 ## Properes dates
 
@@ -73,3 +73,11 @@ Amb JavaScript, les dates desapareixen quan s’acaben; els festius segueixen el
 ## Imatges descarregables
 
 Deseu les imatges a `public/downloads/` i afegiu una llista `images` al Markdown, amb `src` (p. ex. `/downloads/horari.jpg`), `title` i `alt`. Apareixen dins del detall de l’avís. La previsualització obre l’original en una pestanya nova i «Descarrega» desa el fitxer. Els enllaços incorporen automàticament el subdirectori de GitHub Pages.
+
+## Llengües
+
+El català és la llengua per defecte a `/`. El castellà és a `/es/` i l’anglès a `/en/`. El selector desa l’elecció a `localStorage` (`llibres-language`), sense cookies ni servidor. Quan es torna a l’arrel, s’obre la llengua desada. Els enllaços explícits `/es/`, `/en/` i `/?lang=ca` tenen prioritat. Sense JavaScript o sense accés a l’emmagatzematge, els enllaços continuen funcionant però no es recorda l’elecció.
+
+Per publicar un avís, afegiu també `src/content/translations/es/<id>.md` i `src/content/translations/en/<id>.md`, amb el mateix nom de fitxer que l’original. Cada traducció conté `title`, `description`, `note` i el cos Markdown. Si l’original té un esdeveniment, traduïu també `event.title`, `event.location` i `event.description`. Si té imatges, afegiu `images` amb `title` i `alt` en el mateix ordre. Les dates, les hores, l’ordre, les categories i els fitxers adjunts només es defineixen a l’original català. La compilació falla si falta alguna traducció o algun grup de textos d’esdeveniments o imatges.
+
+Els textos de la interfície són a `src/lib/i18n.ts`. Les descàrregues de calendari es generen en cada llengua i conserven el mateix identificador d’esdeveniment. Les imatges originals dels horaris continuen en català; el text traduït apareix a sota. Reviseu les tres versions abans de publicar. No es fan traduccions automàtiques en visitar la web.

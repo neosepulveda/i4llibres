@@ -1,0 +1,7 @@
+---
+import Board from '../../components/Board.astro';
+import type { Language } from '../../lib/i18n';
+export function getStaticPaths() { return ['es','en'].map(lang=>({params:{lang}})); }
+const language = Astro.params.lang as Language;
+---
+<Board language={language} />

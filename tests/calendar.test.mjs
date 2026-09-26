@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { googleCalendarUrl, calendarFile, calendarPath } from '../src/lib/calendar.ts';
+import { googleCalendarUrl, calendarFile, calendarPath, eventTimeLabel } from '../src/lib/calendar.ts';
 const event={start:'2026-10-05T17:00:00+02:00',end:'2026-10-05T18:00:00+02:00',location:'Escola, menjador; Barcelona',description:'Reunió amb famílies\nhttps://forms.gle/test'};
 test('Google Calendar preserves the authorised hour and event information',()=>{
  const url=new URL(googleCalendarUrl('Reunió & famílies',event));
@@ -29,4 +29,9 @@ test('all-day exports use date values and an exclusive end, without timezone shi
  const url=new URL(googleCalendarUrl('Notice headline',holiday));
  assert.equal(url.searchParams.get('dates'),'20261012/20261013');
  assert.equal(url.searchParams.get('text'),'No hi ha escola');
+});
+
+test('translated time labels use Barcelona time without mixing AM/PM and hour suffixes',()=>{
+ assert.equal(eventTimeLabel(event,'en'),'17:00–18:00');
+ assert.equal(eventTimeLabel({...event,allDay:true},'es'),'Todo el día');
 });

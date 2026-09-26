@@ -130,3 +130,70 @@ test('upcoming dates can be expanded and exported without JavaScript',async({bro
  await expect(page.locator('.upcoming-event').first().getByRole('link',{name:/Apple Calendar/})).toBeVisible();
  await context.close();
 });
+
+test('language choice persists, while explicit language links take precedence',async({page})=>{
+ await page.setViewportSize({width:320,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ await expect(page.locator('html')).toHaveAttribute('lang','ca');
+ await page.locator('.language-picker summary').click();
+ await page.getByRole('link',{name:'Castellano',exact:true}).click();
+ await expect(page.locator('html')).toHaveAttribute('lang','es');
+ await expect(page.getByRole('heading',{name:'Las cosas que nos importan.'})).toBeVisible();
+ await expect(page.locator('.notice h2')).toHaveText(['Aviso del colegio de prueba','Aviso de clase de prueba']);
+ await page.goto('http://127.0.0.1:4323');
+ await expect(page).toHaveURL('http://127.0.0.1:4323/es/');
+ await page.goto('http://127.0.0.1:4323/en/');
+ await expect(page.locator('html')).toHaveAttribute('lang','en');
+ await page.getByRole('button',{name:'I4B · Llibres',exact:true}).click();
+ await expect(page.locator('.notice-count')).toHaveText('1 notice');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.locator('.language-picker summary').click();
+ await page.getByRole('link',{name:'Català',exact:true}).click();
+ await expect(page.locator('html')).toHaveAttribute('lang','ca');
+ await page.goto('http://127.0.0.1:4323');
+ await expect(page.locator('html')).toHaveAttribute('lang','ca');
+});
+
+test('translated exports and language navigation work without JavaScript',async({browser})=>{
+ const context=await browser.newContext({javaScriptEnabled:false});
+ const page=await context.newPage();
+ await page.goto('http://127.0.0.1:4323/en/');
+ await page.locator('.upcoming-event').first().locator('summary').click();
+ const event=page.locator('.upcoming-event').first();
+ const google=new URL((await event.getByRole('link',{name:'Google Calendar'}).getAttribute('href'))!);
+ expect(google.searchParams.get('text')).toBe('Test meeting');
+ await expect(event.getByRole('link',{name:/Apple Calendar/})).toHaveAttribute('href','/en/calendar/class.ics');
+ const response=await page.request.get('http://127.0.0.1:4323/en/calendar/class.ics');
+ expect(await response.text()).toContain('SUMMARY:Test meeting');
+ await page.locator('.language-picker summary').click();
+ await page.getByRole('link',{name:'Castellano',exact:true}).click();
+ await expect(page.locator('html')).toHaveAttribute('lang','es');
+ await context.close();
+});
+
+test('blocked browser storage does not break language switching',async({page})=>{
+ await page.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new Error('blocked');}});});
+ await page.goto('http://127.0.0.1:4322');
+ await page.locator('.language-picker summary').click();
+ await page.getByRole('link',{name:'English',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'No notices yet'})).toBeVisible();
+ await page.getByRole('button',{name:'Switch to dark mode'}).click();
+ await expect(page.locator('html')).toHaveAttribute('data-theme','fosc');
+});
+
+test('language label and chevron align, with the dropdown anchored inside the phone viewport',async({page})=>{
+ for(const width of [320,390,1440]){
+  await page.setViewportSize({width,height:900});
+  await page.goto('http://127.0.0.1:4322');
+  const summary=page.locator('.language-picker summary');
+  const label=await summary.locator('span').boundingBox();
+  const icon=await summary.locator('svg').boundingBox();
+  expect(Math.abs(label!.y+label!.height/2-icon!.y-icon!.height/2)).toBeLessThan(1);
+  await summary.click();
+  const button=await summary.boundingBox();
+  const menu=await page.locator('.language-picker nav').boundingBox();
+  expect(Math.abs(menu!.x+menu!.width-button!.x-button!.width)).toBeLessThan(1);
+  expect(menu!.x).toBeGreaterThanOrEqual(0);
+  expect(menu!.y).toBeGreaterThan(button!.y+button!.height);
+ }
+});

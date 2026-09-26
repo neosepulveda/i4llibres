@@ -30,4 +30,12 @@ const notices = defineCollection({
   }),
 });
 
-export const collections = { notices };
+const translations = defineCollection({
+  loader: glob({ pattern:'**/*.md', base:'./src/content/translations' }),
+  schema: z.object({
+    title:z.string().min(1), description:z.string().min(1), note:z.string().min(1),
+    event:z.object({title:z.string().min(1),location:z.string().min(1),description:z.string().min(1)}).optional(),
+    images:z.array(z.object({title:z.string().min(1),alt:z.string().min(1)})).optional(),
+  }),
+});
+export const collections = { notices, translations };

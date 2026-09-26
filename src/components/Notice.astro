@@ -1,24 +1,26 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import CalendarLinks from './CalendarLinks.astro';
-import { categories } from '../lib/categories';
-interface Props { notice: CollectionEntry<'notices'> }
-const { notice } = Astro.props;
-const { Content } = await render(notice);
+import { messages, type Language } from '../lib/i18n';
+interface Props { notice: CollectionEntry<'notices'>; content: CollectionEntry<'notices'> | CollectionEntry<'translations'>; language: Language }
+const { notice, content, language } = Astro.props;
+const t = messages[language];
+const categories = t.categories;
+const { Content } = await render(content);
 const { title, description, category, date, note, event, images } = notice.data;
 const assetUrl = (src: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${src}`;
-const displayDate = date && new Intl.DateTimeFormat('ca-ES', { day:'numeric', month:'short', timeZone:'UTC' }).format(new Date(date+'T12:00:00Z'));
+const displayDate = date && new Intl.DateTimeFormat(language, { day:'numeric', month:'short', timeZone:'UTC' }).format(new Date(date+'T12:00:00Z'));
 ---
 <article class={`notice ${category}`} data-category={category}>
   <div class="card-meta"><span class="tag"><i></i>{categories[category]}</span>{date && <time datetime={date}>{displayDate}</time>}</div>
   <h2>{title}</h2><p>{description}</p>
-  <details><summary><span>{note || 'Més informació'}</span><span class="expand" aria-hidden="true">+</span></summary><div class="notice-body">
-    {images.length > 0 && <div class="notice-images" aria-label="Horaris per consultar i descarregar">{images.map(image => <figure>
-      <a class="image-preview" href={assetUrl(image.src)} target="_blank" rel="noopener noreferrer" aria-label={`Obre ${image.title.toLowerCase()} en una pestanya nova`}><img src={assetUrl(image.src)} alt={image.alt} loading="lazy" width="1024" height="2048" /></a>
+  <details><summary><span>{note || t.more}</span><span class="expand" aria-hidden="true">+</span></summary><div class="notice-body">
+    {images.length > 0 && <div class="notice-images" aria-label={t.images}>{images.map(image => <figure>
+      <a class="image-preview" href={assetUrl(image.src)} target="_blank" rel="noopener noreferrer" aria-label={`${t.openImage}: ${image.title}`}><img src={assetUrl(image.src)} alt={image.alt} loading="lazy" width="1024" height="2048" /></a>
       <figcaption>{image.title}</figcaption>
-      <a class="image-download" href={assetUrl(image.src)} download>Descarrega <span class="sr-only">{image.title.toLowerCase()}</span><span aria-hidden="true">↓</span></a>
+      <a class="image-download" href={assetUrl(image.src)} download>{t.download} <span class="sr-only">{image.title.toLowerCase()}</span><span aria-hidden="true">↓</span></a>
     </figure>)}</div>}
     <Content />
   </div></details>
-  {event && <details class="calendar-actions"><summary><span>Afegeix al calendari</span><span aria-hidden="true">＋</span></summary><CalendarLinks id={notice.id} title={title} event={event} /></details>}
+  {event && <details class="calendar-actions"><summary><span>{t.add}</span><span aria-hidden="true">＋</span></summary><CalendarLinks id={notice.id} title={title} event={event} language={language} /></details>}
 </article>

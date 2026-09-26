@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { messages, type Language } from './i18n.ts';
 
 export interface CalendarEvent {
   title?: string;
@@ -39,8 +40,8 @@ export function calendarFile(id: string, title: string, event: CalendarEvent, ge
 export function calendarPath(base: string, id: string) {
   return `${base.replace(/\/$/, '')}/calendar/${id.split('/').map(encodeURIComponent).join('/')}.ics`;
 }
-export function eventTimeLabel(event: CalendarEvent) {
-  if (event.allDay) return 'Tot el dia';
-  const format = new Intl.DateTimeFormat('ca-ES', { hour:'2-digit', minute:'2-digit', timeZone:'Europe/Madrid' });
-  return `${format.format(new Date(event.start))}–${format.format(new Date(event.end))} h`;
+export function eventTimeLabel(event: CalendarEvent, language: Language = 'ca') {
+  if (event.allDay) return messages[language].allDay;
+  const format = new Intl.DateTimeFormat(language, { hour:'2-digit', minute:'2-digit', hourCycle:'h23', timeZone:'Europe/Madrid' });
+  return `${format.format(new Date(event.start))}–${format.format(new Date(event.end))}${language === 'en' ? '' : ' h'}`;
 }
