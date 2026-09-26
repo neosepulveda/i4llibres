@@ -197,3 +197,18 @@ test('language label and chevron align, with the dropdown anchored inside the ph
   expect(menu!.y).toBeGreaterThan(button!.y+button!.height);
  }
 });
+
+test('notices have a distinct translated heading after the calendar links',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ for(const [path,label] of [['/?lang=ca','Els avisos'],['/es/','Los avisos'],['/en/','Notices']]){
+  await page.goto('http://127.0.0.1:4323'+path);
+  const heading=page.getByRole('heading',{name:label,exact:true});
+  await expect(heading).toBeVisible();
+  const calendar=await page.locator('.useful-links').boundingBox();
+  const title=await heading.boundingBox();
+  const filters=await page.locator('.board-toolbar').boundingBox();
+  expect(title!.y-calendar!.y-calendar!.height).toBeGreaterThanOrEqual(28);
+  expect(filters!.y).toBeGreaterThan(title!.y+title!.height);
+  await expect(page.getByRole('region',{name:label,exact:true})).toBeVisible();
+ }
+});
