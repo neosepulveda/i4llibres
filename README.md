@@ -20,6 +20,20 @@ Open http://127.0.0.1:4321/. `bin/dev` accepts Astro arguments, such as `bin/dev
 
 `bin/setup` installs mise through Homebrew if necessary, trusts `.mise.toml`, installs the pinned Node version, runs `npm ci`, and installs Chromium for browser tests. Without Homebrew, install [mise](https://mise.jdx.dev/) first. Node is pinned to **24.15.0**.
 
+## Work from a phone through Norman
+
+The always-on checkout is `/Users/norman/personal/school-noticeboard` on `normans-mac-mini`. Pair the ChatGPT mobile app directly with Norman's desktop app, then select this project in Remote. Norman runs edits, tests, and Git commands; GitHub Actions publishes the website. Keep Norman awake, online, and running the desktop app.
+
+For terminal access:
+
+```sh
+ssh normans-mac-mini
+cd ~/personal/school-noticeboard
+bin/ci
+```
+
+Non-interactive SSH commands need a login shell or `/opt/homebrew/bin` in `PATH` to find Homebrew tools. Norman's checkout uses a dedicated SSH signing key without a passphrase, configured only for this repository. Its private key stays at `~/.ssh/id_ed25519_school_noticeboard_signing`; only the public key belongs in GitHub's signing-key settings. Fresh clones need the local signing configuration applied again. Before the first phone-driven deployment, verify both signed commits and GitHub push access. Never disable signing to get a deployment through.
+
 ## Check changes
 
 ```sh
@@ -164,6 +178,6 @@ Run `bin/ci` afterwards to restore a normal build before running its production-
 
 ## Publication boundaries
 
-Only deliberately curated content belongs in this public repository. There is no connection to Norman, no database access, and no automatic import from WhatsApp, email, or the private generated noticeboard.
+Only deliberately curated content belongs in this public repository. The development checkout on Norman has no connection to the private ingestion service, no database access, and no automatic import from WhatsApp, email, or the private generated noticeboard.
 
 Pages contain `noindex, nofollow`, but the website and Git history are public. These directives are not access control. Keep private emails, credentials, and school documents with unrestricted edit links out of the repository. When an announcement depends on a private email, direct families to that email instead.

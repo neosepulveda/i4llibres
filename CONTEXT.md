@@ -88,7 +88,9 @@ For UI changes, edit shared components rather than copying separate language lay
 
 ## Local workflow and tests
 
-The usual checkout is `~/personal/school-noticeboard`; commands run from the repository root. Develop locally, not over SSH on Norman.
+The usual checkout is `~/personal/school-noticeboard`; commands run from the repository root. Norman is the always-on development host for phone-driven work, with its checkout at `/Users/norman/personal/school-noticeboard`. SSH access uses `normans-mac-mini`. The phone must connect directly to Norman's desktop app through ChatGPT Remote so this Mac does not need to stay online. A checkout on another Mac can still be used for development; exchange committed changes through Git and preserve uncommitted work on both hosts.
+
+On Norman, use a login shell or include `/opt/homebrew/bin` in `PATH` for SSH commands. Run the same setup and checks there as on any other development machine. This checkout uses repository-local SSH commit signing with `~/.ssh/id_ed25519_school_noticeboard_signing`, a dedicated key without a passphrase for unattended work. Keep the private key on Norman and register only its public key as a signing key on GitHub. Preserve global GPG settings for other repositories. Fresh clones need this local signing configuration applied again; never disable signing to publish. The public site remains hosted by GitHub Pages, so it does not need a persistent development server on Norman. Its checkout is independent of the private `school-ingest` service.
 
 1. Inspect `git status` and preserve existing changes.
 2. Run `bin/setup` on a fresh checkout, then `bin/dev` for http://127.0.0.1:4321/.
