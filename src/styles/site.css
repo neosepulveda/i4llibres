@@ -10,6 +10,7 @@ svg{width:24px;height:24px;display:block}
 @media(max-width:480px){.shell{width:calc(100% - 32px)}}
 .skip{position:fixed;top:-100px;left:15px;background:var(--ink);color:var(--bg);padding:15px;z-index:10}.skip:focus{top:10px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.back-to-top{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--line);border-radius:50%;background:var(--ink);color:var(--bg);box-shadow:0 4px 12px var(--shadow)}
 
 .site-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;flex-wrap:nowrap}
 .brand{display:flex;align-items:baseline;gap:10px;text-decoration:none;min-width:0}

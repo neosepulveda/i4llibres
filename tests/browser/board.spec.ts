@@ -42,6 +42,33 @@ test('empty state works without JavaScript',async({browser})=>{
   await expect(page.locator('#theme-toggle')).toBeHidden();await context.close();
 });
 
+for (const width of [320,390]) {
+ for (const colorScheme of ['light','dark'] as const) {
+  test(`back to top on phones at ${width}px ${colorScheme}`,async({page})=>{
+   await page.setViewportSize({width,height:600});
+   await page.emulateMedia({colorScheme,reducedMotion:colorScheme==='dark'?'reduce':'no-preference'});
+   for(const [path,label] of [['/?lang=ca','Torna a dalt'],['/es/','Volver arriba'],['/en/','Back to top']]){
+    await page.goto('http://127.0.0.1:4323'+path);
+    const button=page.getByRole('button',{name:label,includeHidden:true});
+    await expect(button).toBeHidden();
+    await page.locator('.notice details:not(.calendar-actions)').evaluateAll(elements=>elements.forEach(element=>element.setAttribute('open','')));
+    await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+    await expect(button).toBeVisible();
+    const box=await button.boundingBox();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+    expect(box!.x+box!.width).toBeLessThanOrEqual(width-16);
+    expect(box!.y+box!.height).toBeLessThanOrEqual(600-16);
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBe(0);
+    await expect(button).toBeHidden();
+    await expect(page.locator('.brand')).toBeFocused();
+   }
+  });
+ }
+}
+
 test('external links open new tabs without JavaScript; internal links stay in this tab',async({browser})=>{
   const context=await browser.newContext({javaScriptEnabled:false});
   const page=await context.newPage();await page.goto('http://127.0.0.1:4323');

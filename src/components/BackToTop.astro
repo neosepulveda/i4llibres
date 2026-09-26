@@ -1,0 +1,20 @@
+---
+interface Props { label: string }
+const { label } = Astro.props;
+---
+<button class="back-to-top" type="button" hidden aria-label={label} title={label}>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7M12 5v14" /></svg>
+</button>
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.back-to-top')!;
+  function updateVisibility() {
+    button.hidden = window.scrollY < 400;
+  }
+  window.addEventListener('scroll', updateVisibility, { passive: true });
+  window.addEventListener('pageshow', updateVisibility);
+  updateVisibility();
+  button.addEventListener('click', () => {
+    document.querySelector<HTMLAnchorElement>('.brand')?.focus({ preventScroll: true });
+    window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  });
+</script>
