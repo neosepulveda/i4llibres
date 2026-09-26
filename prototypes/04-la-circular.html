@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Els Llibres · La circular</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+:root{--fons:#d9d7d0;--full:#ffffff;--toner:#1a1a1a;--gris:#5f5f5b;--segell:#b8322a;--linia:#1a1a1a;--classe:#1a1a1a;--escola:#1a1a1a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fons);color:var(--toner);font-family:Alegreya,Georgia,"Times New Roman",serif;font-size:18px;line-height:1.5;padding:24px 0 48px}
+@media (max-width:520px){body{padding:0 0 32px}}
+h1,h2,h3{margin:0;font-weight:700;line-height:1.2;text-wrap:balance}
+a{color:var(--toner)}
+.mono{font-family:"Courier Prime","Courier New",monospace;font-size:14px}
+.full{max-width:720px;margin-inline:auto;background:var(--full);padding:48px 56px 40px;box-shadow:0 2px 0 #bdbbb4,0 10px 24px rgba(0,0,0,.18);position:relative}
+@media (max-width:520px){.full{padding:32px 20px 28px}}
+
+.capcalera{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:3px double var(--linia);padding-bottom:14px}
+.capcalera .escola{font-size:13px;line-height:1.35;text-transform:uppercase;letter-spacing:1.4px}
+.capcalera .escola b{display:block;font-size:15px;letter-spacing:1.8px}
+.capcalera h1{font-size:30px;margin-top:6px;font-style:italic;font-weight:500}
+.segell{flex-shrink:0;border:2.5px solid var(--segell);color:var(--segell);font-family:"Courier Prime",monospace;font-size:12px;text-transform:uppercase;letter-spacing:1.5px;padding:8px 10px;transform:rotate(-6deg);line-height:1.3;text-align:center;opacity:.85;mask:radial-gradient(circle at 30% 60%,transparent 0 1px,#000 2px) 0 0/6px 6px}
+.segell b{display:block;font-size:16px}
+.salut{margin:28px 0 8px;font-size:20px}
+.intro{margin:0 0 22px}
+.idioma{margin:0 0 26px;font-family:"Courier Prime",monospace;font-size:13px;color:var(--gris)}
+.idioma a{color:var(--gris);text-decoration:none;margin-right:12px}
+.idioma a[aria-current]{color:var(--toner);text-decoration:underline;text-underline-offset:3px}
+
+.quadre{border:1.5px solid var(--linia);margin:0 0 30px;font-family:"Courier Prime",monospace;font-size:14px}
+.quadre caption,.quadre h2{font-family:"Courier Prime",monospace;font-size:13px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;padding:8px 12px;border-bottom:1.5px solid var(--linia);background:#f2f1ec}
+.quadre .fila{display:grid;grid-template-columns:110px 1fr;gap:8px;padding:8px 12px;border-bottom:1px dotted #999}
+.quadre .fila:last-child{border-bottom:0}
+.quadre .fila b{white-space:nowrap}
+.quadre .fila span{color:var(--gris)}
+.quadre .fila em{font-style:normal;color:var(--toner)}
+
+.filtres{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 20px;font-family:"Courier Prime",monospace;font-size:13px}
+.filtres button{font:inherit;background:none;border:1px solid var(--toner);padding:6px 10px;cursor:pointer;min-height:36px;color:var(--toner)}
+.filtres button[aria-pressed=true]{background:var(--toner);color:#fff}
+.filtres button:focus-visible,summary:focus-visible{outline:3px solid var(--segell);outline-offset:2px}
+
+.punt{margin:0 0 24px;padding-left:34px;position:relative}
+.punt::before{content:attr(data-n);position:absolute;left:0;top:2px;font-family:"Courier Prime",monospace;font-weight:700;font-size:15px}
+.punt h2{font-size:21px}
+.punt .cat{font-family:"Courier Prime",monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gris);display:block;margin-bottom:2px}
+.punt p{margin:6px 0 0}
+.punt details{margin-top:6px}
+summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;min-height:36px;font-style:italic;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--segell)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"▸";font-style:normal;font-size:13px}
+details[open] summary::after{content:"▾"}
+.det{font-size:17px;padding-top:4px}
+.det ul{margin:6px 0;padding-left:22px}
+.adjunts{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:320px;margin:8px 0 12px}
+.adjunts figure{margin:0;font-family:"Courier Prime",monospace;font-size:12px;text-align:center}
+.adjunts .ph{aspect-ratio:1/2;border:1px solid var(--toner);background:repeating-linear-gradient(0deg,#f4f4f0 0 18px,#fff 18px 20px);margin-bottom:4px}
+
+.resguard{margin-top:38px;border-top:2px dashed var(--toner);padding-top:14px;position:relative}
+.resguard::before{content:"✂";position:absolute;top:-14px;left:12px;background:var(--full);padding:0 4px;font-size:18px}
+.resguard h2{font-family:"Courier Prime",monospace;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:10px}
+.resguard .cal{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.resguard a{display:block;border:1.5px solid var(--toner);padding:10px 12px;text-decoration:none;font-family:"Courier Prime",monospace;font-size:14px;line-height:1.35}
+.resguard a b{display:block}
+.resguard a small{color:var(--gris)}
+.resguard a:hover{background:#f2f1ec}
+.peu{margin-top:30px;font-family:"Courier Prime",monospace;font-size:12px;color:var(--gris);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<article class="full">
+  <header class="capcalera">
+    <div><div class="escola"><b>Escola La Mar Bella</b>Educació Infantil · I4B, Els Llibres</div><h1>Circular a les famílies</h1></div>
+    <div class="segell" aria-label="Actualitzada el 26 de setembre de 2026"><b>26 set 2026</b>Curs 26–27<br>Delegades I4B</div>
+  </header>
+
+  <p class="idioma"><a href="#" aria-current="page">Català</a><a href="#">Castellano</a><a href="#">English</a></p>
+
+  <p class="salut">Benvolgudes famílies,</p>
+  <p class="intro">us fem arribar, com cada setmana, els avisos de la classe dels Llibres i de l’escola, junts perquè no se’ns escapi res. A sota trobareu les dates a recordar i, al final del full, el resguard per afegir-les al vostre calendari.</p>
+
+  <section class="quadre" aria-labelledby="dates"><h2 id="dates">Dates a recordar</h2>
+    <div class="fila"><b>dl 5 oct</b><span><em>Reunió del menjador</em> · 17:00–18:00 h · Menjador de l’escola</span></div>
+    <div class="fila"><b>dl 12 oct</b><span><em>Dia festiu</em> · Tot el dia · No hi ha classe</span></div>
+    <div class="fila"><b>curs 26/27</b><span><a href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer">Calendari escolar complet</a> al web de l’escola</span></div>
+  </section>
+
+  <div class="filtres" role="group" aria-label="Filtra els avisos"><button data-filter="tot" aria-pressed="true">tots els punts</button><button data-filter="classe" aria-pressed="false">I4B · Llibres</button><button data-filter="escola" aria-pressed="false">tota l’escola</button><button data-filter="menjador" aria-pressed="false">menjador</button><button data-filter="calendari" aria-pressed="false">calendari</button></div>
+
+  <section aria-label="Els avisos" id="punts">
+    <article class="punt" data-cat="classe"><span class="cat">I4B · Llibres</span><h2>La presentació de la reunió i les inscripcions ja estan disponibles</h2><p>Al correu de la Sandra del 25 de setembre trobareu la presentació i les graelles per apuntar-vos a les activitats en família i a les entrevistes.</p><details><summary>Consulta el correu de la tutora</summary><div class="det">Busqueu el correu <b>«Informacions reunions famílies»</b>, enviat el <b>25 de setembre</b>. Hi trobareu:<ul><li>La presentació de la reunió d’I4.</li><li>La graella d’<b>activitats en família</b>.</li><li>La graella per reservar les <b>entrevistes</b>.</li></ul>Feu servir els enllaços del correu per apuntar-vos.</div></details></article>
+    <article class="punt" data-cat="menjador"><span class="cat">Menjador · 5 d’octubre</span><h2>Reunió del menjador: 5 d’octubre a les 17 h</h2><p>Menjadors Biosca presentarà el servei, el projecte nutricional i la proposta educativa de l’espai migdia. Hi haurà temps per resoldre dubtes.</p><details><summary>17 h · Menjador de l’escola</summary><div class="det">Hi haurà <b>servei d’acollida per als infants durant la reunió</b>. Si el necessiteu, empleneu el formulari d’acollida per ajudar a organitzar-lo.</div></details></article>
+    <article class="punt" data-cat="calendari"><span class="cat">Calendari · 12 d’octubre</span><h2>Dilluns 12 d’octubre, dia festiu</h2><p>El pròxim dia festiu del calendari escolar és dilluns 12 d’octubre. Tingueu-lo present per organitzar-vos en família.</p><details><summary>Consultar el calendari escolar</summary><div class="det">És festiu estatal i <b>no hi haurà classe</b>. Podeu consultar tots els festius, dies de lliure disposició i jornades intensives al <a href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer">calendari oficial de l’escola</a>.</div></details></article>
+    <article class="punt" data-cat="classe"><span class="cat">I4B · Llibres</span><h2>Què fem cada dia? L’horari dels Llibres</h2><p>Biblioteca, anglès, tallers, psicomotricitat i música: les activitats d’I4B al llarg de la setmana.</p><details><summary>Veure i descarregar els horaris</summary><div class="det"><div class="adjunts"><figure><div class="ph"></div>Adjunt 1 · Horari en llista</figure><figure><div class="ph"></div>Adjunt 2 · Horari per dies</figure></div><ul><li><b>Dilluns:</b> biblioteca a la tarda.</li><li><b>Dimarts:</b> anglès amb el grup sencer, d’11.30 a 12.30 h; tallers, de 15 a 16.10 h.</li><li><b>Dimecres:</b> anglès amb mig grup, de 10 a 11 h; famílies a l’aula a la tarda.</li><li><b>Dijous:</b> psicomotricitat, de 9 a 10.30 h; música a la tarda.</li><li><b>Divendres:</b> tallers, de 9 a 10.30 h.</li></ul></div></details></article>
+    <article class="punt" data-cat="classe"><span class="cat">I4B · Llibres</span><h2>Materials per als espais de joc d’Infantil</h2><p>L’equip d’Infantil busca materials per millorar els espais de joc. Si en teniu a casa i ja no els feu servir, els podeu donar a l’escola.</p><details><summary>Veure els materials que es demanen</summary><div class="det">La col·laboració és <b>voluntària</b>.<ul><li><b>Càmping i cuineta:</b> cadiretes i taula, protectors del sol, caixes de fruita, cuineta i estris que no siguin de plàstic, hamaca, fanalets i llanternes.</li><li><b>Nines i biblioteca:</b> roba, bressol, jocs i complements; contes per a l’aula.</li><li><b>Tallers i construccions:</b> llistons de fusta (màxim un metre), cilindres de cartró, CD, caixes petites i teles.</li></ul></div></details></article>
+  </section>
+
+  <p>Gràcies per llegir-la. Ens veiem a la porta.<br><i>Les delegades d’I4B</i></p>
+
+  <section class="resguard" aria-labelledby="resguard"><h2 id="resguard">Resguard · Afegeix les dates al teu calendari</h2>
+    <div class="cal">
+      <a href="#"><b>Reunió del menjador</b>dl 5 oct · 17:00 h<br><small>Google Calendar · fitxer .ics</small></a>
+      <a href="#"><b>Dia festiu</b>dl 12 oct · tot el dia<br><small>Google Calendar · fitxer .ics</small></a>
+    </div>
+  </section>
+  <p class="peu"><span>Un petit tauler per estar al dia.</span><span>i4llibres.cat</span></p>
+</article>
+<script>
+const btns=[...document.querySelectorAll('.filtres button')],items=[...document.querySelectorAll('.punt')];
+function number(){let n=0;items.forEach(i=>{if(!i.hidden)i.dataset.n=(++n)+'.'})}
+btns.forEach(b=>b.addEventListener('click',()=>{const f=b.dataset.filter;btns.forEach(x=>x.setAttribute('aria-pressed',x===b));items.forEach(i=>i.hidden=f!=='tot'&&i.dataset.cat!==f);number()}));
+number();
+</script>
+</body>
+</html>

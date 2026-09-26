@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Els Llibres · La prestatgeria</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Figtree:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --paret:#f2efe6;--tinta:#1d2230;--suau:#6b6f7b;--pagina:#fffdf7;--linia:rgba(29,34,48,.14);
+  --classe:#e5a72e;--escola:#2f7a5a;--menjador:#c8543d;--calendari:#3c56a6;
+}
+:root[data-theme=fosc]{color-scheme:dark;--paret:#1b1e26;--tinta:#f1eee6;--suau:#a7abb6;--pagina:#262a35;--linia:rgba(241,238,230,.16);--classe:#f0b84a;--escola:#4a9a76;--menjador:#e06d55;--calendari:#7b8fd8}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paret);color:var(--tinta);font-family:Figtree,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.55}
+h1,h2,h3{font-family:"Baloo 2","Arial Rounded MT Bold",Arial,sans-serif;font-weight:700;margin:0;line-height:1.1;text-wrap:balance}
+a{color:inherit}
+.wrap{width:min(720px,100% - 40px);margin-inline:auto}
+@media (max-width:480px){.wrap{width:calc(100% - 32px)}}
+
+header.top{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-block:12px;flex-wrap:nowrap}
+.marca{display:flex;align-items:baseline;gap:10px;text-decoration:none;min-width:0}
+.marca b{font-family:"Baloo 2",sans-serif;font-size:24px;font-weight:800;white-space:nowrap}
+.marca span{font-size:13px;color:var(--suau);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:560px){.marca span{display:none}}
+.eines{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.idioma{position:relative}
+.idioma summary{list-style:none;cursor:pointer;font-weight:600;font-size:14px;padding:0 10px 0 12px;border:1.5px solid var(--linia);border-radius:8px;min-height:40px;display:inline-flex;align-items:center;gap:5px}
+.idioma summary::-webkit-details-marker{display:none}
+.idioma summary::after{content:"";width:7px;height:7px;border-right:1.8px solid currentColor;border-bottom:1.8px solid currentColor;transform:rotate(45deg);margin-top:-4px}
+.idioma[open] summary::after{transform:rotate(-135deg);margin-top:3px}
+.idioma nav{position:absolute;right:0;left:auto;top:calc(100% + 6px);z-index:20;min-width:150px;padding:6px;background:var(--pagina);border:1px solid var(--linia);border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.15);display:grid}
+.idioma nav a{text-decoration:none;font-size:14px;padding:10px;border-radius:6px;min-height:40px;display:flex;align-items:center}
+.idioma nav a[aria-current],.idioma nav a:hover{background:var(--paret)}
+#tema{font:inherit;cursor:pointer;color:var(--suau);background:transparent;border:0;border-radius:50%;width:40px;height:40px;display:grid;place-items:center}
+#tema:hover{color:var(--tinta)}
+#tema svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#tema .sol{display:none}
+[data-theme=fosc] #tema .sol{display:block}
+[data-theme=fosc] #tema .lluna{display:none}
+.hero{padding-block:14px 24px}
+.hero h1{font-size:clamp(30px,5vw,44px);max-width:640px}
+.hero p{font-size:18px;color:var(--suau);margin:8px 0 0;max-width:520px}
+
+.dates{background:var(--pagina);border-radius:10px;padding:18px 18px 8px;box-shadow:0 4px 12px rgba(0,0,0,.08);margin-bottom:36px}
+.dates h2{font-size:22px;margin-bottom:6px}
+.data{--c:var(--classe);display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;padding:12px 0;border-top:1px dashed var(--linia);text-decoration:none;min-height:56px;-webkit-tap-highlight-color:transparent}
+.data[data-cat=menjador]{--c:var(--menjador)}.data[data-cat=calendari]{--c:var(--calendari)}.data[data-cat=escola]{--c:var(--escola)}
+.data .num{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:32px;line-height:1;text-align:center;color:var(--c);font-variant-numeric:tabular-nums}
+.data .num small{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+.data .txt{min-width:0}
+.data b{font-weight:700;font-size:16px;display:block;line-height:1.3}
+.data b small{font-weight:400;font-size:14px;color:var(--suau);margin-left:6px}
+.data span{font-size:15px;display:block;margin-top:1px}
+.data .fletxa{width:9px;height:9px;border-right:2px solid var(--suau);border-top:2px solid var(--suau);transform:rotate(45deg);margin-right:6px}
+@media (hover:hover){.data:hover span{text-decoration:underline;text-underline-offset:3px}}
+.data:focus-visible{outline:3px solid var(--calendari);outline-offset:2px;border-radius:6px}
+.dates .mes{display:block;padding:12px 0 6px;border-top:1px dashed var(--linia);font-size:14px}
+
+.avisos h2{font-size:26px;margin-bottom:8px}
+.filtres{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 18px}
+.filtres button{font:inherit;font-weight:600;font-size:14px;border:1.5px solid var(--linia);background:transparent;color:var(--tinta);border-radius:20px;padding:6px 14px 6px 10px;min-height:40px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.filtres button[data-filter=tot]{padding-left:14px}
+.filtres button i{width:10px;height:10px;border-radius:50%;background:var(--punt);flex-shrink:0}
+.filtres button[aria-pressed=true]{background:var(--tinta);color:var(--paret);border-color:var(--tinta)}
+.filtres button:focus-visible,summary:focus-visible,#tema:focus-visible,.idioma a:focus-visible{outline:3px solid var(--calendari);outline-offset:2px}
+.avis{display:grid;grid-template-columns:10px 1fr;background:var(--pagina);border-radius:4px 10px 10px 4px;margin-bottom:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);overflow:hidden}
+.avis .llom{background:var(--classe)}
+.avis[data-cat=escola] .llom{background:var(--escola)}.avis[data-cat=menjador] .llom{background:var(--menjador)}.avis[data-cat=calendari] .llom{background:var(--calendari)}
+.avis .cos{padding:16px 18px 10px}
+.avis .cat{font-size:13px;font-weight:600;color:var(--suau);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.xip{--c:var(--classe);font-size:11.5px;font-weight:700;line-height:1.3;color:var(--c);border:1px solid var(--c);border-radius:12px;padding:1px 7px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.avis[data-cat=menjador] .xip{--c:var(--menjador)}.avis[data-cat=calendari] .xip{--c:var(--calendari)}.avis[data-cat=escola] .xip{--c:var(--escola)}
+.avis.ressalta{box-shadow:0 0 0 2px var(--c,var(--classe))}
+.avis[data-cat=menjador]{--c:var(--menjador)}.avis[data-cat=calendari]{--c:var(--calendari)}.avis[data-cat=escola]{--c:var(--escola)}
+@media (prefers-reduced-motion:no-preference){.avis{transition:box-shadow .4s}html{scroll-behavior:smooth}}
+.avis{scroll-margin-top:16px}
+.avis h3{font-size:22px;margin:8px 0 6px}
+.avis p{margin:0}
+.avis details{margin-top:6px}
+summary{cursor:pointer;list-style:none;font-weight:600;font-size:15px;min-height:40px;display:inline-flex;align-items:center;gap:8px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-4px}
+details[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.det{font-size:15px;padding:2px 0 8px}
+.det ul{margin:6px 0;padding-left:20px}
+.det .cal a{display:inline-block;font-size:13px;font-weight:600;text-decoration:none;padding:4px 10px;border-radius:14px;border:1.5px solid currentColor;margin:6px 6px 0 0;min-height:32px}
+.pagines{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:320px;margin:6px 0 10px}
+.pagines figure{margin:0;font-size:13px;text-align:center;font-weight:600}
+.pagines .ph{aspect-ratio:1/2;background:var(--paret);border-radius:3px;margin-bottom:4px}
+.buit{display:none;color:var(--suau);padding:20px 0}
+footer{padding-block:36px 40px;color:var(--suau);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+</style>
+<script>
+(()=>{let t;try{t=localStorage.getItem('llibres-theme')}catch{}document.documentElement.dataset.theme=['clar','fosc'].includes(t)?t:(matchMedia('(prefers-color-scheme: dark)').matches?'fosc':'clar')})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="marca" href="#"><b>Els Llibres</b><span>I4B · Escola La Mar Bella · Curs 2026–27</span></a>
+    <div class="eines">
+      <details class="idioma"><summary aria-label="Idioma / Language">CA</summary><nav aria-label="Idioma / Language"><a href="#" aria-current="page">Català</a><a href="#">Castellano</a><a href="#">English</a></nav></details>
+      <button id="tema" aria-label="Activa el mode fosc" data-dark="Activa el mode fosc" data-light="Activa el mode clar">
+        <svg class="lluna" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>
+        <svg class="sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero"><h1>Les coses que ens importen.</h1><p>Els avisos de la classe i de l’escola, junts perquè no se’ns escapi res.</p></section>
+
+  <section class="dates" aria-labelledby="dates-t">
+    <h2 id="dates-t">Properes dates</h2>
+    <a class="data" data-cat="menjador" href="#a2"><span class="num">5<small>oct</small></span><span class="txt"><b>17:00–18:00 h<small>dilluns</small></b><span>Reunió del menjador</span></span><span class="fletxa" aria-hidden="true"></span></a>
+    <a class="data" data-cat="calendari" href="#a3"><span class="num">12<small>oct</small></span><span class="txt"><b>Tot el dia<small>dilluns</small></b><span>Dia festiu, no hi ha classe</span></span><span class="fletxa" aria-hidden="true"></span></a>
+    <a class="mes" href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer">Calendari escolar 2026–27 complet</a>
+  </section>
+
+  <section class="avisos" aria-labelledby="avisos-t">
+    <h2 id="avisos-t">Els avisos</h2>
+    <div class="filtres" role="group" aria-label="Filtra els avisos">
+      <button data-filter="tot" aria-pressed="true">Tots</button>
+      <button data-filter="classe" aria-pressed="false" style="--punt:var(--classe)"><i aria-hidden="true"></i>I4B · Llibres</button>
+      <button data-filter="escola" aria-pressed="false" style="--punt:var(--escola)"><i aria-hidden="true"></i>Tota l’escola</button>
+      <button data-filter="menjador" aria-pressed="false" style="--punt:var(--menjador)"><i aria-hidden="true"></i>Menjador</button>
+      <button data-filter="calendari" aria-pressed="false" style="--punt:var(--calendari)"><i aria-hidden="true"></i>Calendari</button>
+    </div>
+
+    <article class="avis" id="a1" data-cat="classe"><div class="llom"></div><div class="cos"><div class="cat"><span>I4B · Llibres</span></div><h3>La presentació de la reunió i les inscripcions ja estan disponibles</h3><p>Al correu de la Sandra del 25 de setembre trobareu la presentació i les graelles per apuntar-vos a les activitats en família i a les entrevistes.</p><details><summary>Consulta el correu de la tutora</summary><div class="det">Busqueu el correu <b>«Informacions reunions famílies»</b>, enviat el <b>25 de setembre</b>:<ul><li>La presentació de la reunió d’I4.</li><li>La graella d’<b>activitats en família</b>.</li><li>La graella per reservar les <b>entrevistes</b>.</li></ul></div></details></div></article>
+    <article class="avis" id="a2" data-cat="menjador"><div class="llom"></div><div class="cos"><div class="cat"><span>Menjador</span><span class="xip">dl 5 oct · 17 h</span></div><h3>Reunió del menjador: 5 d’octubre a les 17 h</h3><p>Menjadors Biosca presentarà el servei, el projecte nutricional i la proposta educativa de l’espai migdia. Hi haurà temps per resoldre dubtes.</p><details><summary>17 h · Menjador de l’escola</summary><div class="det">Hi haurà <b>servei d’acollida per als infants</b> durant la reunió. Si el necessiteu, empleneu el formulari d’acollida per ajudar a organitzar-lo.<div class="cal"><a href="#">Google Calendar</a><a href="#">Apple, Outlook i altres (.ics)</a></div></div></details></div></article>
+    <article class="avis" id="a3" data-cat="calendari"><div class="llom"></div><div class="cos"><div class="cat"><span>Calendari</span><span class="xip">dl 12 oct · tot el dia</span></div><h3>Dilluns 12 d’octubre, dia festiu</h3><p>El pròxim dia festiu del calendari escolar és dilluns 12 d’octubre. Tingueu-lo present per organitzar-vos en família.</p><details><summary>Consultar el calendari escolar</summary><div class="det">És festiu estatal i <b>no hi haurà classe</b>. Tots els festius són al <a href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer">calendari oficial de l’escola</a>.<div class="cal"><a href="#">Google Calendar</a><a href="#">Apple, Outlook i altres (.ics)</a></div></div></details></div></article>
+    <article class="avis" id="a4" data-cat="classe"><div class="llom"></div><div class="cos"><div class="cat"><span>I4B · Llibres</span></div><h3>Què fem cada dia? L’horari dels Llibres</h3><p>Biblioteca, anglès, tallers, psicomotricitat i música: les activitats d’I4B al llarg de la setmana.</p><details><summary>Veure i descarregar els horaris</summary><div class="det"><div class="pagines"><figure><div class="ph"></div>Horari en llista</figure><figure><div class="ph"></div>Horari per dies</figure></div><ul><li><b>Dilluns:</b> biblioteca a la tarda.</li><li><b>Dimarts:</b> anglès 11.30–12.30 h; tallers 15–16.10 h.</li><li><b>Dimecres:</b> anglès mig grup 10–11 h; famílies a l’aula.</li><li><b>Dijous:</b> psicomotricitat 9–10.30 h; música a la tarda.</li><li><b>Divendres:</b> tallers 9–10.30 h.</li></ul></div></details></div></article>
+    <article class="avis" id="a5" data-cat="classe"><div class="llom"></div><div class="cos"><div class="cat"><span>I4B · Llibres</span></div><h3>Materials per als espais de joc d’Infantil</h3><p>L’equip d’Infantil busca materials per millorar els espais de joc. Si en teniu a casa i ja no els feu servir, els podeu donar a l’escola.</p><details><summary>Veure els materials que es demanen</summary><div class="det">La col·laboració és <b>voluntària</b>.<ul><li>Cadiretes i taula de càmping, protectors del sol i caixes de fruita.</li><li>Cuineta i estris que no siguin de plàstic; hamaca, fanalets i llanternes.</li><li>Roba, bressol i complements per a les nines; contes per a la biblioteca.</li><li>Llistons de fusta (màxim un metre), cilindres de cartró, CD, caixes petites i teles.</li></ul></div></details></div></article>
+    <p class="buit" id="buit">No hi ha avisos d’aquesta categoria.</p>
+  </section>
+
+  <footer><span>Un petit tauler per estar al dia.</span><span>Preparat amb cura per les delegades d’I4B.</span></footer>
+</div>
+<script>
+const btns=[...document.querySelectorAll('.filtres button')],cards=[...document.querySelectorAll('.avis')],buit=document.getElementById('buit');
+btns.forEach(b=>b.addEventListener('click',()=>{const f=b.dataset.filter;btns.forEach(x=>x.setAttribute('aria-pressed',x===b));let n=0;cards.forEach(c=>{c.hidden=f!=='tot'&&c.dataset.cat!==f;if(!c.hidden)n++});buit.style.display=n?'none':'block'}));
+document.querySelectorAll('.data[href^="#"]').forEach(l=>l.addEventListener('click',e=>{const c=document.querySelector(l.getAttribute('href'));if(!c)return;e.preventDefault();if(c.hidden)btns[0].click();c.querySelector('details').open=true;l.blur();c.scrollIntoView({block:'start'});c.classList.add('ressalta');c.querySelector('summary').focus({preventScroll:true});setTimeout(()=>c.classList.remove('ressalta'),2500)}));
+const idioma=document.querySelector('.idioma');
+idioma.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();idioma.querySelectorAll('nav a').forEach(x=>x.removeAttribute('aria-current'));a.setAttribute('aria-current','page');idioma.querySelector('summary').textContent={'Català':'CA','Castellano':'ES','English':'EN'}[a.textContent];idioma.open=false}));
+document.addEventListener('click',e=>{if(!idioma.contains(e.target))idioma.open=false});
+const tema=document.getElementById('tema');
+function etiqueta(){tema.setAttribute('aria-label',document.documentElement.dataset.theme==='fosc'?tema.dataset.light:tema.dataset.dark)}
+etiqueta();
+tema.addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='fosc'?'clar':'fosc';document.documentElement.dataset.theme=t;try{localStorage.setItem('llibres-theme',t)}catch{}etiqueta()});
+</script>
+</body>
+</html>

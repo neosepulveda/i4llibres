@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Els Llibres Variants</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,700;1,400&family=Figtree:wght@400;600&display=swap">
+<style>
+:root{color-scheme:light;--bg:#f1f2ee;--card:#ffffff;--ink:#1f2622;--muted:#5f6a63;--line:#d3d9d2;--accent:#205c50;
+  --c1:#c99a63;--c2:#008bcb;--c3:#fbf9f1;--c4:#ffffff;--c5:#e5a72e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#151a18;--card:#1f2724;--ink:#eef1ea;--muted:#a9b5ad;--line:#33403a;--accent:#b7d9aa}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151a18;--card:#1f2724;--ink:#eef1ea;--muted:#a9b5ad;--line:#33403a;--accent:#b7d9aa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.55;padding:32px 20px 48px}
+main{max-width:880px;margin-inline:auto}
+h1{font-family:Alegreya,Georgia,serif;font-weight:700;font-size:clamp(30px,5vw,44px);line-height:1.1;margin:0 0 10px;text-wrap:balance}
+.lead{color:var(--muted);max-width:60ch;margin:0 0 28px}
+.lead a{color:var(--ink)}
+ol{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+li{display:grid;grid-template-columns:96px 1fr;background:var(--card);border:1px solid var(--line);overflow:hidden;border-radius:4px}
+.swatch{display:grid;place-items:center;font-family:Alegreya,serif;font-weight:700;font-size:28px}
+.txt{padding:16px 18px}
+h2{font-family:Alegreya,Georgia,serif;font-size:24px;margin:0 0 4px;line-height:1.15}
+h2 a{color:inherit;text-decoration:none}
+h2 a:hover{text-decoration:underline;text-underline-offset:3px}
+h2 a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.txt p{margin:0;color:var(--muted);font-size:15px}
+.txt small{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
+.txt small b{color:var(--ink);font-weight:600}
+@media (max-width:480px){li{grid-template-columns:1fr}.swatch{height:56px}}
+.note{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;max-width:70ch}
+</style>
+</head>
+<body>
+<main>
+<h1>Five directions for the Els Llibres noticeboard</h1>
+<p class="lead">Working prototypes with the real notices and dates from <a href="https://i4llibres.cat/" target="_blank" rel="noopener noreferrer">i4llibres.cat</a>, in Catalan only. Each one takes its look from something families already recognise. Filters and expandable details work; calendar links are placeholders.</p>
+<ol>
+  <li><a class="swatch" style="background:var(--c1);color:#2a2420" href="01-el-suro.html" aria-hidden="true" tabindex="-1">1</a><div class="txt"><h2><a href="01-el-suro.html">El suro</a></h2><p>The corridor cork board: coloured paper notes held by drawing pins, headlines in the stick-letter handwriting I4 children learn, index cards for the upcoming dates.</p><small><b>Type:</b> Patrick Hand and Atkinson Hyperlegible. <b>Risk:</b> the tilt and pins carry the whole idea, so everything else stays plain.</small></div></li>
+  <li><a class="swatch" style="background:var(--c2);color:#fff" href="02-la-mar-bella.html" aria-hidden="true" tabindex="-1">2</a><div class="txt"><h2><a href="02-la-mar-bella.html">La Mar Bella</a></h2><p>The school's own website, tidied: Poppins and Lato, the school blue in full-width bands, the wave divider, the circular M badge, flat outline icons and capitalised buttons.</p><small><b>Type:</b> Poppins and Lato, as on lamarbella.cat. <b>Risk:</b> it reads as official, which may be a feature or a problem.</small></div></li>
+  <li><a class="swatch" style="background:var(--c3);color:#1c2b4a;border-right:1px solid var(--line)" href="03-l-agenda.html" aria-hidden="true" tabindex="-1">3</a><div class="txt"><h2><a href="03-l-agenda.html">L’agenda</a></h2><p>The school diary: ruled paper with a red margin, everything in one chronological column grouped by week, and the category filters as the coloured index tabs on the page edge.</p><small><b>Type:</b> Zilla Slab and Karla. <b>Risk:</b> chronology first means undated notices need a label like "cada setmana".</small></div></li>
+  <li><a class="swatch" style="background:var(--c4);color:#b8322a;border-right:1px solid var(--line)" href="04-la-circular.html" aria-hidden="true" tabindex="-1">4</a><div class="txt"><h2><a href="04-la-circular.html">La circular</a></h2><p>The photocopied letter that comes home in the backpack: one A4 column, "Benvolgudes famílies", a red date stamp, numbered points, a typewritten box of dates, and a tear-off slip for calendar actions.</p><small><b>Type:</b> Alegreya and Courier Prime. <b>Risk:</b> the quietest of the five, and the most readable.</small></div></li>
+  <li><a class="swatch" style="background:var(--c5);color:#1d2230" href="05-la-prestatgeria.html" aria-hidden="true" tabindex="-1">5</a><div class="txt"><h2><a href="05-la-prestatgeria.html">La prestatgeria</a></h2><p>Revised after review: dates box first, one column of notices with a thin colour spine, colour dots in the filter tabs, and a sun and moon theme toggle. The bookshelf is gone.</p><small><b>Type:</b> Baloo 2 and Figtree. <b>Status:</b> the working direction.</small></div></li>
+</ol>
+<p class="note">Every page works at 320px and 390px, keeps 44px tap targets, uses native details elements for expanding, and shows visible keyboard focus. Only the bookshelf includes a dark theme; the paper-based directions commit to a single look on purpose.</p>
+</main>
+</body>
+</html>

@@ -24,6 +24,7 @@ test('Markdown content, category filtering and empty filter recovery',async({pag
   await page.goto('http://127.0.0.1:4323');
   await expect(page.locator('.notice')).toHaveCount(2);
   await expect(page.locator('.notice h2')).toHaveText(['Avís d’escola de prova', 'Avís de classe de prova']);
+  await expect(page.getByRole('button',{name:'Calendari',exact:true})).toHaveCount(0);
   await page.getByRole('button',{name:'I4B · Llibres',exact:true}).click();
   await expect(page.locator('.notice:visible')).toHaveCount(1);
   await expect(page.locator('.notice-count')).toHaveText('1 avís');
@@ -60,10 +61,14 @@ test('calendar controls are opt-in and provide a real downloadable event',async(
  await page.locator('.notice.classe .calendar-actions summary').click();
  const google=page.getByRole('link',{name:'Google Calendar'});
  await expect(google).toHaveAttribute('target','_blank');
+ const downloadLink=page.getByRole('link',{name:/Apple Calendar, Outlook/});
+ const googleBox=await google.boundingBox();
+ const downloadBox=await downloadLink.boundingBox();
+ expect(Math.abs(googleBox!.height-downloadBox!.height)).toBeLessThan(1);
  const params=new URL((await google.getAttribute('href'))!).searchParams;
  expect(params.get('dates')).toBe('20261005T150000Z/20261005T160000Z');
  const download=page.waitForEvent('download');
- await page.getByRole('link',{name:/Apple Calendar, Outlook/}).click();
+ await downloadLink.click();
  expect((await download).suggestedFilename()).toBe('class.ics');
  const response=await page.request.get('http://127.0.0.1:4323/calendar/class.ics');
  expect(response.ok()).toBe(true);expect(await response.text()).toContain('DTEND:20261005T160000Z');
@@ -89,26 +94,38 @@ test('timetable images load, open separately and download their originals',async
 });
 
 for (const width of [320,390]) {
- test(`upcoming dates expand and export on phones at ${width}px`,async({page})=>{
+ test(`upcoming dates open their notices and export on phones at ${width}px`,async({page})=>{
   await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
   await page.setViewportSize({width,height:844});
   await page.goto('http://127.0.0.1:4323');
   const rows=page.locator('.upcoming-event:visible');
   await expect(rows).toHaveCount(2);
-  await expect(rows.first().locator('.upcoming-text>strong')).toHaveText('Avís de classe de prova');
-  await rows.first().locator('summary').click();
-  await expect(rows.first().getByRole('link',{name:'Google Calendar'})).toBeVisible();
+  await expect(rows.first().locator('.upcoming-day strong')).toHaveText('5');
+  await expect(rows.first().locator('.upcoming-when')).toContainText('17:00–18:00 h');
+  await expect(rows.first().locator('.upcoming-when small')).toHaveText('dilluns');
+  await expect(rows.first().locator('.upcoming-title')).toHaveText('Avís de classe de prova');
+  await page.getByRole('button',{name:'Menjador',exact:true}).click();
+  await expect(rows).toHaveCount(2);
+  await rows.first().click();
+  const card=page.locator('#avis-class');
+  await expect(card).toBeVisible();
+  await expect(page.getByRole('button',{name:'Tots els avisos'})).toHaveAttribute('aria-pressed','true');
+  await expect(card.locator('details').first()).toHaveAttribute('open','');
+  await expect(card.locator('.chip')).toHaveText('dl 5 oct · 17:00 h');
+  await card.locator('.calendar-actions summary').click();
+  await expect(card.getByRole('link',{name:'Google Calendar'})).toBeVisible();
   const download=page.waitForEvent('download');
-  await rows.first().getByRole('link',{name:/Apple Calendar/}).click();
+  await card.getByRole('link',{name:/Apple Calendar/}).click();
   expect((await download).suggestedFilename()).toBe('class.ics');
-  await rows.nth(1).locator('summary').click();
-  const holiday=await rows.nth(1).getByRole('link',{name:'Google Calendar'}).getAttribute('href');
+  await rows.nth(1).click();
+  const school=page.locator('#avis-school');
+  await expect(school.locator('.chip')).toHaveText('dl 12 oct · tot el dia');
+  await school.locator('.calendar-actions summary').click();
+  const holiday=await school.getByRole('link',{name:'Google Calendar'}).getAttribute('href');
   expect(new URL(holiday!).searchParams.get('dates')).toBe('20261012/20261013');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.getByRole('button',{name:/Activa el mode/}).click();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await page.getByRole('button',{name:'Menjador',exact:true}).click();
-  await expect(rows).toHaveCount(2);
  });
 }
 test('past dates expire in Barcelona time, including all-day holidays',async({page})=>{
@@ -123,11 +140,14 @@ test('past dates expire in Barcelona time, including all-day holidays',async({pa
  await expect(page.locator('.upcoming')).toBeHidden();
  await expect(page.locator('.useful-links')).toBeVisible();
 });
-test('upcoming dates can be expanded and exported without JavaScript',async({browser})=>{
+test('upcoming dates reach their notice and export without JavaScript',async({browser})=>{
  const context=await browser.newContext({javaScriptEnabled:false});
  const page=await context.newPage();await page.goto('http://127.0.0.1:4323');
- await page.locator('.upcoming-event').first().locator('summary').click();
- await expect(page.locator('.upcoming-event').first().getByRole('link',{name:/Apple Calendar/})).toBeVisible();
+ await expect(page.locator('.upcoming-event').first()).toHaveAttribute('href','#avis-class');
+ await page.locator('.upcoming-event').first().click();
+ await expect(page).toHaveURL(/#avis-class$/);
+ await page.locator('#avis-class .calendar-actions summary').click();
+ await expect(page.locator('#avis-class').getByRole('link',{name:/Apple Calendar/})).toBeVisible();
  await context.close();
 });
 
@@ -158,8 +178,9 @@ test('translated exports and language navigation work without JavaScript',async(
  const context=await browser.newContext({javaScriptEnabled:false});
  const page=await context.newPage();
  await page.goto('http://127.0.0.1:4323/en/');
- await page.locator('.upcoming-event').first().locator('summary').click();
- const event=page.locator('.upcoming-event').first();
+ await expect(page.locator('.upcoming-event').first().locator('.upcoming-when')).toContainText('17:00–18:00');
+ const event=page.locator('#avis-class');
+ await event.locator('.calendar-actions summary').click();
  const google=new URL((await event.getByRole('link',{name:'Google Calendar'}).getAttribute('href'))!);
  expect(google.searchParams.get('text')).toBe('Test meeting');
  await expect(event.getByRole('link',{name:/Apple Calendar/})).toHaveAttribute('href','/en/calendar/class.ics');

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Els Llibres · L’agenda</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,500;0,600;1,500&family=Karla:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root{
+  --taula:#3d4a5c;--paper:#fbf9f1;--ratlla:#c5d8e8;--marge:#d64545;--boli:#1c2b4a;--llapis:#6d6a5c;--marca:#f3e79a;
+  --classe:#e9b400;--escola:#2a7f62;--menjador:#e0672b;--calendari:#4b63c9;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--taula);color:var(--boli);font-family:Karla,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:24px;padding:0 0 40px}
+h1,h2,h3{font-family:"Zilla Slab",Georgia,serif;font-weight:600;margin:0;line-height:1.15;text-wrap:balance}
+a{color:var(--boli)}
+.llibreta{position:relative;max-width:840px;margin:24px auto 0;background:var(--paper);box-shadow:0 12px 30px rgba(0,0,0,.45);
+  background-image:repeating-linear-gradient(0deg,transparent 0 23px,var(--ratlla) 23px 24px);background-position:0 12px}
+.llibreta::before{content:"";position:absolute;top:0;bottom:0;left:64px;width:2px;background:var(--marge);opacity:.75}
+.llibreta::after{content:"";position:absolute;top:0;bottom:0;left:0;width:18px;background:repeating-linear-gradient(0deg,transparent 0 30px,rgba(0,0,0,.25) 30px 40px);opacity:.35}
+@media (max-width:520px){.llibreta{margin-top:0}.llibreta::before{left:44px}}
+.pag{padding:36px 40px 40px 84px}
+@media (max-width:520px){.pag{padding:28px 18px 32px 58px}}
+
+.tabs{position:absolute;right:-14px;top:110px;display:flex;flex-direction:column;gap:10px;z-index:2}
+.tabs button{writing-mode:vertical-rl;font:inherit;font-weight:600;font-size:13px;letter-spacing:.3px;border:0;color:#fff;padding:14px 8px;cursor:pointer;border-radius:0 6px 6px 0;box-shadow:2px 2px 4px rgba(0,0,0,.3);min-width:32px;opacity:.72}
+.tabs button[aria-pressed=true]{opacity:1;transform:translateX(4px)}
+.tabs button:focus-visible{outline:3px solid var(--marca);outline-offset:2px}
+.tabs .tot{background:var(--boli)}.tabs .classe{background:var(--classe);color:var(--boli)}.tabs .escola{background:var(--escola)}.tabs .menjador{background:var(--menjador)}.tabs .calendari{background:var(--calendari)}
+@media (max-width:900px){.tabs{position:static;flex-direction:row;flex-wrap:wrap;gap:6px;margin:0 0 24px}.tabs button{writing-mode:horizontal-tb;padding:8px 12px;border-radius:6px;min-height:40px}.tabs button[aria-pressed=true]{transform:none}}
+
+.cap{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:2px solid var(--boli);padding-bottom:8px;margin-bottom:24px}
+.cap h1{font-size:34px;font-style:italic}
+.cap h1 small{display:block;font-style:normal;font-size:15px;font-weight:500;color:var(--llapis)}
+.idioma{display:flex;gap:14px;font-size:14px}
+.idioma a{text-decoration:none;color:var(--llapis)}
+.idioma a[aria-current]{color:var(--boli);font-weight:600;border-bottom:2px solid var(--marge)}
+
+.setmana{margin-bottom:26px}
+.setmana h2{font-size:17px;font-weight:500;font-style:italic;color:var(--llapis);margin-bottom:8px}
+.entrada{display:grid;grid-template-columns:64px 1fr;gap:14px;padding:6px 0 10px;border-bottom:1px solid transparent}
+.entrada .data{font-family:"Zilla Slab",serif;font-weight:600;line-height:1;color:var(--marge);padding-top:2px}
+.entrada .data b{font-size:36px;font-weight:600;display:block}
+.entrada .data span{font-size:13px;text-transform:uppercase;letter-spacing:1px}
+.entrada .data.avui{color:var(--boli)}
+.entrada h3{font-size:22px}
+.entrada .meta{font-size:14px;color:var(--llapis);margin:0 0 2px}
+.entrada p{margin:0}
+.entrada .cat{display:inline-block;font-size:12px;font-weight:600;padding:0 6px;line-height:20px;border-radius:3px;color:#fff;vertical-align:2px;margin-left:6px}
+.cat.classe{background:var(--classe);color:var(--boli)}.cat.escola{background:var(--escola)}.cat.menjador{background:var(--menjador)}.cat.calendari{background:var(--calendari)}
+.entrada details{margin-top:4px}
+summary{cursor:pointer;list-style:none;font-weight:600;font-size:15px;min-height:36px;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(transparent 40%,var(--marca) 40%,var(--marca) 90%,transparent 90%);padding:0 4px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"☐";font-size:15px}
+details[open] summary::before{content:"☑"}
+summary:focus-visible{outline:3px solid var(--calendari);outline-offset:2px}
+.det{padding-top:4px;font-size:15px;line-height:24px}
+.det ul{margin:0;padding-left:20px}
+.det .cal{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.det .cal a{font-size:14px;font-weight:600;padding:2px 10px;border:1.5px solid var(--boli);border-radius:14px;text-decoration:none;line-height:20px}
+.horaris{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 8px;max-width:360px}
+.horaris figure{margin:0;font-size:13px;text-align:center;font-style:italic}
+.horaris .ph{aspect-ratio:1/2;background:#fff;border:1px solid var(--ratlla);transform:rotate(-1.5deg);margin-bottom:4px}
+.horaris figure:last-child .ph{transform:rotate(1.2deg)}
+.enllacos{margin-top:30px;font-size:14px;color:var(--llapis)}
+.enllacos a{color:var(--boli)}
+.enllacos b{color:var(--boli)}
+.buit{display:none;font-style:italic;color:var(--llapis)}
+.buit:only-child{display:block}
+</style>
+</head>
+<body>
+<div class="llibreta">
+  <div class="pag">
+    <header class="cap">
+      <h1>Agenda dels Llibres<small>I4B · Escola La Mar Bella · Curs 2026–27</small></h1>
+      <nav class="idioma" aria-label="Idioma"><a href="#" aria-current="page">Català</a><a href="#">Castellano</a><a href="#">English</a></nav>
+    </header>
+
+    <div class="tabs" role="group" aria-label="Filtra els avisos"><button class="tot" data-filter="tot" aria-pressed="true">Tot</button><button class="classe" data-filter="classe" aria-pressed="false">I4B · Llibres</button><button class="escola" data-filter="escola" aria-pressed="false">Tota l’escola</button><button class="menjador" data-filter="menjador" aria-pressed="false">Menjador</button><button class="calendari" data-filter="calendari" aria-pressed="false">Calendari</button></div>
+
+    <section class="setmana" aria-labelledby="s1">
+      <h2 id="s1">Aquesta setmana · del 28 de setembre al 4 d’octubre</h2>
+      <article class="entrada" data-cat="classe"><div class="data avui"><b>25</b><span>set</span></div><div><h3>La presentació de la reunió i les inscripcions ja estan disponibles<span class="cat classe">I4B</span></h3><p class="meta">Correu de la Sandra, tutora</p><p>Hi trobareu la presentació i les graelles per apuntar-vos a les activitats en família i a les entrevistes.</p><details><summary>Consulta el correu de la tutora</summary><div class="det">Busqueu el correu <b>«Informacions reunions famílies»</b> del 25 de setembre:<ul><li>La presentació de la reunió d’I4.</li><li>La graella d’<b>activitats en família</b>.</li><li>La graella per reservar les <b>entrevistes</b>.</li></ul></div></details></div></article>
+      <article class="entrada" data-cat="classe"><div class="data"><b>—</b><span>cada setmana</span></div><div><h3>Què fem cada dia? L’horari dels Llibres<span class="cat classe">I4B</span></h3><p>Biblioteca, anglès, tallers, psicomotricitat i música al llarg de la setmana.</p><details><summary>Veure i descarregar els horaris</summary><div class="det"><div class="horaris"><figure><div class="ph"></div>Horari en llista</figure><figure><div class="ph"></div>Horari per dies</figure></div><ul><li><b>Dilluns:</b> biblioteca a la tarda.</li><li><b>Dimarts:</b> anglès 11.30–12.30 h; tallers 15–16.10 h.</li><li><b>Dimecres:</b> anglès mig grup 10–11 h; famílies a l’aula a la tarda.</li><li><b>Dijous:</b> psicomotricitat 9–10.30 h; música a la tarda.</li><li><b>Divendres:</b> tallers 9–10.30 h.</li></ul></div></details></div></article>
+      <article class="entrada" data-cat="classe"><div class="data"><b>—</b><span>quan pugueu</span></div><div><h3>Materials per als espais de joc d’Infantil<span class="cat classe">I4B</span></h3><p>L’equip d’Infantil busca materials per millorar els espais de joc. Si en teniu a casa i ja no els feu servir, els podeu donar a l’escola.</p><details><summary>Veure els materials que es demanen</summary><div class="det">La col·laboració és <b>voluntària</b>.<ul><li>Cadiretes i taula de càmping, protectors del sol i caixes grans de fruita.</li><li>Una cuineta i estris que no siguin de plàstic; fanalets i llanternes.</li><li>Roba, bressol i complements per a les nines; contes per a la biblioteca.</li><li>Llistons de fusta (màxim un metre), cilindres de cartró, CD, caixes petites i teles.</li></ul></div></details></div></article>
+    </section>
+
+    <section class="setmana" aria-labelledby="s2">
+      <h2 id="s2">Setmana següent · del 5 a l’11 d’octubre</h2>
+      <article class="entrada" data-cat="menjador"><div class="data"><b>5</b><span>oct · dl</span></div><div><h3>Reunió del menjador<span class="cat menjador">Menjador</span></h3><p class="meta">17:00–18:00 h · Menjador de l’escola</p><p>Menjadors Biosca presentarà el servei, el projecte nutricional i la proposta educativa de l’espai migdia. Hi haurà temps per resoldre dubtes.</p><details><summary>Afegeix-ho al calendari</summary><div class="det">Hi haurà <b>servei d’acollida per als infants</b> durant la reunió; si el necessiteu, empleneu el formulari d’acollida.<div class="cal"><a href="#">Google Calendar</a><a href="#">Apple, Outlook i altres (.ics)</a></div></div></details></div></article>
+    </section>
+
+    <section class="setmana" aria-labelledby="s3">
+      <h2 id="s3">Del 12 al 18 d’octubre</h2>
+      <article class="entrada" data-cat="calendari"><div class="data"><b>12</b><span>oct · dl</span></div><div><h3>Dia festiu<span class="cat calendari">Calendari</span></h3><p class="meta">Tot el dia · No hi ha classe</p><p>Festiu estatal segons el calendari del curs 2026–27. Tingueu-lo present per organitzar-vos en família.</p><details><summary>Afegeix-ho al calendari</summary><div class="det">Tots els festius i dies de lliure disposició són al <a href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer">calendari oficial de l’escola</a>.<div class="cal"><a href="#">Google Calendar</a><a href="#">Apple, Outlook i altres (.ics)</a></div></div></details></div></article>
+    </section>
+
+    <p class="enllacos"><b>Enllaços útils:</b> <a href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer">Calendari escolar 2026–27</a> · <a href="https://lamarbella.cat/" target="_blank" rel="noopener noreferrer">Web de l’escola</a><br>Un petit tauler per estar al dia. Preparat amb cura per les delegades d’I4B.</p>
+  </div>
+</div>
+<script>
+const btns=[...document.querySelectorAll('.tabs button')],rows=[...document.querySelectorAll('.entrada')],weeks=[...document.querySelectorAll('.setmana')];
+btns.forEach(b=>b.addEventListener('click',()=>{const f=b.dataset.filter;btns.forEach(x=>x.setAttribute('aria-pressed',x===b));rows.forEach(r=>r.hidden=f!=='tot'&&r.dataset.cat!==f);weeks.forEach(w=>w.hidden=!w.querySelector('.entrada:not([hidden])'))}));
+</script>
+</body>
+</html>

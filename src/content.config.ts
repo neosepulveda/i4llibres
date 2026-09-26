@@ -10,7 +10,7 @@ const notices = defineCollection({
   schema: z.object({
     title: z.string().min(1),
     description: z.string().min(1),
-    category: z.enum(['classe', 'escola', 'menjador', 'calendari']),
+    category: z.enum(['classe', 'escola', 'menjador', 'afa']),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     note: z.string().optional(),
     images: z.array(z.object({

@@ -16,8 +16,9 @@ Daily/weekly recaps, a CMS approval queue, authentication, and automatic transla
 
 - Phone-first layout, usable at 320px and 390px, with light and dark themes.
 - Catalan is the default; Spanish and English cover interface text, notices, and calendar exports.
-- Upcoming dates use a compact, expandable list, not a month grid. Keep the notices as a distinct section with its own heading and spacing.
+- Upcoming dates are a compact list at the top of the page, not a month grid. Each row links to its notice card, which holds the details and calendar exports; with JavaScript the card opens and is highlighted on arrival. Keep the notices as a distinct section with its own heading and spacing.
 - Notice filters affect cards only, not the upcoming-dates list.
+- Notice categories are class, whole school, school meals, and AFA (the family association). Calendar dates use the relevant audience category; event metadata controls the upcoming-dates list and calendar exports.
 - Public holidays are named “Dia festiu”, “Día festivo”, and “Public holiday”. School closure days are not necessarily public holidays; use the wording appropriate to the source.
 - Calendar export is opt-in through event metadata. Do not infer event durations or add exports to every dated announcement.
 - External web links open in a new tab with `noopener noreferrer`. Downloads stay direct downloads.
@@ -59,13 +60,13 @@ Build output is deterministic given source files, configuration, and build time.
 | `src/components/Board.astro` | Shared page layout, calendar placement, notice section, filtering. |
 | `src/layouts/Layout.astro` | HTML language/metadata, header, language picker, theme, preference handling, footer. |
 | `src/components/Notice.astro` | Cards, translated Markdown, images, optional calendar controls. |
-| `src/components/UpcomingDates.astro` | Chronological event list, expandable details, client-side expiry. |
+| `src/components/UpcomingDates.astro` | Chronological event list linking to notice cards, client-side expiry. |
 | `src/components/CalendarLinks.astro` | Shared Google Calendar and download actions. |
 | `src/lib/calendar.ts` | Calendar URL/file generation, time labels, stable event UIDs, escaping and UTF-8 line folding. |
 | `src/pages/calendar/[...id].ics.ts` | Catalan event downloads. |
 | `src/pages/[lang]/calendar/[...id].ics.ts` | Translated event downloads. |
 | `src/lib/external-links.mjs` | Build-time Markdown external-link policy. |
-| `src/styles/site.css` | Responsive layout and theme tokens. |
+| `src/styles/site.css` | Responsive layout, theme tokens and category colours. Baloo 2 and Figtree load from Google Fonts with system fallbacks. |
 | `public/downloads/` | Public original attachments copied into the build. |
 | `.github/workflows/pages.yml` | Checks and deployment. |
 
@@ -79,7 +80,7 @@ Notice order is `order`, then optional `date`, then ID. A notice date is descrip
 
 For timed events, retain explicit offsets and display Barcelona time. All-day events use date-only start/end with an exclusive end. Keep the same event UID across languages. Exports are individual calendar entries, not a live subscription. Do not promise imported entries will automatically update or deduplicate in every calendar app.
 
-To retire content, remove the original and both translations. Ended events disappear from the upcoming list with JavaScript, but cards do not expire automatically. Without JavaScript, static event rows remain visible until source removal and deployment. Category filtering and automatic expiry are progressive enhancements; reading details and following language/download links must work without scripts.
+To retire content, remove the original and both translations. Ended events disappear from the upcoming list with JavaScript, but cards do not expire automatically. Without JavaScript, static event rows remain visible until source removal and deployment, and each row is a plain anchor link to its card. Category filtering and automatic expiry are progressive enhancements; reading details and following language/download links must work without scripts.
 
 For UI changes, edit shared components rather than copying separate language layouts. Add all interface translations together. Reuse the existing theme variables. Check long Spanish/English labels on phones as well as Catalan.
 

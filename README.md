@@ -55,7 +55,7 @@ The example date is illustrative, not a current announcement.
 | Field | Purpose |
 | --- | --- |
 | `title`, `description` | Required card heading and summary. |
-| `category` | `classe`, `escola`, `menjador`, or `calendari`. |
+| `category` | `classe`, `escola`, `menjador`, or `afa` (the family association). School-wide calendar notices use `escola`; the optional `event` block controls the upcoming-dates list and calendar exports. |
 | `order` | Lower values appear first; defaults to 100. Put family actions before optional information. |
 | `date` | Optional date displayed on the card. Does not create an event or expire the notice. |
 | `note` | Optional label for the expandable details. |
@@ -111,7 +111,7 @@ event:
   description: "Dia festiu. No hi ha classe."
 ```
 
-Upcoming dates are separate from notice filters. With JavaScript, ended events disappear when the page opens, every minute, and when returning to the tab. All-day expiry follows Barcelona time. Without JavaScript, events remain visible and can still be expanded and downloaded. The original notice stays until manually removed.
+Upcoming dates are separate from notice filters. With JavaScript, ended events disappear when the page opens, every minute, and when returning to the tab. All-day expiry follows Barcelona time. Each date links to its notice card, where the details and calendar downloads live; with JavaScript the card opens automatically. Without JavaScript, the link still jumps to the card. The original notice stays until manually removed.
 
 Calendar exports are copies, not subscriptions: later website edits do not automatically update a family's calendar.
 
