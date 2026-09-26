@@ -1,7 +1,7 @@
 ---
 title: "Lunes 12 de octubre, día festivo"
 description: "El próximo festivo del calendario escolar es el lunes 12 de octubre. Tenedlo presente para organizaros en familia."
-note: "Consultar el calendario escolar"
+note: "Detalles del día festivo"
 event:
   title: "Día festivo"
   location: "Escola La Mar Bella"

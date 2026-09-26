@@ -115,6 +115,8 @@ Upcoming dates are separate from notice filters. With JavaScript, ended events d
 
 Calendar exports are copies, not subscriptions: later website edits do not automatically update a family's calendar.
 
+For the AFA cancellation deadline, export only the final day for cancelling the following month's activities. Use a one-day all-day event with the next day as its exclusive end, and include the exact cutoff time in the description. The notice can still explain the full application window. Category filters remain visible with compact labels; the board currently uses editorial ordering without action or freshness badges.
+
 ## Add timetable images
 
 Place originals in `public/downloads/` and add:

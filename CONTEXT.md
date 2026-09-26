@@ -18,9 +18,11 @@ Daily/weekly recaps, a CMS approval queue, authentication, and automatic transla
 - Catalan is the default; Spanish and English cover interface text, notices, and calendar exports.
 - Upcoming dates are a compact list at the top of the page, not a month grid. Each row links to its notice card, which holds the details and calendar exports; with JavaScript the card opens and is highlighted on arrival. Keep the notices as a distinct section with its own heading and spacing.
 - Notice filters affect cards only, not the upcoming-dates list.
+- Keep all category filters visible, with the same compact category labels used on notice cards; do not replace them with action sorting. Use the current board before deciding whether action or freshness badges are needed.
 - Notice categories are class, whole school, school meals, and AFA (the family association). Calendar dates use the relevant audience category; event metadata controls the upcoming-dates list and calendar exports.
 - Public holidays are named “Dia festiu”, “Día festivo”, and “Public holiday”. School closure days are not necessarily public holidays; use the wording appropriate to the source.
 - Calendar export is opt-in through event metadata. Do not infer event durations or add exports to every dated announcement.
+- The AFA cancellation reminder marks the final day to cancel activities for the following month, not the whole application window. Use a one-day all-day event and state the exact cutoff in its description.
 - External web links open in a new tab with `noopener noreferrer`. Downloads stay direct downloads.
 - Preserve downloadable original timetable images. Their contents are also available as translated text.
 - The site and repository history are public. `noindex, nofollow` discourages indexing but does not restrict access.

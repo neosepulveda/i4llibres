@@ -14,8 +14,19 @@ test('published HTML tells search engines not to index or follow links',()=>{
   assert.match(readFileSync('dist/index.html','utf8'), /<meta name="robots" content="noindex, nofollow"/);
 });
 
+test('category filters and notice cards use identical labels in every language',()=>{
+ for(const path of ['', 'es/', 'en/']){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const filters=new Map(Array.from(html.matchAll(/<button data-filter="([^"]+)"[^>]*>([\s\S]*?)<\/button>/g),
+   ([,category,content])=>[category,content.replace(/<[^>]+>/g,'').trim()]));
+  const cards=Array.from(html.matchAll(/<article[^>]+data-category="([^"]+)"[\s\S]*?<span class="tag">([^<]+)<\/span>/g));
+  assert.ok(cards.length>0);
+  for(const [,category,label] of cards) assert.equal(label,filters.get(category),`${path}${category}`);
+ }
+});
+
 test('all published languages include translated notices and calendar exports',()=>{
- for(const [language,title,summary] of [['es','Las cosas que nos importan.','Reunión del comedor'],['en','The things that matter to us.','School meals meeting']]){
+ for(const [language,title,summary] of [['es','El tablón de I4B','Reunión del comedor'],['en','The I4B noticeboard','School meals meeting']]){
   const html=readFileSync(`dist/${language}/index.html`,'utf8');
   assert.ok(html.includes(`<html lang="${language}"`));
   assert.ok(html.includes(title));
@@ -43,13 +54,24 @@ test('AFA notice and filter explain the monthly enrolment and cancellation windo
  }
 });
 
-test('AFA registration window appears in upcoming dates and translated calendar downloads',()=>{
- for(const path of ['', 'es/', 'en/']){
+test('AFA calendar exports mark only the final day to cancel activities for the following month',()=>{
+ for(const [path,title] of [
+  ['', 'Últim dia per donar de baixa extraescolars de novembre'],
+  ['es/', 'Último día para dar de baja extraescolares de noviembre'],
+  ['en/', 'Last day to cancel November extracurricular activities'],
+ ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.match(html,/<a class="upcoming-event afa" href="#avis-extraescolars-afa" data-end="2026-10-21"/);
   const ics=readFileSync(`dist/${path}calendar/extraescolars-afa.ics`,'utf8');
-  assert.match(ics,/DTSTART;VALUE=DATE:20261001/);
+  assert.match(ics,/DTSTART;VALUE=DATE:20261020/);
   assert.match(ics,/DTEND;VALUE=DATE:20261021/);
+  assert.ok(ics.replace(/\r\n /g,'').includes('SUMMARY:'+title));
+  const card=html.match(/<article class="notice afa"[\s\S]*?<\/article>/)?.[0];
+  const google=card.match(/href="(https:\/\/calendar\.google\.com[^\"]+)"/)[1];
+  const params=new URL(google.replaceAll('&amp;','&')).searchParams;
+  assert.equal(params.get('dates'),'20261020/20261021');
+  assert.equal(params.get('text'),title);
+  assert.ok(params.get('details').includes('23:55'));
  }
 });
 

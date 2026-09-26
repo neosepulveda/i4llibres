@@ -3,7 +3,7 @@ title: "La presentació de la reunió i les inscripcions ja estan disponibles"
 description: "Al correu de la Sandra del 25 de setembre trobareu la presentació i les graelles per apuntar-vos a les activitats en família i a les entrevistes."
 order: 10
 category: classe
-note: "Consulta el correu de la tutora"
+note: "Quin correu cal buscar?"
 ---
 Busqueu el correu **«Informacions reunions famílies»**, enviat per la Sandra el **25 de setembre**. Hi trobareu:
 

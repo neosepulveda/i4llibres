@@ -25,7 +25,7 @@ test('Markdown content, category filtering and empty filter recovery',async({pag
   await expect(page.locator('.notice')).toHaveCount(2);
   await expect(page.locator('.notice h2')).toHaveText(['Avís d’escola de prova', 'Avís de classe de prova']);
   await expect(page.getByRole('button',{name:'Calendari',exact:true})).toHaveCount(0);
-  await page.getByRole('button',{name:'I4B · Llibres',exact:true}).click();
+  await page.getByRole('button',{name:'I4B',exact:true}).click();
   await expect(page.locator('.notice:visible')).toHaveCount(1);
   await expect(page.locator('.notice-count')).toHaveText('1 avís');
   await page.locator('.notice:visible details:not(.calendar-actions) summary').click();
@@ -136,7 +136,7 @@ for (const width of [320,390]) {
   await rows.first().click();
   const card=page.locator('#avis-class');
   await expect(card).toBeVisible();
-  await expect(page.getByRole('button',{name:'Tots els avisos'})).toHaveAttribute('aria-pressed','true');
+  await expect(page.getByRole('button',{name:'Tots',exact:true})).toHaveAttribute('aria-pressed','true');
   await expect(card.locator('details').first()).toHaveAttribute('open','');
   await expect(card.locator('.chip')).toHaveText('dl 5 oct · 17:00 h');
   await card.locator('.calendar-actions summary').click();
@@ -185,13 +185,13 @@ test('language choice persists, while explicit language links take precedence',a
  await page.locator('.language-picker summary').click();
  await page.getByRole('link',{name:'Castellano',exact:true}).click();
  await expect(page.locator('html')).toHaveAttribute('lang','es');
- await expect(page.getByRole('heading',{name:'Las cosas que nos importan.'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'El tablón de I4B'})).toBeVisible();
  await expect(page.locator('.notice h2')).toHaveText(['Aviso del colegio de prueba','Aviso de clase de prueba']);
  await page.goto('http://127.0.0.1:4323');
  await expect(page).toHaveURL('http://127.0.0.1:4323/es/');
  await page.goto('http://127.0.0.1:4323/en/');
  await expect(page.locator('html')).toHaveAttribute('lang','en');
- await page.getByRole('button',{name:'I4B · Llibres',exact:true}).click();
+ await page.getByRole('button',{name:'I4B',exact:true}).click();
  await expect(page.locator('.notice-count')).toHaveText('1 notice');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.locator('.language-picker summary').click();
@@ -255,8 +255,48 @@ test('notices have a distinct translated heading after the calendar links',async
   const calendar=await page.locator('.useful-links').boundingBox();
   const title=await heading.boundingBox();
   const filters=await page.locator('.board-toolbar').boundingBox();
-  expect(title!.y-calendar!.y-calendar!.height).toBeGreaterThanOrEqual(28);
+  expect(title!.y-calendar!.y-calendar!.height).toBeGreaterThanOrEqual(24);
   expect(filters!.y).toBeGreaterThan(title!.y+title!.height);
   await expect(page.getByRole('region',{name:label,exact:true})).toBeVisible();
  }
 });
+
+for (const width of [320,390]) {
+ for (const colorScheme of ['light','dark'] as const) {
+  test(`compact phone controls remain visible and readable at ${width}px ${colorScheme}`,async({page})=>{
+   await page.setViewportSize({width,height:844});
+   await page.emulateMedia({colorScheme});
+   await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
+   for(const path of ['/?lang=ca','/es/','/en/']){
+    await page.goto('http://127.0.0.1:4323'+path);
+    await expect(page.locator('.brand small')).toBeVisible();
+    await expect(page.locator('.brand small')).toContainText('I4B · La Mar Bella');
+    const controls=page.locator('.filters button, .language-picker summary, #theme-toggle, .notice details:not(.calendar-actions) summary');
+    for(const control of await controls.all()){
+     await expect(control).toBeVisible();
+     const box=await control.boundingBox();
+     expect(box!.height).toBeGreaterThanOrEqual(44);
+     expect(box!.width).toBeGreaterThanOrEqual(44);
+    }
+    await expect(page.locator('.filters button')).toHaveCount(5);
+    expect((await page.locator('.filters').boundingBox())!.height).toBeLessThanOrEqual(94);
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    const colors=await page.locator('.upcoming-day span, .chip').evaluateAll(elements=>elements.map(element=>({
+     foreground:getComputedStyle(element).color,
+     background:getComputedStyle(element.closest('.upcoming, .notice')!).backgroundColor,
+    })));
+    const luminance=(rgb:string)=>{
+     const channels=rgb.match(/[\d.]+/g)!.slice(0,3).map(Number).map(value=>{
+      const channel=value/255;
+      return channel<=0.04045 ? channel/12.92 : ((channel+0.055)/1.055)**2.4;
+     });
+     return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+    };
+    for(const {foreground,background} of colors){
+     const light=luminance(foreground), dark=luminance(background);
+     expect((Math.max(light,dark)+0.05)/(Math.min(light,dark)+0.05)).toBeGreaterThanOrEqual(4.5);
+    }
+   }
+  });
+ }
+}

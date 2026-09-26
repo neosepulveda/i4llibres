@@ -3,11 +3,13 @@ title: "AFA extracurricular activities: enrolment and cancellation open on the 1
 description: "Request enrolment or cancellation for AFA extracurricular activities through Ampasoft from the 1st of each month until 23:55 on the 20th."
 note: "How to request enrolment or cancellation"
 event:
-  title: "AFA activities: enrolment and cancellation open"
+  title: "Last day to cancel November extracurricular activities"
   location: "AFA"
-  description: "Enrolment and cancellation requests open on the 1st of each month and close at 23:55 on the 20th. All payments must be up to date to take part in activities. Requests: https://ampalamarbella.ampasoft.net/"
+  description: "Deadline to cancel AFA extracurricular activities for November: 20 October at 23:55. In Ampasoft, open “Preinscripció”, go to the activities tab, select the activity and click “Demanar baixa”. https://ampalamarbella.ampasoft.net/"
 ---
 Families can request enrolment in or cancellation of extracurricular activities organised by the AFA, the family association, **from the 1st to the 20th of every month**. The deadline is **23:55 on the 20th**.
+
+To cancel an activity for November, submit the request **by 23:55 on 20 October**. The calendar reminder marks that final day.
 
 To take part in the activities, **all payments must be up to date**.
 

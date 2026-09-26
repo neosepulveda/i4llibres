@@ -1,7 +1,7 @@
 ---
 title: "Public holiday on Monday 12 October"
 description: "The next public holiday on the school calendar is Monday 12 October. Keep it in mind when making family plans."
-note: "View the school calendar"
+note: "Public holiday details"
 event:
   title: "Public holiday"
   location: "Escola La Mar Bella"

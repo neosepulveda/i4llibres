@@ -1,7 +1,7 @@
 ---
 title: "School meals meeting: 5 October at 17:00"
-description: "Menjadors Biosca will present the service, nutrition programme and lunchtime educational activities. There will be time for questions."
-note: "17:00 · School dining hall"
+description: "Menjadors Biosca will present the service, nutrition programme and lunchtime educational activities. If you need childcare during the meeting, complete the form in the details."
+note: "Details and childcare form"
 event:
   title: "School meals meeting"
   location: "Dining hall, Escola La Mar Bella"

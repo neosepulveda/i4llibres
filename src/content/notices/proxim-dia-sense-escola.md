@@ -4,7 +4,7 @@ description: "El pròxim dia festiu del calendari escolar és dilluns 12 d’oct
 category: escola
 date: "2026-10-12"
 order: 25
-note: "Consultar el calendari escolar"
+note: "Detalls del dia festiu"
 event:
   title: "Dia festiu"
   allDay: true

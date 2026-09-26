@@ -14,7 +14,7 @@ const format = (value: string, options: Intl.DateTimeFormatOptions) => new Intl.
     const event = data.event!;
     return <a class={`upcoming-event ${data.category}`} href={`#avis-${id}`} data-end={event.end} data-all-day={String(!!event.allDay)}>
       <time class="upcoming-day" datetime={event.start}><strong>{format(event.start,{day:'numeric'})}</strong><span>{format(event.start,{month:'short'}).replace(/\.$/,'')}</span></time>
-      <span class="upcoming-text"><strong class="upcoming-when">{eventTimeLabel(event, language)}<small>{format(event.start,{weekday:'long'})}</small></strong><span class="upcoming-title">{event.title || data.title}</span></span>
+      <span class="upcoming-text"><strong class="upcoming-when">{eventTimeLabel(event, language)}{' '}<small>{format(event.start,{weekday:'long'})}</small></strong><span class="upcoming-title">{event.title || data.title}</span></span>
       <span class="upcoming-arrow" aria-hidden="true"></span>
     </a>;
   })}

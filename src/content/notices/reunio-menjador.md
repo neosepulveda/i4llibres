@@ -1,10 +1,10 @@
 ---
 title: "Reunió del menjador: 5 d’octubre a les 17 h"
-description: "Menjadors Biosca presentarà el servei, el projecte nutricional i la proposta educativa de l’espai migdia. Hi haurà temps per resoldre dubtes."
+description: "Menjadors Biosca presentarà el servei, el projecte nutricional i la proposta educativa de l’espai migdia. Si necessiteu acollida per als infants durant la reunió, empleneu el formulari als detalls."
 order: 20
 category: menjador
 date: "2026-10-05"
-note: "17 h · Menjador de l’escola"
+note: "Detalls i formulari d’acollida"
 event:
   title: "Reunió del menjador"
   start: "2026-10-05T17:00:00+02:00"

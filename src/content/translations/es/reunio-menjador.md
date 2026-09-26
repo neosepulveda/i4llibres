@@ -1,7 +1,7 @@
 ---
 title: "Reunión del comedor: 5 de octubre a las 17 h"
-description: "Menjadors Biosca presentará el servicio, el proyecto nutricional y la propuesta educativa del mediodía. Habrá tiempo para resolver dudas."
-note: "17 h · Comedor del colegio"
+description: "Menjadors Biosca presentará el servicio, el proyecto nutricional y la propuesta educativa del mediodía. Si necesitáis acogida para los niños durante la reunión, rellenad el formulario en los detalles."
+note: "Detalles y formulario de acogida"
 event:
   title: "Reunión del comedor"
   location: "Comedor de la Escola La Mar Bella"
