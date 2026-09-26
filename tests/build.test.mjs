@@ -7,3 +7,7 @@ test('production HTML excludes fixtures and renders the empty state when there a
   assert.doesNotMatch(html,/Avís de classe de prova|Avís d’escola de prova|Hola, octubre|Propostes de disseny|Contingut d’exemple/);
   assert.match(html,/<html lang="ca"/);
 });
+
+test('published HTML tells search engines not to index or follow links',()=>{
+  assert.match(readFileSync('dist/index.html','utf8'), /<meta name="robots" content="noindex, nofollow"/);
+});
