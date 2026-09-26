@@ -3,6 +3,13 @@ title: "Avís d’escola de prova"
 description: "Un segon avís fictici per comprovar els filtres."
 order: 10
 category: escola
+event:
+  allDay: true
+  title: "Festiu de prova"
+  start: "2026-10-12"
+  end: "2026-10-13"
+  location: "Escola"
+  description: "Dia sense classe"
 images:
   - src: "/downloads/activitats-i4b-llista.jpg"
     title: "Horari en llista"

@@ -20,3 +20,13 @@ test('ICS uses UTC, escapes text, folds UTF-8 safely and has a stable UID',()=>{
  assert.equal(winter.searchParams.get('dates'),'20261205T160000Z/20261205T170000Z');
  assert.equal(calendarPath('/school-noticeboard/','reunio'),'/school-noticeboard/calendar/reunio.ics');
 });
+
+test('all-day exports use date values and an exclusive end, without timezone shifts',()=>{
+ const holiday={allDay:true,title:'No hi ha escola',start:'2026-10-12',end:'2026-10-13',location:'Escola',description:'Festiu'};
+ const file=calendarFile('festiu','Notice headline',holiday);
+ assert.match(file,/DTSTART;VALUE=DATE:20261012\r\nDTEND;VALUE=DATE:20261013/);
+ assert.match(file,/SUMMARY:No hi ha escola/);
+ const url=new URL(googleCalendarUrl('Notice headline',holiday));
+ assert.equal(url.searchParams.get('dates'),'20261012/20261013');
+ assert.equal(url.searchParams.get('text'),'No hi ha escola');
+});

@@ -18,12 +18,14 @@ const notices = defineCollection({
       title: z.string().min(1),
       alt: z.string().min(1),
     })).default([]),
-    event: z.object({
-      start: z.iso.datetime({ offset: true }),
-      end: z.iso.datetime({ offset: true }),
+    event: z.intersection(z.discriminatedUnion('allDay', [
+      z.object({ allDay: z.literal(true), start: z.iso.date(), end: z.iso.date() }),
+      z.object({ allDay: z.literal(false).optional(), start: z.iso.datetime({ offset: true }), end: z.iso.datetime({ offset: true }) }),
+    ]), z.object({
+      title: z.string().min(1).optional(),
       location: z.string().min(1),
       description: z.string().min(1),
-    }).refine(event => Date.parse(event.end) > Date.parse(event.start), { message: 'Event end must be after start' }).optional(),
+    })).refine(event => Date.parse(event.end) > Date.parse(event.start), { message: 'Event end must be after start' }).optional(),
     order: z.number().int().nonnegative().default(100),
   }),
 });

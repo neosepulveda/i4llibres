@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
 
 export interface CalendarEvent {
+  title?: string;
+  allDay?: boolean;
   start: string;
   end: string;
   location: string;
@@ -20,18 +22,25 @@ function fold(line: string) {
   return lines.join('\r\n');
 }
 export function googleCalendarUrl(title: string, event: CalendarEvent) {
-  const query = new URLSearchParams({ action:'TEMPLATE', text:title, dates:`${stamp(event.start)}/${stamp(event.end)}`, ctz:'Europe/Madrid', location:event.location, details:event.description });
+  const date = (value: string) => event.allDay ? value.replace(/-/g, '') : stamp(value);
+  const query = new URLSearchParams({ action:'TEMPLATE', text:event.title || title, dates:`${date(event.start)}/${date(event.end)}`, ctz:'Europe/Madrid', location:event.location, details:event.description });
   return `https://calendar.google.com/calendar/render?${query}`;
 }
 export function calendarFile(id: string, title: string, event: CalendarEvent, generatedAt = new Date()) {
   const uid = createHash('sha256').update(`els-llibres:${id}`).digest('hex') + '@els-llibres';
+  const date = (key: string, value: string) => event.allDay ? `${key};VALUE=DATE:${value.replace(/-/g, '')}` : `${key}:${stamp(value)}`;
   return [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Els Llibres//Tauler I4B//CA', 'CALSCALE:GREGORIAN',
-    'BEGIN:VEVENT', `UID:${uid}`, `DTSTAMP:${stamp(generatedAt)}`, `DTSTART:${stamp(event.start)}`, `DTEND:${stamp(event.end)}`,
-    `SUMMARY:${escapeText(title)}`, `LOCATION:${escapeText(event.location)}`, `DESCRIPTION:${escapeText(event.description)}`,
+    'BEGIN:VEVENT', `UID:${uid}`, `DTSTAMP:${stamp(generatedAt)}`, date('DTSTART', event.start), date('DTEND', event.end),
+    `SUMMARY:${escapeText(event.title || title)}`, `LOCATION:${escapeText(event.location)}`, `DESCRIPTION:${escapeText(event.description)}`,
     'END:VEVENT', 'END:VCALENDAR',
   ].map(fold).join('\r\n') + '\r\n';
 }
 export function calendarPath(base: string, id: string) {
   return `${base.replace(/\/$/, '')}/calendar/${id.split('/').map(encodeURIComponent).join('/')}.ics`;
+}
+export function eventTimeLabel(event: CalendarEvent) {
+  if (event.allDay) return 'Tot el dia';
+  const format = new Intl.DateTimeFormat('ca-ES', { hour:'2-digit', minute:'2-digit', timeZone:'Europe/Madrid' });
+  return `${format.format(new Date(event.start))}–${format.format(new Date(event.end))} h`;
 }

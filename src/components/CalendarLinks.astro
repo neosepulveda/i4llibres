@@ -1,0 +1,10 @@
+---
+import { googleCalendarUrl, calendarPath, eventTimeLabel, type CalendarEvent } from '../lib/calendar';
+interface Props { id: string; title: string; event: CalendarEvent }
+const { id, title, event } = Astro.props;
+---
+<div class="calendar-options">
+  <a href={googleCalendarUrl(title, event)} target="_blank" rel="noopener noreferrer">Google Calendar <span aria-hidden="true">↗</span></a>
+  <a href={calendarPath(import.meta.env.BASE_URL, id)} download>Apple Calendar, Outlook i altres <small>Descarrega el fitxer .ics</small></a>
+  <p>{eventTimeLabel(event)}{!event.allDay && ' · Hora de Barcelona'}</p>
+</div>

@@ -6,6 +6,7 @@ category: menjador
 date: "2026-10-05"
 note: "17 h · Menjador de l’escola"
 event:
+  title: "Reunió del menjador"
   start: "2026-10-05T17:00:00+02:00"
   end: "2026-10-05T18:00:00+02:00"
   location: "Menjador de l’Escola La Mar Bella"

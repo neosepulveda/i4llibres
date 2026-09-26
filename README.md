@@ -52,6 +52,24 @@ event:
 
 Indiqueu el desfasament horari correcte de Barcelona per a la data: +02:00 a l’estiu, +01:00 a l’hivern. La web genera un enllaç de Google Calendar i un fitxer .ics per a Apple Calendar, Outlook i altres aplicacions. Els fitxers utilitzen UTC per conservar l’hora exacta en importar-los. Són còpies puntuals: les modificacions al tauler no actualitzen automàticament els calendaris personals.
 
+## Properes dates
+
+La llista de dates es genera a partir dels blocs `event` dels avisos i s’ordena cronològicament. `event.title` permet posar-hi un títol curt. Cada data es desplega per mostrar els enllaços de Google Calendar i de descàrrega .ics. Els filtres dels avisos no amaguen aquesta llista.
+
+Per als festius, feu servir dates sense hora i `allDay: true`. El final és exclusiu: per al 12 d’octubre, indiqueu el dia 13.
+
+```yaml
+event:
+  title: "No hi ha escola"
+  allDay: true
+  start: "2026-10-12"
+  end: "2026-10-13"
+  location: "Escola La Mar Bella"
+  description: "Dia festiu. No hi ha classe."
+```
+
+Amb JavaScript, les dates desapareixen quan s’acaben; els festius segueixen el fus horari de Barcelona. La comprovació es fa en obrir la pàgina, cada minut i en tornar a la pestanya. Sense JavaScript, es poden consultar i descarregar, però no s’amaguen automàticament. Els avisos originals continuen al tauler fins que s’editen o es retiren manualment.
+
 ## Imatges descarregables
 
 Deseu les imatges a `public/downloads/` i afegiu una llista `images` al Markdown, amb `src` (p. ex. `/downloads/horari.jpg`), `title` i `alt`. Apareixen dins del detall de l’avís. La previsualització obre l’original en una pestanya nova i «Descarrega» desa el fitxer. Els enllaços incorporen automàticament el subdirectori de GitHub Pages.
