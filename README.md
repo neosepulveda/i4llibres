@@ -1,66 +1,109 @@
 # Els Llibres
 
-Tauler públic de les famílies d’I4B, Escola La Mar Bella. Astro i Markdown, en català. Disseny El pati amb etiquetes de La carpeta, mode clar i fosc. El contingut es revisa i es publica manualment.
+A public, manually curated noticeboard for the families of **I4B, Els Llibres**, at Escola La Mar Bella in Barcelona. It brings class announcements, school information, and upcoming dates together in a phone-friendly website.
 
-## Desenvolupament
+- Website: [i4llibres.cat](https://i4llibres.cat/)
+- Repository: [neosepulveda/i4llibres](https://github.com/neosepulveda/i4llibres)
+- Languages: Catalan by default, Spanish, and English.
+- Stack: Astro, TypeScript, Markdown, and GitHub Pages. No application server or database.
 
-```
+Read [CONTEXT.md](CONTEXT.md) for architecture, product decisions, and instructions for agents working on the project. Repository documentation is in English; published content is translated into all three languages.
+
+## Run locally
+
+```sh
 bin/setup
 bin/dev
+```
+
+Open http://127.0.0.1:4321/. `bin/dev` accepts Astro arguments, such as `bin/dev --port 4325`.
+
+`bin/setup` installs mise through Homebrew if necessary, trusts `.mise.toml`, installs the pinned Node version, runs `npm ci`, and installs Chromium for browser tests. Without Homebrew, install [mise](https://mise.jdx.dev/) first. Node is pinned to **24.15.0**.
+
+## Check changes
+
+```sh
 bin/ci
 ```
 
-Mise fixa Node 24.15.0. `bin/setup` instal·la les dependències i Chromium per a les proves. `bin/ci` comprova scripts i tipus, construeix la web i executa proves de navegador. `bin/dev` accepta arguments d’Astro, com ara `--port 4321`.
+This checks shell syntax and Astro/TypeScript, builds the website, and runs Node and Playwright tests. On macOS, an existing Chrome installation can be used for tests:
 
-## Publicar un avís
+```sh
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' bin/ci
+```
 
-Creeu un fitxer `.md` a `src/content/notices/` amb aquesta estructura:
+Browser tests build isolated temporary copies with empty or fictional content. They do not replace the notices in the working checkout.
+
+## Add or edit a notice
+
+Create `src/content/notices/<id>.md` with Catalan content:
 
 ```markdown
 ---
 title: "Títol de l’avís"
-description: "Resum breu que apareix a la targeta."
+description: "Resum breu de l’avís."
 category: classe
 order: 10
 date: "2026-10-02"
 note: "Més informació"
 ---
-El text complet de l’avís, amb **Markdown** i enllaços.
+The notice body goes here, written in Catalan using Markdown.
 ```
 
-Categories: `classe`, `escola`, `menjador`, `calendari`. `date` i `note` són opcionals. El camp `order` controla la posició: els valors més baixos apareixen primer, independentment de la categoria. Poseu al davant els avisos que requereixen una acció de les famílies. El valor per defecte és 100; els empats s’ordenen per data i després pel nom del fitxer. La data és informativa: no caduca ni retira l’avís automàticament. Per actualitzar-lo, editeu el fitxer; per retirar-lo, elimineu-lo i torneu a publicar. Git conserva l’historial públic.
+The example date is illustrative, not a current announcement.
 
-No hi ha connexió amb Norman ni importació de missatges o adjunts. Només es publica el contingut escrit deliberadament en aquest repositori. Els exemples de `tests/fixtures/` són dades fictícies exclusives de les proves i no es publiquen al lloc web.
+| Field | Purpose |
+| --- | --- |
+| `title`, `description` | Required card heading and summary. |
+| `category` | `classe`, `escola`, `menjador`, or `calendari`. |
+| `order` | Lower values appear first; defaults to 100. Put family actions before optional information. |
+| `date` | Optional date displayed on the card. Does not create an event or expire the notice. |
+| `note` | Optional label for the expandable details. |
 
-## GitHub Pages
+Ties in `order` are resolved by date and then notice ID. Edit an existing file to update a notice. To remove it, delete the original and its translations, then publish. Public Git history retains previous versions.
 
-El flux `.github/workflows/pages.yml` comprova el projecte i publica `dist/` després d’un push a `main`. Les pull requests només executen les comprovacions. El repositori públic és `neosepulveda/i4llibres`, amb **GitHub Actions** com a origen de Pages. El flux obté el domini i el subdirectori de Pages automàticament. URL del tauler: https://neosepulveda.github.io/i4llibres/
+### Translate the notice
 
-Per provar un subdirectori localment: `BASE_PATH=/i4llibres npm run build`. Feu un build normal abans d’executar les proves. Les proves de navegador construeixen còpies temporals del projecte amb contingut buit o fictici, sense modificar el tauler local.
+Add matching files:
 
-## Enllaços de calendari opcionals
+```text
+src/content/translations/es/<id>.md
+src/content/translations/en/<id>.md
+```
 
-Només els avisos amb un bloc `event` mostren «Afegeix al calendari». Una data informativa no activa aquesta opció. Exemple:
+Each translation has `title`, `description`, `note`, and a Markdown body. For example, the English file starts with:
+
+```markdown
+---
+title: "Notice title"
+description: "A short summary."
+note: "More information"
+---
+The translated notice body.
+```
+
+If the original includes an event, translate `event.title`, `event.location`, and `event.description`. If it includes images, provide an `images` list containing translated `title` and `alt` values in the same order. Do not duplicate dates, times, categories, ordering, or attachment paths in translations: these come from the Catalan original.
+
+The build fails if a notice is missing a Spanish or English translation, event text, or matching image text. Review all versions before publishing; translations are not generated at runtime.
+
+## Add a calendar event
+
+An optional `event` block makes the notice appear in **Upcoming dates** and adds Google Calendar and `.ics` download actions. A `date` field alone does not enable these features.
 
 ```yaml
 event:
+  title: "Reunió del menjador"
   start: "2026-10-05T17:00:00+02:00"
   end: "2026-10-05T18:00:00+02:00"
   location: "Menjador de l’Escola La Mar Bella"
   description: "Reunió informativa del menjador."
 ```
 
-Indiqueu el desfasament horari correcte de Barcelona per a la data: +02:00 a l’estiu, +01:00 a l’hivern. La web genera un enllaç de Google Calendar i un fitxer .ics per a Apple Calendar, Outlook i altres aplicacions. Els esdeveniments amb hora utilitzen UTC per conservar l’hora exacta en importar-los; els de tot el dia utilitzen dates sense fus horari. Són còpies puntuals: les modificacions al tauler no actualitzen automàticament els calendaris personals.
-
-## Properes dates
-
-La llista de dates es genera a partir dels blocs `event` dels avisos i s’ordena cronològicament. `event.title` permet posar-hi un títol curt. Cada data es desplega per mostrar els enllaços de Google Calendar i de descàrrega .ics. Els filtres dels avisos no amaguen aquesta llista.
-
-Per als festius, feu servir dates sense hora i `allDay: true`. El final és exclusiu: per al 12 d’octubre, indiqueu el dia 13.
+Use the correct Barcelona UTC offset for the event date. Timed exports use UTC. For an all-day public holiday, use date-only values and an **exclusive end date**:
 
 ```yaml
 event:
-  title: "No hi ha escola"
+  title: "Dia festiu"
   allDay: true
   start: "2026-10-12"
   end: "2026-10-13"
@@ -68,16 +111,57 @@ event:
   description: "Dia festiu. No hi ha classe."
 ```
 
-Amb JavaScript, les dates desapareixen quan s’acaben; els festius segueixen el fus horari de Barcelona. La comprovació es fa en obrir la pàgina, cada minut i en tornar a la pestanya. Sense JavaScript, es poden consultar i descarregar, però no s’amaguen automàticament. Els avisos originals continuen al tauler fins que s’editen o es retiren manualment.
+Upcoming dates are separate from notice filters. With JavaScript, ended events disappear when the page opens, every minute, and when returning to the tab. All-day expiry follows Barcelona time. Without JavaScript, events remain visible and can still be expanded and downloaded. The original notice stays until manually removed.
 
-## Imatges descarregables
+Calendar exports are copies, not subscriptions: later website edits do not automatically update a family's calendar.
 
-Deseu les imatges a `public/downloads/` i afegiu una llista `images` al Markdown, amb `src` (p. ex. `/downloads/horari.jpg`), `title` i `alt`. Apareixen dins del detall de l’avís. La previsualització obre l’original en una pestanya nova i «Descarrega» desa el fitxer. Els enllaços incorporen automàticament el subdirectori de GitHub Pages.
+## Add timetable images
 
-## Llengües
+Place originals in `public/downloads/` and add:
 
-El català és la llengua per defecte a `/`. El castellà és a `/es/` i l’anglès a `/en/`. El selector desa l’elecció a `localStorage` (`llibres-language`), sense cookies ni servidor. Quan es torna a l’arrel, s’obre la llengua desada. Els enllaços explícits `/es/`, `/en/` i `/?lang=ca` tenen prioritat. Sense JavaScript o sense accés a l’emmagatzematge, els enllaços continuen funcionant però no es recorda l’elecció.
+```yaml
+images:
+  - src: "/downloads/timetable.jpg"
+    title: "Horari"
+    alt: "A meaningful description in Catalan."
+```
 
-Per publicar un avís, afegiu també `src/content/translations/es/<id>.md` i `src/content/translations/en/<id>.md`, amb el mateix nom de fitxer que l’original. Cada traducció conté `title`, `description`, `note` i el cos Markdown. Si l’original té un esdeveniment, traduïu també `event.title`, `event.location` i `event.description`. Si té imatges, afegiu `images` amb `title` i `alt` en el mateix ordre. Les dates, les hores, l’ordre, les categories i els fitxers adjunts només es defineixen a l’original català. La compilació falla si falta alguna traducció o algun grup de textos d’esdeveniments o imatges.
+Add corresponding translated image text to both translation files. Images appear in the expanded notice, open in a new tab, and can be downloaded. Original timetable images remain in Catalan; the translated notice body provides their contents in Spanish and English.
 
-Els textos de la interfície són a `src/lib/i18n.ts`. Les descàrregues de calendari es generen en cada llengua i conserven el mateix identificador d’esdeveniment. Les imatges originals dels horaris continuen en català; el text traduït apareix a sota. Reviseu les tres versions abans de publicar. No es fan traduccions automàtiques en visitar la web.
+## Language and appearance preferences
+
+- `/` defaults to Catalan; `/es/` is Spanish; `/en/` is English.
+- The language selector saves `llibres-language` in localStorage. Returning to `/` follows this preference.
+- Explicit `/es/`, `/en/`, and `/?lang=ca` links take precedence over the saved preference.
+- The theme follows the system until the visitor chooses a mode, saved as `llibres-theme`.
+- No cookies or account are required. Preferences are local to the browser and can be cleared by the visitor.
+- Navigation still works without JavaScript or browser storage; preference persistence requires both.
+
+## Deploy
+
+A push to `main` runs `.github/workflows/pages.yml`, executes `bin/ci`, builds for the configured Pages domain, and deploys `dist/`. Pull requests run checks without deploying. GitHub Pages must use **GitHub Actions** as its source.
+
+After reviewing and committing the changes:
+
+```sh
+git push origin main
+gh run list --repo neosepulveda/i4llibres --limit 3
+# Replace RUN_ID with the run for your pushed commit.
+gh run watch RUN_ID --repo neosepulveda/i4llibres --exit-status
+```
+
+Confirm the live page after the workflow succeeds, including changed content, languages, downloads, and mobile layout. Do not treat a successful push as a completed deployment.
+
+The workflow obtains `SITE_URL` and `BASE_PATH` from GitHub Pages. Do not hard-code `/i4llibres` into links: the custom domain serves the site from `/`. To check a repository subpath locally:
+
+```sh
+mise exec -- env BASE_PATH=/i4llibres npm run build
+```
+
+Run `bin/ci` afterwards to restore a normal build before running its production-output assertions.
+
+## Publication boundaries
+
+Only deliberately curated content belongs in this public repository. There is no connection to Norman, no database access, and no automatic import from WhatsApp, email, or the private generated noticeboard.
+
+Pages contain `noindex, nofollow`, but the website and Git history are public. These directives are not access control. Keep private emails, credentials, and school documents with unrestricted edit links out of the repository. When an announcement depends on a private email, direct families to that email instead.
