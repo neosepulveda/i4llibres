@@ -93,11 +93,11 @@ The usual checkout is `~/personal/school-noticeboard`; commands run from the rep
 On Norman, use a login shell or include `/opt/homebrew/bin` in `PATH` for SSH commands. Run the same setup and checks there as on any other development machine. This checkout uses repository-local SSH commit signing with `~/.ssh/id_ed25519_school_noticeboard_signing`, a dedicated key without a passphrase for unattended work. Keep the private key on Norman and register only its public key as a signing key on GitHub. Preserve global GPG settings for other repositories. Fresh clones need this local signing configuration applied again; never disable signing to publish. The public site remains hosted by GitHub Pages, so it does not need a persistent development server on Norman. Its checkout is independent of the private `school-ingest` service.
 
 1. Inspect `git status` and preserve existing changes.
-2. Run `bin/setup` on a fresh checkout, then `bin/dev` for http://127.0.0.1:4321/.
+2. Run `bin/setup` on a fresh checkout. On Norman, always keep the development preview reachable through Tailscale with `bin/dev --tailscale`, at http://100.113.216.23:4321/. Reuse the `cat.i4llibres.dev` LaunchAgent described in the README; do not start duplicate servers. On other machines, `bin/dev` serves http://127.0.0.1:4321/.
 3. Make the scoped change and add meaningful regression coverage for changed behaviour.
 4. Run `bin/ci`. Use the Chrome override in the README if the downloaded browser is unavailable.
 5. Inspect the relevant UI at phone widths in both themes and all affected languages.
-6. Report what changed and whether it is local, committed, pushed, or deployed.
+6. Verify Norman's preview URL responds before handing off changes for phone review, leave the preview running, and include its URL in the response. Report what changed and whether it is local, committed, pushed, or deployed.
 
 `bin/ci` runs shell syntax checks, `astro check`, the production build, Node tests, and Playwright tests. `npm test` expects a production build to exist. Unit tests cover calendar serialization, external links, script execution with injected command fakes, and generated production output. Browser tests cover fixtures, themes, filters, downloads, expiry, language preferences, and layout.
 

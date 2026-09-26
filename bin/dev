@@ -2,4 +2,21 @@
 set -euo pipefail
 source "$(dirname "$0")/common"
 ensure_runtime "$@"
+if [ "${1:-}" = "--tailscale" ]; then
+  shift
+  tailscale_bin="${TAILSCALE_BIN:-tailscale}"
+  if ! command -v "$tailscale_bin" >/dev/null 2>&1; then
+    tailscale_bin=/Applications/Tailscale.app/Contents/MacOS/Tailscale
+  fi
+  if ! address="$("$tailscale_bin" ip -4)" || [[ ! "$address" =~ ^100\.([6-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]+\.[0-9]+$ ]]; then
+    echo 'Connect Tailscale before starting the phone preview.' >&2
+    exit 1
+  fi
+  if [ "$#" -ne 0 ]; then
+    echo 'Usage: bin/dev --tailscale (fixed preview port 4321)' >&2
+    exit 1
+  fi
+  printf 'Phone preview: http://%s:4321/\n' "$address"
+  exec npm run dev -- --host "$address" --port 4321
+fi
 exec npm run dev -- "$@"

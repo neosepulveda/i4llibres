@@ -34,6 +34,23 @@ bin/ci
 
 Non-interactive SSH commands need a login shell or `/opt/homebrew/bin` in `PATH` to find Homebrew tools. Norman's checkout uses a dedicated SSH signing key without a passphrase, configured only for this repository. Its private key stays at `~/.ssh/id_ed25519_school_noticeboard_signing`; only the public key belongs in GitHub's signing-key settings. Fresh clones need the local signing configuration applied again. Before the first phone-driven deployment, verify both signed commits and GitHub push access. Never disable signing to get a deployment through.
 
+### Preview on your phone
+
+Connect the phone to Tailscale and open **http://100.113.216.23:4321/**. Spanish and English previews are at `/es/` and `/en/`. This serves Norman's current working files, including uncommitted edits, with Astro's live reload. GitHub Pages remains the published site.
+
+`bin/dev --tailscale` detects the host's Tailscale IPv4 address and binds only to that address on port 4321. It fails if Tailscale cannot provide an address or the port is occupied. Do not use `--host 0.0.0.0`, Funnel, or public port forwarding for the development preview. Access follows the tailnet's existing device permissions.
+
+On Norman, the user LaunchAgent `cat.i4llibres.dev` keeps this command running after SSH disconnects and restarts it after failure. It starts when Norman's user logs in; a reboot still requires that login and Tailscale to be available. Its configuration lives at `~/Library/LaunchAgents/cat.i4llibres.dev.plist`, with logs in `~/Library/Logs/i4llibres-dev/`.
+
+```sh
+# Inspect or restart the existing preview; do not launch a duplicate.
+launchctl print gui/$(id -u)/cat.i4llibres.dev
+launchctl kickstart -k gui/$(id -u)/cat.i4llibres.dev
+curl --fail http://100.113.216.23:4321/ > /dev/null
+```
+
+Always leave this preview available when handing off development changes for phone review, and include its URL in the response. Check access from another Tailscale device when changing the server configuration.
+
 ## Check changes
 
 ```sh
