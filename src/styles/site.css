@@ -228,7 +228,6 @@ html:not(.motion) .front{aspect-ratio:100/128}
 .notices-heading{padding:6px 2px 0;font-size:34px}
 /* filter buttons: a tick and a count, filled with the category colour when chosen */
 .filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:12px 0 2px}
-.filters-label{margin-right:2px;font-weight:600;font-size:15px}
 .filter{--c:var(--classe);--on:#1d2533;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 5px 0 10px;border:1.5px solid color-mix(in srgb,var(--on-table) 40%,transparent);border-radius:22px;
   background:var(--paper);color:var(--ink);font-size:14.5px;line-height:1.2}
 .filter[data-filter=tot]{--c:var(--cloth);--on:#fffcf3}
@@ -365,6 +364,8 @@ html.motion .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-b
 html.motion .front{min-height:0}
 html.motion .face.inside{display:grid;border-radius:12px 4px 4px 12px;transform:rotateY(180deg)}
 html.motion .prop{display:block;position:absolute;z-index:1;pointer-events:none}
+html.motion .pencil{transition:opacity .4s}
+html.motion .opening.reading .pencil{opacity:0}
 html.motion .open-book{position:absolute;left:50%;bottom:max(18px,env(safe-area-inset-bottom));z-index:5;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 20px 0 16px;border:0;border-radius:24px;
   background:var(--paper);color:var(--ink);white-space:nowrap;font-weight:600;font-size:16px;box-shadow:0 6px 16px var(--shadow);transform:translateX(-50%)}
 html.motion .open-book svg{width:18px;height:18px}
@@ -373,6 +374,14 @@ html.motion .opening.released{height:auto}
 html.motion .opening.released .stage{position:relative;height:auto;padding:var(--released-top,90px) 0 36px}
 html.motion .opening.released .pencil{top:calc(91svh - 15px);bottom:auto;z-index:0}
 .open-book{display:none}
+/* Once the cover is halfway open, an arrow in pencil on the table points to the notices, until they come into view. */
+.to-notices{display:none}
+html.motion .to-notices{position:absolute;left:50%;bottom:max(8px,env(safe-area-inset-bottom));z-index:5;display:flex;flex-direction:column;align-items:center;min-width:96px;min-height:44px;
+  color:var(--on-table);text-decoration:none;font-style:italic;font-size:19px;transform:translateX(-50%) rotate(-3deg);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .45s ease,visibility 0s .45s}
+/* only the arrow that is showing takes taps, so it never catches one meant for the button beneath it as it fades */
+html.motion .opening.nudging .to-notices{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .45s ease,visibility 0s}
+.to-notices svg{flex-shrink:0;width:40px;height:48px;margin-top:2px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;transition:stroke-dashoffset .7s ease}
+.opening.nudging .to-notices svg{stroke-dashoffset:0}
 
 /* ---------- Desktop spreads ---------- */
 @media (min-width:900px){
@@ -400,9 +409,8 @@ html.motion .opening.released .pencil{top:calc(91svh - 15px);bottom:auto;z-index
   .sheet,.notice{padding:20px 16px 24px}
   .tab summary{margin-left:-16px;padding-left:16px}
   .notice-body,.calendar-options{margin-inline:-12px}
-  /* the smallest phones fit the filters in two rows; the group keeps its name for screen readers */
+  /* the smallest phones fit the filters in two rows */
   .filters{gap:5px}
-  .filters-label{display:none}
   .filter{gap:5px;padding:0 4px 0 8px;font-size:14px}
   .filter-dot{width:9px;height:9px}
   .filter-count{min-width:20px;height:20px;padding:0 5px;font-size:12px}

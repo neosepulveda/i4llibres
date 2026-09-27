@@ -84,6 +84,31 @@ for (const width of [390,1280]) {
  });
 }
 
+for (const width of [390,1180]) {
+ test(`an arrow on the table points to the notices once the cover is halfway open at ${width}px`,async({page})=>{
+  await page.setViewportSize({width,height:820});
+  await page.goto('http://127.0.0.1:4323');
+  const arrow=page.getByRole('link',{name:'Els avisos'});
+  const turn=()=>page.locator('.book').evaluate(book=>parseFloat((book as HTMLElement).style.getPropertyValue('--turn')));
+  const range=await page.locator('.opening').evaluate(opening=>(opening as HTMLElement).offsetHeight-innerHeight);
+  await expect(arrow).toBeHidden();
+  await page.evaluate(y=>window.scrollTo(0,y),Math.round(range*.1));
+  await expect.poll(turn).toBeGreaterThan(-89);
+  await expect(arrow).toBeHidden();
+  await page.evaluate(y=>window.scrollTo(0,y),Math.round(range*.2));
+  await expect.poll(turn).toBeLessThan(-89);
+  await expect(arrow).toBeVisible();
+  const box=(await arrow.boundingBox())!;
+  expect(box.height).toBeGreaterThanOrEqual(44);
+  expect(box.y+box.height).toBeLessThanOrEqual(820);
+  await arrow.click();
+  await expect.poll(async()=>(await page.locator('#avisos').boundingBox())!.y).toBeLessThan(40);
+  await expect(arrow).toBeHidden();
+  // The pencil leaves the table as the notices slide over it.
+  await expect.poll(()=>page.locator('.pencil').evaluate(pencil=>getComputedStyle(pencil).opacity)).toBe('0');
+ });
+}
+
 test('dates that do not fit wait behind a link, and the open book grows to show them',async({page})=>{
  await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
  await page.setViewportSize({width:390,height:844});

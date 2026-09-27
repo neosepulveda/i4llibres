@@ -20,7 +20,6 @@ const filters = [['tot', t.filterAll], ...Object.entries(t.categories)];
     <section id="avisos" class="notices-section" aria-labelledby="notices-heading">
       <h2 id="notices-heading" class="notices-heading">{t.notices}</h2>
       {notices.length > 0 && <div class="filters" role="group" aria-label={t.filter} hidden>
-        <span class="filters-label" aria-hidden="true">{t.show}</span>
         {filters.map(([key,label]) => <button data-filter={key} class="filter" type="button" aria-pressed={key === 'tot' ? 'true' : 'false'} data-label={label}><span class="filter-dot" aria-hidden="true"></span>{label}<span class="filter-count" aria-hidden="true"></span></button>)}
       </div>}
       <div class="filter-status">
