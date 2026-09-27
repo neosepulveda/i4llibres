@@ -1,4 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+
+// The dates page sits under the cover until the book opens, so open it before using the dates.
+async function openBook(page: Page) {
+ await page.evaluate(()=>window.scrollTo(0,0));
+ await page.getByRole('button',{name:/Obre el llibre|Abrir el libro|Open the book/}).click();
+ await expect.poll(()=>page.locator('.book').evaluate(book=>(book as HTMLElement).style.getPropertyValue('--turn'))).toBe('-178.00deg');
+}
+
 for (const width of [1440,390,320]) {
   for (const colorScheme of ['light','dark'] as const) {
     test(`empty board ${width}px ${colorScheme}`, async ({ page }) => {
@@ -8,6 +16,7 @@ for (const width of [1440,390,320]) {
       await expect(page.locator('html')).toHaveAttribute('lang','ca');
       await expect(page.getByRole('heading',{name:'Encara no hi ha cap avís'})).toBeVisible();
       await expect(page.locator('.notice')).toHaveCount(0);
+      await expect(page.getByText('Ara mateix no hi ha cap data a la vista.')).toBeVisible();
       await expect(page.getByRole('link',{name:'Calendari escolar 2026–27'})).toBeVisible();
       await expect(page.getByRole('link',{name:'Calendari escolar 2026–27'})).toHaveAttribute('href','https://lamarbella.cat/calendari-escolar/');
       await expect(page.locator('.notice-count')).toHaveText('0 avisos');
@@ -23,17 +32,23 @@ for (const width of [1440,390,320]) {
 test('Markdown content, category filtering and empty filter recovery',async({page})=>{
   await page.goto('http://127.0.0.1:4323');
   await expect(page.locator('.notice')).toHaveCount(2);
-  await expect(page.locator('.notice h2')).toHaveText(['Avís d’escola de prova', 'Avís de classe de prova']);
+  await expect(page.locator('.notice h3')).toHaveText(['Avís d’escola de prova', 'Avís de classe de prova']);
   await expect(page.getByRole('button',{name:'Calendari',exact:true})).toHaveCount(0);
+  await expect(page.locator('.filter-count')).toHaveText(['2','1','1','0','0']);
   await page.getByRole('button',{name:'I4B',exact:true}).click();
   await expect(page.locator('.notice:visible')).toHaveCount(1);
-  await expect(page.locator('.notice-count')).toHaveText('1 avís');
+  await expect(page.locator('.notice-count')).toHaveText('1 avís d’I4B');
   await page.locator('.notice:visible details:not(.calendar-actions) summary').click();
   await expect(page.getByText('Detall del conte de prova.')).toBeVisible();
   await page.getByRole('button',{name:'Menjador',exact:true}).click();
   await expect(page.getByRole('heading',{name:'No hi ha avisos d’aquesta categoria'})).toBeVisible();
   await page.getByRole('button',{name:'Mostra tots els avisos'}).click();
   await expect(page.locator('.notice:visible')).toHaveCount(2);
+  await page.getByRole('button',{name:'Escola',exact:true}).click();
+  await expect(page.locator('.notice-count')).toHaveText('1 avís de l’escola');
+  await page.getByRole('button',{name:'Mostra’ls tots'}).click();
+  await expect(page.locator('.notice-count')).toHaveText('2 avisos');
+  await expect(page.getByRole('button',{name:'Mostra’ls tots'})).toBeHidden();
 });
 test('empty state works without JavaScript',async({browser})=>{
   const context=await browser.newContext({javaScriptEnabled:false});
@@ -42,37 +57,120 @@ test('empty state works without JavaScript',async({browser})=>{
   await expect(page.locator('#theme-toggle')).toBeHidden();await context.close();
 });
 
+for (const width of [390,1280]) {
+ test(`the closed book fills the first screen and opens as you scroll at ${width}px`,async({page})=>{
+  await page.setViewportSize({width,height:844});
+  await page.goto('http://127.0.0.1:4323');
+  const turn=()=>page.locator('.book').evaluate(book=>parseFloat((book as HTMLElement).style.getPropertyValue('--turn')));
+  // Nothing but the book, the pencil and the button above the fold.
+  expect((await page.locator('#avisos').boundingBox())!.y).toBeGreaterThan(844);
+  await expect(page.getByRole('button',{name:'Obre el llibre'})).toBeVisible();
+  expect(await turn()).toBe(0);
+  const range=await page.locator('.opening').evaluate(opening=>(opening as HTMLElement).offsetHeight-innerHeight);
+  await page.evaluate(y=>window.scrollTo(0,y),Math.round(range*.3));
+  await expect.poll(turn).toBeLessThan(-20);
+  expect(await turn()).toBeGreaterThan(-178);
+  await expect(page.getByRole('button',{name:'Obre el llibre'})).toBeHidden();
+  // The book holds still while the cover turns and once it has opened.
+  await page.evaluate(y=>window.scrollTo(0,y),Math.round(range*.75));
+  await expect.poll(turn).toBe(-178);
+  const open=(await page.locator('.book').boundingBox())!.y;
+  await page.evaluate(y=>window.scrollTo(0,y),Math.round(range*.95));
+  await page.waitForTimeout(100);
+  expect(Math.abs((await page.locator('.book').boundingBox())!.y-open)).toBeLessThan(2);
+  await openBook(page);
+  await expect(page.locator('.upcoming-event').first()).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ });
+}
+
+test('dates that do not fit wait behind a link, and the open book grows to show them',async({page})=>{
+ await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ // Six more dates than the fixtures have, so the page overflows the cover.
+ await page.evaluate(()=>{
+  const list=document.querySelector('.upcoming-list')!;
+  for(let index=0;index<6;index++) list.append(list.lastElementChild!.cloneNode(true));
+  document.getElementById('dates')!.dispatchEvent(new Event('dates-change'));
+ });
+ const more=page.locator('.more-dates');
+ await expect(more).toBeVisible();
+ const shown=await page.locator('.upcoming-event:visible').count();
+ expect(shown).toBeLessThan(8);
+ await expect(more).toHaveText(`Mostra ${8-shown} dates més`);
+ const cover=(await page.locator('.cover').boundingBox())!.height;
+ expect((await page.locator('#dates').boundingBox())!.height).toBeLessThanOrEqual(cover+1);
+ await openBook(page);
+ const before=(await page.locator('.book').boundingBox())!.y;
+ await more.click();
+ await expect(page.locator('.upcoming-event:visible')).toHaveCount(8);
+ await expect(more).toHaveAttribute('aria-expanded','true');
+ await expect(more).toHaveText('Mostra’n menys');
+ await expect(page.locator('.opening')).toHaveClass(/released/);
+ expect(Math.abs((await page.locator('.book').boundingBox())!.y-before)).toBeLessThan(2);
+ expect((await page.locator('#dates').boundingBox())!.height).toBeGreaterThan(cover+100);
+ await more.click();
+ await expect(page.locator('.upcoming-event:visible')).toHaveCount(shown);
+ await expect(page.locator('.opening')).not.toHaveClass(/released/);
+});
+
+test('with reduced motion the cover and every date simply sit on the page',async({page})=>{
+ await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ await expect(page.locator('html')).not.toHaveClass(/motion/);
+ await expect(page.getByRole('button',{name:'Obre el llibre'})).toBeHidden();
+ await expect(page.locator('.upcoming-event:visible')).toHaveCount(2);
+ const cover=(await page.locator('.cover').boundingBox())!, dates=(await page.locator('#dates').boundingBox())!;
+ expect(dates.y).toBeGreaterThan(cover.y+cover.height);
+ await page.locator('.upcoming-event').first().click();
+ await expect(page.locator('#avis-class details').first()).toHaveAttribute('open','');
+});
+
 for (const width of [320,390]) {
  for (const colorScheme of ['light','dark'] as const) {
-  test(`back to top on phones at ${width}px ${colorScheme}`,async({page})=>{
+  test(`the filters shortcut on phones at ${width}px ${colorScheme}`,async({page})=>{
    await page.setViewportSize({width,height:600});
    await page.emulateMedia({colorScheme,reducedMotion:colorScheme==='dark'?'reduce':'no-preference'});
-   for(const [path,label] of [['/?lang=ca','Torna a dalt'],['/es/','Volver arriba'],['/en/','Back to top']]){
+   for(const [path,label] of [['/?lang=ca','Filtres: Tots'],['/es/','Filtros: Todos'],['/en/','Filters: All']]){
     await page.goto('http://127.0.0.1:4323'+path);
     const button=page.getByRole('button',{name:label,includeHidden:true});
     await expect(button).toBeHidden();
     await page.locator('.notice details:not(.calendar-actions)').evaluateAll(elements=>elements.forEach(element=>element.setAttribute('open','')));
-    await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+    await page.locator('.notice').first().evaluate(card=>card.scrollIntoView({block:'start'}));
     await expect(button).toBeVisible();
+    await button.evaluate(element=>Promise.all(element.getAnimations().map(animation=>animation.finished)));
     const box=await button.boundingBox();
-    expect(box!.width).toBeGreaterThanOrEqual(44);
     expect(box!.height).toBeGreaterThanOrEqual(44);
-    expect(box!.x+box!.width).toBeLessThanOrEqual(width-16);
-    expect(box!.y+box!.height).toBeLessThanOrEqual(600-16);
+    expect(box!.x+box!.width).toBeLessThanOrEqual(width-14);
+    expect(box!.y+box!.height).toBeLessThanOrEqual(600-14);
     await button.focus();
     await page.keyboard.press('Enter');
-    await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBe(0);
+    await expect(page.locator('.filter[aria-pressed="true"]')).toBeFocused();
+    await expect.poll(async()=>(await page.locator('.filters').boundingBox())!.y).toBeLessThan(600);
     await expect(button).toBeHidden();
-    await expect(page.locator('.brand')).toBeFocused();
    }
   });
  }
 }
 
+test('the filters shortcut appears after jumping from a date past the filters',async({page})=>{
+ await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
+ await page.setViewportSize({width:390,height:600});
+ await page.goto('http://127.0.0.1:4323');
+ await page.locator('.notice details:not(.calendar-actions)').evaluateAll(elements=>elements.forEach(element=>element.setAttribute('open','')));
+ await openBook(page);
+ await page.locator('.upcoming-event').nth(1).click();
+ await expect(page.locator('#avis-school')).toBeInViewport();
+ await expect(page.getByRole('button',{name:'Filtres: Tots'})).toBeVisible();
+});
+
 test('external links open new tabs without JavaScript; internal links stay in this tab',async({browser})=>{
   const context=await browser.newContext({javaScriptEnabled:false});
   const page=await context.newPage();await page.goto('http://127.0.0.1:4323');
-  for(const link of [page.locator('.useful-links a'),page.getByRole('link',{name:'Enllaç extern de prova',includeHidden:true})]) {
+  for(const link of [page.locator('.school-calendar'),page.getByRole('link',{name:'Enllaç extern de prova',includeHidden:true})]) {
     await expect(link).toHaveAttribute('target','_blank');
     await expect(link).toHaveAttribute('rel','noopener noreferrer');
   }
@@ -92,6 +190,7 @@ test('calendar controls are opt-in and provide a real downloadable event',async(
  const googleBox=await google.boundingBox();
  const downloadBox=await downloadLink.boundingBox();
  expect(Math.abs(googleBox!.height-downloadBox!.height)).toBeLessThan(1);
+ await expect(page.locator('.notice.classe .calendar-options p')).toHaveText('17:00–18:00 h, hora de Barcelona');
  const params=new URL((await google.getAttribute('href'))!).searchParams;
  expect(params.get('dates')).toBe('20261005T150000Z/20261005T160000Z');
  const download=page.waitForEvent('download');
@@ -120,6 +219,14 @@ test('timetable images load, open separately and download their originals',async
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
+test('a notice opens with its pop-up scene, or the school when it has none',async({page})=>{
+ await page.goto('http://127.0.0.1:4323');
+ await expect(page.locator('#avis-school .popup .piece').first()).toBeAttached();
+ await expect(page.locator('#avis-class .popup')).toHaveCount(0);
+ await expect(page.locator('#avis-class .scene-plate use')).toHaveAttribute('href','#school-scene');
+ await expect(page.locator('.notice-scene [aria-hidden="true"]')).toHaveCount(2);
+});
+
 for (const width of [320,390]) {
  test(`upcoming dates open their notices and export on phones at ${width}px`,async({page})=>{
   await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
@@ -127,26 +234,28 @@ for (const width of [320,390]) {
   await page.goto('http://127.0.0.1:4323');
   const rows=page.locator('.upcoming-event:visible');
   await expect(rows).toHaveCount(2);
-  await expect(rows.first().locator('.upcoming-day strong')).toHaveText('5');
-  await expect(rows.first().locator('.upcoming-when')).toContainText('17:00–18:00 h');
-  await expect(rows.first().locator('.upcoming-when small')).toHaveText('dilluns');
+  await expect(rows.first().locator('.date-leaf b')).toHaveText('OCT');
+  await expect(rows.first().locator('.date-leaf > span')).toHaveText('5');
+  await expect(rows.first().locator('.upcoming-when')).toHaveText('5 d’octubre, dilluns, 17:00–18:00 h');
   await expect(rows.first().locator('.upcoming-title')).toHaveText('Avís de classe de prova');
   await page.getByRole('button',{name:'Menjador',exact:true}).click();
   await expect(rows).toHaveCount(2);
+  await openBook(page);
   await rows.first().click();
   const card=page.locator('#avis-class');
   await expect(card).toBeVisible();
   await expect(page.getByRole('button',{name:'Tots',exact:true})).toHaveAttribute('aria-pressed','true');
   await expect(card.locator('details').first()).toHaveAttribute('open','');
-  await expect(card.locator('.chip')).toHaveText('dl 5 oct · 17:00 h');
+  await expect(card.locator('.stamp')).toHaveText('dl 5 oct, 17:00 h');
   await card.locator('.calendar-actions summary').click();
   await expect(card.getByRole('link',{name:'Google Calendar'})).toBeVisible();
   const download=page.waitForEvent('download');
   await card.getByRole('link',{name:/Apple Calendar/}).click();
   expect((await download).suggestedFilename()).toBe('class.ics');
+  await openBook(page);
   await rows.nth(1).click();
   const school=page.locator('#avis-school');
-  await expect(school.locator('.chip')).toHaveText('dl 12 oct · tot el dia');
+  await expect(school.locator('.stamp')).toHaveText('dl 12 oct, tot el dia');
   await school.locator('.calendar-actions summary').click();
   const holiday=await school.getByRole('link',{name:'Google Calendar'}).getAttribute('href');
   expect(new URL(holiday!).searchParams.get('dates')).toBe('20261012/20261013');
@@ -155,6 +264,13 @@ for (const width of [320,390]) {
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  });
 }
+test('tabbing into the dates opens the book',async({page})=>{
+ await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ await page.locator('.upcoming-event').first().focus();
+ await expect.poll(()=>page.locator('.book').evaluate(book=>(book as HTMLElement).style.getPropertyValue('--turn'))).toBe('-178.00deg');
+});
 test('past dates expire in Barcelona time, including all-day holidays',async({page})=>{
  await page.clock.install({time:new Date('2026-10-05T16:00:00Z')});
  await page.goto('http://127.0.0.1:4323');
@@ -164,8 +280,9 @@ test('past dates expire in Barcelona time, including all-day holidays',async({pa
  await expect(page.locator('.upcoming-event:visible')).toHaveCount(1);
  await page.clock.setSystemTime(new Date('2026-10-12T22:00:00Z'));
  await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
- await expect(page.locator('.upcoming')).toBeHidden();
- await expect(page.locator('.useful-links')).toBeVisible();
+ await expect(page.locator('.upcoming-event:visible')).toHaveCount(0);
+ await expect(page.getByText('Ara mateix no hi ha cap data a la vista.')).toBeVisible();
+ await expect(page.locator('.school-calendar')).toBeVisible();
 });
 test('upcoming dates reach their notice and export without JavaScript',async({browser})=>{
  const context=await browser.newContext({javaScriptEnabled:false});
@@ -185,14 +302,14 @@ test('language choice persists, while explicit language links take precedence',a
  await page.locator('.language-picker summary').click();
  await page.getByRole('link',{name:'Castellano',exact:true}).click();
  await expect(page.locator('html')).toHaveAttribute('lang','es');
- await expect(page.getByRole('heading',{name:'El tablón de I4B'})).toBeVisible();
- await expect(page.locator('.notice h2')).toHaveText(['Aviso del colegio de prueba','Aviso de clase de prueba']);
+ await expect(page.getByRole('heading',{name:'El tablón de I4B'})).toBeAttached();
+ await expect(page.locator('.notice h3')).toHaveText(['Aviso del colegio de prueba','Aviso de clase de prueba']);
  await page.goto('http://127.0.0.1:4323');
  await expect(page).toHaveURL('http://127.0.0.1:4323/es/');
  await page.goto('http://127.0.0.1:4323/en/');
  await expect(page.locator('html')).toHaveAttribute('lang','en');
  await page.getByRole('button',{name:'I4B',exact:true}).click();
- await expect(page.locator('.notice-count')).toHaveText('1 notice');
+ await expect(page.locator('.notice-count')).toHaveText('1 notice from I4B');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.locator('.language-picker summary').click();
  await page.getByRole('link',{name:'Català',exact:true}).click();
@@ -205,7 +322,8 @@ test('translated exports and language navigation work without JavaScript',async(
  const context=await browser.newContext({javaScriptEnabled:false});
  const page=await context.newPage();
  await page.goto('http://127.0.0.1:4323/en/');
- await expect(page.locator('.upcoming-event').first().locator('.upcoming-when')).toContainText('17:00–18:00');
+ await expect(page.locator('.upcoming-event').first().locator('.upcoming-when')).toHaveText('5 October, Monday, 17:00–18:00');
+ await expect(page.locator('.upcoming-event').first().locator('.date-leaf b')).toHaveText('OCT');
  const event=page.locator('#avis-class');
  await event.locator('.calendar-actions summary').click();
  const google=new URL((await event.getByRole('link',{name:'Google Calendar'}).getAttribute('href'))!);
@@ -246,16 +364,17 @@ test('language label and chevron align, with the dropdown anchored inside the ph
  }
 });
 
-test('notices have a distinct translated heading after the calendar links',async({page})=>{
+test('notices have a distinct translated heading after the book',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
  await page.setViewportSize({width:390,height:844});
  for(const [path,label] of [['/?lang=ca','Els avisos'],['/es/','Los avisos'],['/en/','Notices']]){
   await page.goto('http://127.0.0.1:4323'+path);
   const heading=page.getByRole('heading',{name:label,exact:true});
   await expect(heading).toBeVisible();
-  const calendar=await page.locator('.useful-links').boundingBox();
+  const dates=await page.locator('#dates').boundingBox();
   const title=await heading.boundingBox();
-  const filters=await page.locator('.board-toolbar').boundingBox();
-  expect(title!.y-calendar!.y-calendar!.height).toBeGreaterThanOrEqual(24);
+  const filters=await page.locator('.filters').boundingBox();
+  expect(title!.y-dates!.y-dates!.height).toBeGreaterThanOrEqual(24);
   expect(filters!.y).toBeGreaterThan(title!.y+title!.height);
   await expect(page.getByRole('region',{name:label,exact:true})).toBeVisible();
  }
@@ -269,9 +388,8 @@ for (const width of [320,390]) {
    await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
    for(const path of ['/?lang=ca','/es/','/en/']){
     await page.goto('http://127.0.0.1:4323'+path);
-    await expect(page.locator('.brand small')).toBeVisible();
-    await expect(page.locator('.brand small')).toContainText('I4B · La Mar Bella');
-    const controls=page.locator('.filters button, .language-picker summary, #theme-toggle, .notice details:not(.calendar-actions) summary');
+    await expect(page.locator('.brand')).toContainText('Els Llibres');
+    const controls=page.locator('.filters button, .language-picker summary, #theme-toggle, .notice details summary, .open-book');
     for(const control of await controls.all()){
      await expect(control).toBeVisible();
      const box=await control.boundingBox();
@@ -281,10 +399,14 @@ for (const width of [320,390]) {
     await expect(page.locator('.filters button')).toHaveCount(5);
     expect((await page.locator('.filters').boundingBox())!.height).toBeLessThanOrEqual(94);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    const colors=await page.locator('.upcoming-day span, .chip').evaluateAll(elements=>elements.map(element=>({
-     foreground:getComputedStyle(element).color,
-     background:getComputedStyle(element.closest('.upcoming, .notice')!).backgroundColor,
-    })));
+    // Text on a category colour, and coloured text on paper, stay readable in both themes.
+    await page.getByRole('button',{name:'I4B',exact:true}).click();
+    const colors=await page.locator('.upcoming-event .date-leaf b, .tag, .stamp, .upcoming-when, .filter[aria-pressed="true"]').evaluateAll(elements=>elements.map(element=>{
+     const own=getComputedStyle(element).backgroundColor;
+     const paper=getComputedStyle(element.closest('.upcoming, .notice-text')||element).backgroundColor;
+     return {foreground:getComputedStyle(element).color,background:own==='rgba(0, 0, 0, 0)'?paper:own};
+    }));
+    expect(colors.length).toBeGreaterThan(6);
     const luminance=(rgb:string)=>{
      const channels=rgb.match(/[\d.]+/g)!.slice(0,3).map(Number).map(value=>{
       const channel=value/255;

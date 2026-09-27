@@ -1,6 +1,5 @@
 ---
-import Book from '../components/Book.astro';
-import BackToTop from '../components/BackToTop.astro';
+import Illustrations from '../components/Illustrations.astro';
 import '../styles/site.css';
 import { messages, languagePath, type Language } from '../lib/i18n';
 interface Props { language: Language }
@@ -12,7 +11,7 @@ const paths = {ca:languagePath(import.meta.env.BASE_URL,'ca'),es:languagePath(im
 <html lang={language}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="description" content={t.description} />
@@ -20,7 +19,7 @@ const paths = {ca:languagePath(import.meta.env.BASE_URL,'ca'),es:languagePath(im
     <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.svg`} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Figtree:ital,wght@0,400;0,600;0,700;1,400&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=Young+Serif&display=swap" />
     <script is:inline define:vars={{language,paths}}>
       // Only the neutral entry URL follows a saved preference. Explicit language links win.
       if (language === 'ca' && new URLSearchParams(location.search).get('lang') !== 'ca') {
@@ -32,31 +31,40 @@ const paths = {ca:languagePath(import.meta.env.BASE_URL,'ca'),es:languagePath(im
     </script>
     <script is:inline>
       (() => {
+        const root = document.documentElement;
         let theme;
         try { theme = localStorage.getItem('llibres-theme'); } catch {}
-        document.documentElement.dataset.theme = ['clar', 'fosc'].includes(theme) ? theme : (matchMedia('(prefers-color-scheme: dark)').matches ? 'fosc' : 'clar');
+        root.dataset.theme = ['clar', 'fosc'].includes(theme) ? theme : (matchMedia('(prefers-color-scheme: dark)').matches ? 'fosc' : 'clar');
+        // Set before the first paint, so the book never jumps from the still layout to the moving one.
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) root.classList.add('motion');
       })();
     </script>
   </head>
   <body>
     <a class="skip" href="#avisos">{t.skip}</a>
-    <div class="shell">
+    <Illustrations />
+    <div class="lamplight" aria-hidden="true"></div>
+    <div class="frame">
       <header class="site-header">
-        <a class="brand" href={paths[language]}><span>Els Llibres</span><small>I4B · La Mar Bella<span class="school-year"> · {t.course}</span></small></a>
-        <div class="header-right"><details class="language-picker"><summary aria-label="Idioma / Language"><span>{language.toUpperCase()}</span><svg class="language-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary><nav aria-label="Idioma / Language">
+        <a class="brand" href={paths[language]}><span>Els Llibres</span><small>{t.school}</small></a>
+        <div class="header-right"><details class="language-picker"><summary aria-label="Idioma / Language"><span>{language.toUpperCase()}</span><svg class="language-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary><nav class="paper" aria-label="Idioma / Language">
           <a href={`${paths.ca}?lang=ca`} data-language="ca" lang="ca" hreflang="ca" aria-current={language === 'ca' ? 'page' : undefined}>Català</a>
           <a href={paths.es} data-language="es" lang="es" hreflang="es" aria-current={language === 'es' ? 'page' : undefined}>Castellano</a>
           <a href={paths.en} data-language="en" lang="en" hreflang="en" aria-current={language === 'en' ? 'page' : undefined}>English</a>
         </nav></details>
-<button id="theme-toggle" hidden aria-label={t.dark} data-dark={t.dark} data-light={t.light}>
-          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>
-          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
-        </button></div>
+          <button id="theme-toggle" type="button" hidden aria-label={t.dark} data-dark={t.dark} data-light={t.light}>
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 13h14l-3-8h-8z"/><path class="bulb" d="M13.5 13a2.5 2.5 0 0 0 5 0" stroke-width="1.5"/>
+              <path d="M16 5V2"/><g class="pull-cord"><path d="M21.5 13v6" stroke-dasharray="1.4 1.6"/><circle cx="21.5" cy="20.5" r="1.3"/></g>
+              <path d="M11 29h10M16 29v-9"/>
+            </svg>
+          </button>
+        </div>
       </header>
       <main><slot /></main>
-      <footer><Book /><p>{t.footer}<span>{t.credits}</span></p><span class="footer-class">I4B / LLIBRES</span></footer>
+      <footer class="back-cover"><span class="the-end" aria-hidden="true">{t.theEnd}</span><p>{t.footer}</p><p>{t.credits}</p></footer>
     </div>
-    <BackToTop label={t.backToTop} />
+    <slot name="overlays" />
     <script>
       document.querySelectorAll<HTMLAnchorElement>('[data-language]').forEach(link => {
         link.addEventListener('click', () => {
@@ -65,6 +73,7 @@ const paths = {ca:languagePath(import.meta.env.BASE_URL,'ca'),es:languagePath(im
       });
       const picker = document.querySelector<HTMLDetailsElement>('.language-picker')!;
       document.addEventListener('click', event => { if (!picker.contains(event.target as Node)) picker.open = false; });
+      // The desk lamp switches between day and night.
       const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle')!;
       const system = matchMedia('(prefers-color-scheme: dark)');
       let manuallySelected = false;

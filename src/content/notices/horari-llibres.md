@@ -3,14 +3,13 @@ title: "Què fem cada dia? L’horari dels Llibres"
 description: "Biblioteca, anglès, tallers, psicomotricitat i música: les activitats d’I4B al llarg de la setmana."
 order: 30
 category: classe
+scene: timetable
+expanded: true
 note: "Veure i descarregar els horaris"
 images:
-  - src: "/downloads/activitats-i4b-llista.jpg"
-    title: "Horari en llista"
-    alt: "Activitats d’I4B en format de llista, de dilluns a divendres. El contingut es pot llegir en text a continuació."
   - src: "/downloads/activitats-i4b-per-dies.jpg"
     title: "Horari per dies"
-    alt: "Activitats d’I4B agrupades per dia de la setmana. El contingut es pot llegir en text a continuació."
+    alt: "Activitats d’I4B agrupades per dia de la setmana. El mateix contingut és al text de l’avís."
 ---
 Aquestes són les activitats de l’horari compartit amb les famílies d’I4B:
 

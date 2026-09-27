@@ -89,7 +89,11 @@ The example date is illustrative, not a current announcement.
 | `category` | `classe`, `escola`, `menjador`, or `afa` (the family association). School-wide calendar notices use `escola`; the optional `event` block controls the upcoming-dates list and calendar exports. |
 | `order` | Lower values appear first; defaults to 100. Put family actions before optional information. |
 | `date` | Optional date displayed on the card. Does not create an event or expire the notice. |
-| `note` | Optional label for the expandable details. |
+| `note` | Optional label for the pull-tab that opens the details. |
+| `scene` | Optional pop-up illustration: `letter`, `activities`, `dining`, `holiday`, `timetable` or `playground`. Without one, the card shows the school from the cover. |
+| `expanded` | Optional. `true` shows the body and images on the page instead of behind a pull-tab. In an expanded notice, a list whose items start with bold text reads as a timetable. |
+
+Each scene was drawn for a particular notice, and some carry words (the email subject, “every month”, the weekday initials), so pick one only when its picture fits. A new kind of notice needs a new component in `src/components/scenes/` and its name in `src/lib/scenes.ts`.
 
 Ties in `order` are resolved by date and then notice ID. Edit an existing file to update a notice. To remove it, delete the original and its translations, then publish. Public Git history retains previous versions.
 
@@ -142,7 +146,7 @@ event:
   description: "Dia festiu. No hi ha classe."
 ```
 
-Upcoming dates are separate from notice filters. With JavaScript, ended events disappear when the page opens, every minute, and when returning to the tab. All-day expiry follows Barcelona time. Each date links to its notice card, where the details and calendar downloads live; with JavaScript the card opens automatically. Without JavaScript, the link still jumps to the card. The original notice stays until manually removed.
+Upcoming dates are the first page of the book, under the cover, and separate from notice filters. Dates that do not fit on the page wait behind “Show N more dates”; with none left, the page says there are no dates coming up. With JavaScript, ended events disappear when the page opens, every minute, and when returning to the tab. All-day expiry follows Barcelona time. Each date links to its notice card, where the details and calendar downloads live; with JavaScript the card opens automatically. Without JavaScript, the link still jumps to the card. The original notice stays until manually removed.
 
 Calendar exports are copies, not subscriptions: later website edits do not automatically update a family's calendar.
 
@@ -159,7 +163,7 @@ images:
     alt: "A meaningful description in Catalan."
 ```
 
-Add corresponding translated image text to both translation files. Images appear in the expanded notice, open in a new tab, and can be downloaded. Original timetable images remain in Catalan; the translated notice body provides their contents in Spanish and English.
+Add corresponding translated image text to both translation files. Images appear after the notice text, like snapshots pinned to the page, behind the pull-tab or directly on the page for an `expanded` notice. Tapping one opens it in a new tab, and each has a download link. Original timetable images remain in Catalan; the translated notice body provides their contents in Spanish and English.
 
 ## Language and appearance preferences
 

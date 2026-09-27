@@ -2,6 +2,7 @@
 title: "Dilluns 12 d’octubre, dia festiu"
 description: "El pròxim dia festiu del calendari escolar és dilluns 12 d’octubre. Tingueu-lo present per organitzar-vos en família."
 category: escola
+scene: holiday
 date: "2026-10-12"
 order: 25
 note: "Detalls del dia festiu"

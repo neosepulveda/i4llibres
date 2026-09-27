@@ -15,16 +15,19 @@ Daily/weekly recaps, a CMS approval queue, authentication, and automatic transla
 ## Product decisions to preserve
 
 - Phone-first layout, usable at 320px and 390px, with light and dark themes.
+- The page is a pop-up storybook. The first screen shows only the closed book on the table: a navy cloth cover with the title and an arched window onto the school, a pencil, and an “Open the book” button. The book keeps the same proportions closed and open. Scrolling turns the cover while the book holds still, then the notices follow; the button scrolls there for you. With reduced motion or without JavaScript, the cover and the dates page simply sit one after the other.
+- Night mode is a desk lamp: the table goes dark, the pages stay warm. The lamp button in the header switches it.
 - Catalan is the default; Spanish and English cover interface text, notices, and calendar exports.
-- Upcoming dates are a compact list at the top of the page, not a month grid. Each row links to its notice card, which holds the details and calendar exports; with JavaScript the card opens and is highlighted on arrival. Keep the notices as a distinct section with its own heading and spacing.
+- Upcoming dates are the first page of the book, not a month grid and not a month-specific heading, since dates can span months. Each date is a calendar leaf showing only the month and day; the line under the title gives the weekday and time without repeating the date. Dates that do not fit the page wait behind “Show N more dates”, which lets the open book grow; with no dates, the page says so and keeps the school calendar link. Each row links to its notice card, which holds the details and calendar exports; with JavaScript the pages riffle to the card, which opens and is highlighted on arrival. Keep the notices as a distinct section with its own heading and spacing.
 - Notice filters affect cards only, not the upcoming-dates list.
-- Keep all category filters visible, with the same compact category labels used on notice cards; do not replace them with action sorting. Use the current board before deciding whether action or freshness badges are needed.
+- Keep all category filters visible, with the same compact category labels used on notice cards; do not replace them with action sorting. The filters are buttons with a category dot and a count; the chosen one fills with its colour and shows a tick. A status line names the result (“1 avís del menjador”) with a way back to all notices, and once the filters scroll away a floating “Filters: …” button returns to them. It replaces the earlier back-to-top button. Use the current board before deciding whether action or freshness badges are needed.
+- Each notice is a chapter: a pop-up scene chosen with `scene`, then a page of text with a category ribbon, a date stamp for events, and pull-tabs for details and calendar exports. A notice without a scene shows the school from the cover. Text on category colours and coloured text on paper must keep at least 4.5:1 contrast in both themes.
 - Notice categories are class, whole school, school meals, and AFA (the family association). Calendar dates use the relevant audience category; event metadata controls the upcoming-dates list and calendar exports.
 - Public holidays are named “Dia festiu”, “Día festivo”, and “Public holiday”. School closure days are not necessarily public holidays; use the wording appropriate to the source.
 - Calendar export is opt-in through event metadata. Do not infer event durations or add exports to every dated announcement.
 - The AFA cancellation reminder marks the final day to cancel activities for the following month, not the whole application window. Use a one-day all-day event and state the exact cutoff in its description.
 - External web links open in a new tab with `noopener noreferrer`. Downloads stay direct downloads.
-- Preserve downloadable original timetable images. Their contents are also available as translated text.
+- Preserve downloadable original timetable images. Their contents are also available as translated text. The class timetable is `expanded`: its week reads on the page, followed by the “Horari per dies” picture only.
 - The site and repository history are public. `noindex, nofollow` discourages indexing but does not restrict access.
 - Do not publish school Google Docs links that grant unrestricted editing. The existing announcement refers families to the teacher's email instead.
 
@@ -59,16 +62,20 @@ Build output is deterministic given source files, configuration, and build time.
 | `src/lib/i18n.ts` | Interface strings, category labels, supported languages, base-aware language paths. |
 | `src/pages/index.astro` | Catalan entry point. |
 | `src/pages/[lang]/index.astro` | Static Spanish and English entry points. |
-| `src/components/Board.astro` | Shared page layout, calendar placement, notice section, filtering. |
-| `src/layouts/Layout.astro` | HTML language/metadata, header, language picker, theme, preference handling, footer. |
-| `src/components/Notice.astro` | Cards, translated Markdown, images, optional calendar controls. |
-| `src/components/UpcomingDates.astro` | Chronological event list linking to notice cards, client-side expiry. |
+| `src/components/Board.astro` | Shared page layout, the book, notice section, filters and the filters shortcut. |
+| `src/components/OpeningBook.astro` | The cover and its scroll-driven opening; fits the dates page to the cover and releases the book when more dates show. |
+| `src/layouts/Layout.astro` | HTML language/metadata, header, language picker, lamp theme switch, preference handling, back cover. |
+| `src/components/Illustrations.astro` | Shared SVG symbols: the children, trees, clouds, stars and the school scene used on the cover. |
+| `src/components/Notice.astro` | Chapter cards, translated Markdown, optional calendar controls. `NoticeImages.astro` renders pictures with open and download links. |
+| `src/components/Scene.astro`, `src/components/scenes/` | Pop-up scenes and their spring animation; `src/lib/scenes.ts` lists the names a notice can use. |
+| `src/components/UpcomingDates.astro` | The dates page: calendar leaves linking to notice cards, empty state, client-side expiry, travel to a card. |
+| `src/lib/date-labels.ts` | Leaf, stamp and calendar-ticket labels in Barcelona time for each language. |
 | `src/components/CalendarLinks.astro` | Shared Google Calendar and download actions. |
 | `src/lib/calendar.ts` | Calendar URL/file generation, time labels, stable event UIDs, escaping and UTF-8 line folding. |
 | `src/pages/calendar/[...id].ics.ts` | Catalan event downloads. |
 | `src/pages/[lang]/calendar/[...id].ics.ts` | Translated event downloads. |
 | `src/lib/external-links.mjs` | Build-time Markdown external-link policy. |
-| `src/styles/site.css` | Responsive layout, theme tokens and category colours. Baloo 2 and Figtree load from Google Fonts with system fallbacks. |
+| `src/styles/site.css` | Responsive layout, theme tokens and category colours. Young Serif (headings) and Literata (text) load from Google Fonts with Georgia fallbacks. |
 | `public/downloads/` | Public original attachments copied into the build. |
 | `.github/workflows/pages.yml` | Checks and deployment. |
 
@@ -99,7 +106,7 @@ On Norman, use a login shell or include `/opt/homebrew/bin` in `PATH` for SSH co
 5. Inspect the relevant UI at phone widths in both themes and all affected languages.
 6. Verify Norman's preview URL responds before handing off changes for phone review, leave the preview running, and include its URL in the response. Report what changed and whether it is local, committed, pushed, or deployed.
 
-`bin/ci` runs shell syntax checks, `astro check`, the production build, Node tests, and Playwright tests. `npm test` expects a production build to exist. Unit tests cover calendar serialization, external links, script execution with injected command fakes, and generated production output. Browser tests cover fixtures, themes, filters, downloads, expiry, language preferences, and layout.
+`bin/ci` runs shell syntax checks, `astro check`, the production build, Node tests, and Playwright tests. `npm test` expects a production build to exist. Unit tests cover calendar serialization, date labels, external links, script execution with injected command fakes, and generated production output. Browser tests cover fixtures, the opening book and its dates page, themes, filters and their shortcut, downloads, expiry, language preferences, reduced motion, contrast and layout.
 
 `tests/server.mjs` builds isolated temporary projects on ports 4322 and 4323. Never run fixture builds inside the working checkout: shared Astro content stores previously caused fixture contamination. Keep fixture translations alongside fixture originals. Some production-output tests refer to the current published notices; update these assertions deliberately if those notices are retired.
 

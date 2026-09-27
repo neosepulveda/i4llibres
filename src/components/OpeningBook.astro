@@ -1,0 +1,134 @@
+---
+import { messages, type Language } from '../lib/i18n';
+interface Props { language: Language }
+const { language } = Astro.props;
+const t = messages[language];
+const children = [['classe','skin-1','hair-4'],['escola','skin-2','hair-1'],['red','skin-3','hair-3'],['afa','skin-4','hair-2'],['sea-light','skin-5','hair-3']];
+---
+<section class="opening" aria-labelledby="upcoming-title">
+  <div class="stage">
+    <svg class="prop pencil" aria-hidden="true" viewBox="0 0 120 12">
+      <path d="M8 2h96v8H8z" fill="#f2c14e"/><path d="M8 2h96v2.6H8z" fill="#f7d77e"/><path d="M104 2h8v8h-8z" fill="#e8a7a4"/><path d="M104 2h3v8h-3z" fill="#c7cdd1"/><path d="M8 2 0 6l8 4z" fill="#e8c9a0"/><path d="M0 6l2.6-1.3v2.6z" fill="#1d2533"/>
+    </svg>
+    <svg class="prop desk-lamp night" aria-hidden="true" viewBox="0 0 120 90">
+      <path d="M120 8H70q-8 0-10 8l-6 22" fill="none" stroke="#39404f" stroke-width="5" stroke-linecap="round"/><circle cx="56" cy="38" r="5" fill="#39404f"/>
+      <path d="M30 44l40-10 10 22-44 12z" fill="#2f3749"/><ellipse cx="58" cy="62" rx="22" ry="5" transform="rotate(-15 58 62)" fill="#ffe3a3"/>
+    </svg>
+    <div class="book">
+      <slot />
+      <div class="cover" aria-hidden="true">
+        <div class="face front">
+          <div class="cover-title"><b>Els Llibres</b><span>{t.heading}</span></div>
+          <div class="cover-window"><svg viewBox="0 0 100 82" preserveAspectRatio="xMidYMax slice"><rect width="100" height="82" style="fill:var(--sky)"/><use href="#school-scene" x="0" y="-6" width="100" height="90"/></svg></div>
+          <div class="cover-foot"><b>Escola La Mar Bella</b>{t.courseCover}</div>
+        </div>
+        <div class="face inside">
+          <svg class="endpapers" viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice"><defs><pattern id="endpaper" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M2 14q2.5-3 5 0t5 0" fill="none" style="stroke:var(--cloth)" stroke-width=".9" opacity=".35"/><path d="M13 4h5v5h-5z" style="fill:var(--classe)" opacity=".35"/><path d="M15.5 4v5" style="stroke:var(--cloth)" stroke-width=".6" opacity=".35"/></pattern></defs><rect width="120" height="160" fill="url(#endpaper)"/></svg>
+          <div class="bookplate"><svg viewBox="0 0 72 18">{children.map(([clothes,skin,hair],index) => <use href="#child" x={2 + index * 14} width="12" height="18" style={`--clothes:var(--${clothes});--skin:var(--${skin});--hair:var(--${hair})`}/>)}</svg><p>{t.bookplate}</p></div>
+        </div>
+      </div>
+    </div>
+    <button class="open-book" type="button" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>{t.openBook}</button>
+  </div>
+</section>
+<script>
+  // The closed book fills the first screen. Scrolling turns the cover while the book stays put,
+  // then the notices follow. Without motion, the cover and the dates simply sit side by side.
+  const motion = document.documentElement.classList.contains('motion');
+  const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+  const ease = (value: number) => 1 - Math.pow(1 - value, 3);
+  const opening = document.querySelector<HTMLElement>('.opening')!;
+  const stage = opening.querySelector<HTMLElement>('.stage')!;
+  const book = opening.querySelector<HTMLElement>('.book')!;
+  const openButton = opening.querySelector<HTMLButtonElement>('.open-book')!;
+  const page = document.getElementById('dates')!;
+  const pages = document.querySelector<HTMLElement>('.pages');
+  const released = () => opening.classList.contains('released');
+  // Share of the scroll range the cover takes to open; the rest holds the open book still.
+  const OPEN = .69;
+  let wide = false, progress = 0, frame = 0;
+
+  function measure() {
+    wide = matchMedia('(min-width: 900px)').matches;
+    // The stage is a screen tall, so pull the notices up to sit just below the open book.
+    requestAnimationFrame(() => {
+      const gap = (innerHeight - page.offsetHeight) / 2;
+      if (pages) pages.style.marginTop = !released() && gap > 36 ? `${-(gap - 36)}px` : '';
+    });
+  }
+  function turn(amount: number) {
+    book.style.setProperty('--turn', `${(-178 * amount).toFixed(2)}deg`);
+    book.style.setProperty('--tilt', `${(14 * (1 - amount)).toFixed(2)}deg`);
+    book.style.setProperty('--scale', (.9 + .1 * amount).toFixed(3));
+    book.style.setProperty('--shift', wide ? `${(book.offsetWidth / 2 * amount).toFixed(1)}px` : '0px');
+  }
+  function update() {
+    frame = 0;
+    if (released()) { turn(1); return; }
+    const box = opening.getBoundingClientRect();
+    progress = clamp(-box.top / (box.height - innerHeight));
+    turn(ease(clamp(progress / OPEN)));
+    // The hint fades with the first bit of scroll and leaves the layout once the cover is open.
+    openButton.style.opacity = (1 - clamp((progress - .02) / .08)).toFixed(2);
+    openButton.hidden = progress >= .1;
+  }
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+  const openPosition = () => { const box = opening.getBoundingClientRect(); return scrollY + box.top + (box.height - innerHeight) * (OPEN + 1) / 2; };
+  if (motion) {
+    measure();
+    update();
+    addEventListener('scroll', schedule, { passive: true });
+    addEventListener('resize', () => { measure(); schedule(); }, { passive: true });
+    openButton.addEventListener('click', () => scrollTo({ top: openPosition(), behavior: 'smooth' }));
+    // Tabbing into the dates opens the book, so a focused link is never under the cover.
+    page.addEventListener('focusin', () => { if (progress < OPEN && !released()) scrollTo({ top: openPosition(), behavior: 'smooth' }); });
+  }
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => location.reload());
+
+  // The dates page is the cover's size: dates that don't fit wait behind "Show N more dates".
+  const list = page.querySelector<HTMLElement>('.upcoming-list');
+  const noDates = page.querySelector<HTMLElement>('.upcoming-empty')!;
+  const more = page.querySelector<HTMLButtonElement>('.more-dates')!;
+  const moreLabel = more.querySelector('span')!;
+  let showAll = false;
+  // With every date showing, the page outgrows the screen, so the open book stops being held
+  // by the scroll and sits in the page instead, exactly where it was.
+  function release(on: boolean) {
+    if (!motion || on === released()) return;
+    if (on) {
+      turn(1);
+      const before = book.getBoundingClientRect().top;
+      opening.style.setProperty('--released-top', `${before - stage.getBoundingClientRect().top}px`);
+      opening.classList.add('released');
+      if (pages) pages.style.marginTop = '';
+      scrollTo({ top: scrollY + book.getBoundingClientRect().top - before, behavior: 'instant' });
+    } else {
+      opening.classList.remove('released');
+      measure();
+      scrollTo({ top: openPosition(), behavior: 'instant' });
+      schedule();
+    }
+  }
+  function fit(animate = false) {
+    const rows = Array.from(list?.querySelectorAll<HTMLElement>('.upcoming-event') ?? []).filter(row => !row.hidden);
+    rows.forEach(row => row.classList.remove('spare', 'arriving'));
+    noDates.hidden = rows.length > 0;
+    if (list) list.hidden = rows.length === 0;
+    more.hidden = true;
+    const limit = motion ? parseFloat(getComputedStyle(page).minHeight) + 1 : Infinity;
+    let shown = rows.length;
+    while (shown > 1 && page.offsetHeight > limit) { rows[--shown].classList.add('spare'); more.hidden = false; }
+    const spare = rows.length - shown;
+    const expanded = showAll && spare > 0;
+    if (expanded) rows.slice(shown).forEach(row => { row.classList.remove('spare'); if (animate) row.classList.add('arriving'); });
+    moreLabel.textContent = expanded ? more.dataset.fewer! : (spare === 1 ? more.dataset.one! : more.dataset.many!).replace('{n}', String(spare));
+    more.setAttribute('aria-expanded', String(expanded));
+    if (!expanded) release(false);
+    if (motion) measure();
+  }
+  more.addEventListener('click', () => { showAll = !showAll; if (showAll) release(true); fit(true); });
+  page.addEventListener('dates-change', () => fit());
+  addEventListener('resize', () => fit());
+  document.fonts?.ready.then(() => fit());
+  fit();
+</script>

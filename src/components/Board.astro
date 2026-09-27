@@ -4,46 +4,119 @@ import { messages, type Language } from '../lib/i18n';
 import Layout from '../layouts/Layout.astro';
 import Notice from './Notice.astro';
 import Book from './Book.astro';
+import OpeningBook from './OpeningBook.astro';
 import UpcomingDates from './UpcomingDates.astro';
 interface Props { language?: Language }
 const { language = 'ca' } = Astro.props;
 const t = messages[language];
 const entries = await localizedNotices(language);
 const notices = entries.map(entry => entry.notice);
+const filters = [['tot', t.filterAll], ...Object.entries(t.categories)];
 ---
 <Layout language={language}>
-  <section class="intro"><h1>{t.heading}</h1><p class="intro-description">{t.intro}</p></section>
-  <UpcomingDates notices={notices} language={language} />
-  <nav class="useful-links" aria-label={t.useful}><a href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18"/></svg><span>{t.schoolCalendar} <small>2026–27</small></span><span aria-hidden="true">↗</span></a></nav>
-  <section id="avisos" aria-labelledby="notices-heading">
-    <div class="notices-header">
+  <h1 class="sr-only">{t.heading}</h1>
+  <OpeningBook language={language}><UpcomingDates notices={notices} language={language} /></OpeningBook>
+  <div class="pages">
+    <section id="avisos" class="notices-section" aria-labelledby="notices-heading">
       <h2 id="notices-heading" class="notices-heading">{t.notices}</h2>
-      <span class="notice-count" role="status" data-singular={t.singular} data-plural={t.plural}>{notices.length} {notices.length === 1 ? t.singular : t.plural}</span>
-    </div>
-    <div class="board-toolbar">
-      {notices.length > 0 ? <nav class="filters" aria-label={t.filter} hidden>
-        <button data-filter="tot" aria-pressed="true">{t.filterAll}</button>
-        {Object.entries(t.categories).map(([key,label]) => <button data-filter={key} aria-pressed="false"><i aria-hidden="true"></i>{label}</button>)}
-      </nav> : <span class="board-label">{t.all}</span>}
-    </div>
-    {notices.length === 0 ? <div class="empty-state"><span class="empty-icon"><Book /></span><h2>{t.empty}</h2><p>{t.emptyBody}</p></div> : <><div class="notices">{entries.map(({notice,content}) => <Notice notice={notice} content={content} language={language} />)}</div><div class="filter-empty" hidden><h2>{t.noCategory}</h2><button id="reset-filter">{t.reset}</button></div></>}
-  </section>
+      {notices.length > 0 && <div class="filters" role="group" aria-label={t.filter} hidden>
+        <span class="filters-label" aria-hidden="true">{t.show}</span>
+        {filters.map(([key,label]) => <button data-filter={key} class="filter" type="button" aria-pressed={key === 'tot' ? 'true' : 'false'} data-label={label}><span class="filter-dot" aria-hidden="true"></span>{label}<span class="filter-count" aria-hidden="true"></span></button>)}
+      </div>}
+      <div class="filter-status">
+        <p class="notice-count" role="status" data-singular={t.singular} data-plural={t.plural} data-suffixes={JSON.stringify(t.countSuffix)}>{notices.length} {notices.length === 1 ? t.singular : t.plural}</p>
+        <button class="show-all" type="button" hidden>{t.showAll}</button>
+      </div>
+      {notices.length === 0 ? <div class="empty-state sheet paper"><span class="empty-icon"><Book /></span><h3>{t.empty}</h3><p>{t.emptyBody}</p></div> : <>
+        <div class="notices">{entries.map(({notice,content}) => <Notice notice={notice} content={content} language={language} />)}</div>
+        <div class="filter-empty sheet paper" hidden><h3>{t.noCategory}</h3><button id="reset-filter" type="button">{t.reset}</button></div>
+      </>}
+    </section>
+  </div>
+  <Fragment slot="overlays">
+    {notices.length > 0 && <button class="filters-shortcut" type="button" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg><span>{t.filtersShortcut}: <b>{t.filterAll}</b></span></button>}
+    <div class="riffle" aria-hidden="true"><i class="paper"></i><i class="paper"></i><i class="paper"></i><i class="paper"></i><i class="paper"></i></div>
+  </Fragment>
   <script>
+    // Filters fold away the notices they hide. Upcoming dates always stay on the dates page.
+    const motion = document.documentElement.classList.contains('motion');
     const filters = document.querySelector<HTMLElement>('.filters');
     if (filters) {
       filters.hidden = false;
       const cards = Array.from(document.querySelectorAll<HTMLElement>('.notice'));
-      const buttons = Array.from(filters.querySelectorAll<HTMLButtonElement>('button'));
-      function filter(category: string) {
+      const buttons = Array.from(filters.querySelectorAll<HTMLButtonElement>('.filter'));
+      const counter = document.querySelector<HTMLElement>('.notice-count')!;
+      const suffixes = JSON.parse(counter.dataset.suffixes!) as Record<string, string>;
+      const showAll = document.querySelector<HTMLButtonElement>('.show-all')!;
+      const empty = document.querySelector<HTMLElement>('.filter-empty')!;
+      const shortcut = document.querySelector<HTMLButtonElement>('.filters-shortcut')!;
+      buttons.forEach(button => {
+        const category = button.dataset.filter;
+        button.querySelector('.filter-count')!.textContent = String(cards.filter(card => category === 'tot' || card.dataset.category === category).length);
+      });
+      let current = 'tot', busy = false;
+      function apply(category: string) {
         let count = 0;
         cards.forEach(card => { card.hidden = category !== 'tot' && card.dataset.category !== category; if (!card.hidden) count++; });
         buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === category)));
-        const counter = document.querySelector<HTMLElement>('.notice-count')!;
-        counter.textContent = `${count} ${count === 1 ? counter.dataset.singular : counter.dataset.plural}`;
-        document.querySelector<HTMLElement>('.filter-empty')!.hidden = count !== 0;
+        const word = count === 1 ? counter.dataset.singular : counter.dataset.plural;
+        counter.textContent = category === 'tot' ? `${count} ${word}` : `${count} ${word} ${suffixes[category]}`;
+        showAll.hidden = category === 'tot';
+        empty.hidden = count !== 0;
+        shortcut.querySelector('b')!.textContent = buttons.find(button => button.dataset.filter === category)!.dataset.label!;
+        current = category;
+      }
+      function filter(category: string) {
+        if (category === current || busy) return;
+        buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === category)));
+        const leaving = cards.filter(card => !card.hidden && category !== 'tot' && card.dataset.category !== category);
+        if (!motion) { apply(category); return; }
+        busy = true;
+        leaving.forEach(card => card.classList.add('folding'));
+        setTimeout(() => {
+          const before = new Map(cards.map(card => [card, card.hidden ? null : card.getBoundingClientRect().top]));
+          apply(category);
+          leaving.forEach(card => card.classList.remove('folding'));
+          cards.forEach(card => {
+            if (card.hidden) return;
+            const top = before.get(card);
+            if (top == null) {
+              card.classList.add('unfolding');
+              card.addEventListener('animationend', () => card.classList.remove('unfolding'), { once:true });
+            } else {
+              const moved = top - card.getBoundingClientRect().top;
+              if (Math.abs(moved) > 1) card.animate([{ transform:`translateY(${moved}px)` }, { transform:'none' }], { duration:480, easing:'cubic-bezier(.2,.9,.25,1)' });
+            }
+          });
+          document.dispatchEvent(new Event('llibres:filtered'));
+          busy = false;
+        }, leaving.length ? 320 : 0);
       }
       buttons.forEach(button => button.addEventListener('click', () => filter(button.dataset.filter!)));
+      showAll.addEventListener('click', () => filter('tot'));
       document.querySelector('#reset-filter')?.addEventListener('click', () => { filter('tot'); buttons[0].focus(); });
+      // A date on the first page always reaches its notice, whatever the filter.
+      document.addEventListener('llibres:show-all', () => apply('tot'));
+
+      // Once the filters have scrolled away, a small button brings you back to them. Measured on
+      // scroll rather than observed, because a jump from a date skips straight past the filters.
+      const list = document.querySelector<HTMLElement>('.notices')!;
+      const backCover = document.querySelector<HTMLElement>('.back-cover')!;
+      let queued = 0;
+      function toggleShortcut() {
+        queued = 0;
+        const notices = list.getBoundingClientRect();
+        shortcut.hidden = !(filters!.getBoundingClientRect().bottom < 0 && notices.top < innerHeight * .7 && notices.bottom > 0 && backCover.getBoundingClientRect().top > innerHeight);
+      }
+      const queueShortcut = () => { if (!queued) queued = requestAnimationFrame(toggleShortcut); };
+      addEventListener('scroll', queueShortcut, { passive:true });
+      addEventListener('resize', queueShortcut, { passive:true });
+      document.addEventListener('llibres:filtered', queueShortcut);
+      toggleShortcut();
+      shortcut.addEventListener('click', () => {
+        document.getElementById('avisos')!.scrollIntoView({ behavior:motion ? 'smooth' : 'auto', block:'start' });
+        (buttons.find(button => button.getAttribute('aria-pressed') === 'true') ?? buttons[0]).focus({ preventScroll:true });
+      });
     }
   </script>
 </Layout>

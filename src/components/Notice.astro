@@ -1,36 +1,27 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import CalendarLinks from './CalendarLinks.astro';
+import NoticeImages from './NoticeImages.astro';
+import Scene from './Scene.astro';
+import { stampLabel, shortDate } from '../lib/date-labels';
 import { messages, type Language } from '../lib/i18n';
 interface Props { notice: CollectionEntry<'notices'>; content: CollectionEntry<'notices'> | CollectionEntry<'translations'>; language: Language }
 const { notice, content, language } = Astro.props;
 const t = messages[language];
-const categories = t.categories;
 const { Content } = await render(content);
-const { title, description, category, date, note, event, images } = notice.data;
-const assetUrl = (src: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${src}`;
-const displayDate = date && new Intl.DateTimeFormat(language, { day:'numeric', month:'short', timeZone:'UTC' }).format(new Date(date+'T12:00:00Z'));
-// The chip repeats the date row at the top of the page: short weekday, day, month, then the start time.
-const chip = event && (() => {
-  const when = new Date(event.allDay ? event.start + 'T12:00:00Z' : event.start);
-  const part = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(language, { ...options, timeZone:'Europe/Madrid' }).format(when).replace(/\.$/,'');
-  const time = event.allDay ? t.allDay.toLowerCase() : `${new Intl.DateTimeFormat(language, { hour:'2-digit', minute:'2-digit', hourCycle:'h23', timeZone:'Europe/Madrid' }).format(when)}${language === 'en' ? '' : ' h'}`;
-  return `${part({weekday:'short'})} ${part({day:'numeric'})} ${part({month:'short'})} · ${time}`;
-})();
+const { title, description, category, date, note, event, images, scene, expanded } = notice.data;
+// The stamp repeats the date row from the dates page: short weekday, day, month, then the time.
+const stamp = event ? { datetime:event.start, label:stampLabel(event, language) } : date && { datetime:date, label:shortDate(date, language) };
 ---
 <article class={`notice ${category}`} id={`avis-${notice.id}`} data-category={category}>
-  <span class="notice-spine" aria-hidden="true"></span>
-  <div class="notice-inner">
-    <div class="card-meta"><span class="tag">{categories[category]}</span>{event ? <span class="chip"><time datetime={event.start}>{chip}</time></span> : date && <time datetime={date}>{displayDate}</time>}</div>
-    <h2>{title}</h2><p>{description}</p>
-    <details><summary><span>{note || t.more}</span><span class="expand" aria-hidden="true"></span></summary><div class="notice-body">
-      {images.length > 0 && <div class="notice-images" aria-label={t.images}>{images.map(image => <figure>
-        <a class="image-preview" href={assetUrl(image.src)} target="_blank" rel="noopener noreferrer" aria-label={`${t.openImage}: ${image.title}`}><img src={assetUrl(image.src)} alt={image.alt} loading="lazy" width="1024" height="2048" /></a>
-        <figcaption>{image.title}</figcaption>
-        <a class="image-download" href={assetUrl(image.src)} download>{t.download} <span class="sr-only">{image.title.toLowerCase()}</span><span aria-hidden="true">↓</span></a>
-      </figure>)}</div>}
-      <Content />
-    </div></details>
-    {event && <details class="calendar-actions"><summary><span>{t.add}</span><span class="expand" aria-hidden="true"></span></summary><CalendarLinks id={notice.id} title={title} event={event} language={language} /></details>}
+  <div class="notice-scene paper"><Scene name={scene} language={language} /></div>
+  <div class="notice-text paper">
+    <span class="tag">{t.categories[category]}</span>
+    {stamp && <p class="stamp"><time datetime={stamp.datetime}>{stamp.label}</time></p>}
+    <h3>{title}</h3>
+    <p class="notice-summary">{description}</p>
+    {expanded ? <div class="notice-body open"><Content /><NoticeImages images={images} language={language} /></div>
+      : <details class="tab"><summary><span>{note || t.more}</span><span class="tab-hole" aria-hidden="true"></span></summary><div class="notice-body"><Content /><NoticeImages images={images} language={language} /></div></details>}
+    {event && <details class="tab calendar-actions"><summary><span>{t.add}</span><span class="tab-hole" aria-hidden="true"></span></summary><CalendarLinks id={notice.id} title={title} event={event} language={language} /></details>}
   </div>
 </article>

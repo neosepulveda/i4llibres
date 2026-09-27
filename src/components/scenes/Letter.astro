@@ -1,0 +1,32 @@
+---
+import type { Language } from '../../lib/i18n';
+interface Props { language: Language }
+// The email subject stays as sent; only the date is translated.
+const sent = { ca:'25 set.', es:'25 sept.', en:'25 Sep' }[Astro.props.language];
+---
+<div class="backdrop"><svg viewBox="0 0 100 50" preserveAspectRatio="none">
+  <rect width="100" height="50" style="fill:var(--lilac-light)"/>
+  <use href="#stars" class="night" width="100" height="50"/>
+  <path d="M8 34c6-14 22-24 34-18s-4 16-10 8S40 6 60 8" style="fill:none;stroke:var(--black);stroke-width:.4;stroke-dasharray:1.2 1.4;opacity:.45"/>
+  <g class="plane part"><path d="M60 8l14-5-6 12-2.6-4.4z" style="fill:var(--white)"/><path d="M65.4 10.6 74 3l-8.6 4.6z" style="fill:var(--wall-dark)"/></g>
+  <g class="clouds"><use href="#cloud" x="76" y="20" width="18" height="7"/></g>
+</svg></div>
+<div class="floor"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><rect width="100" height="40" style="fill:var(--wood)"/><g style="fill:none;stroke:var(--wood-dark);stroke-width:.35;opacity:.7"><path d="M0 8c30-2 60 2 100 0M0 18c24 2 70-3 100 1M0 29c40-2 60 2 100-1"/></g></svg>
+  <div class="piece" style="--x:22;--y:10;--w:56;--ar:56/42;--d:0"><svg viewBox="0 0 56 42">
+    <defs><clipPath id="envelope-inside"><rect x="-4" y="-30" width="64" height="72"/></clipPath></defs>
+    <path d="M0 20h56v22H0z" style="fill:var(--envelope-dark)"/><path d="M0 20 28 7l28 13z" style="fill:var(--envelope)"/>
+    <g clip-path="url(#envelope-inside)"><g class="letter" style="transform:translateY(calc((1 - min(var(--r,1),1)) * 26px))">
+      <rect x="5" y="0" width="46" height="36" rx=".6" style="fill:var(--white)"/>
+      <text x="9" y="7.4" style="font-family:'Young Serif',Georgia,serif;font-size:3.5px;fill:var(--black)">Informacions reunions</text>
+      <text x="9" y="11.8" style="font-family:'Young Serif',Georgia,serif;font-size:3.5px;fill:var(--black)">famílies</text>
+      <text x="47" y="11.8" text-anchor="end" style="font-family:Literata,Georgia,serif;font-style:italic;font-size:2.6px;fill:var(--black);opacity:.6">{sent}</text>
+      <g style="fill:none;stroke:var(--wall-dark);stroke-width:.8;stroke-linecap:round"><path d="M9 16h34M9 20h28M9 24h32"/></g>
+    </g></g>
+    <path d="M0 20l28 11 28-11v22H0z" style="fill:var(--envelope)"/><path d="M0 42 22 27M56 42 34 27" style="stroke:rgba(0,0,0,.12);stroke-width:.5"/>
+    <circle cx="28" cy="31" r="3" style="fill:var(--red)"/><path d="M26.6 30.4a.9.9 0 0 1 1.4-.4.9.9 0 0 1 1.4.4c0 .9-1.4 1.8-1.4 1.8s-1.4-.9-1.4-1.8z" style="fill:var(--white)"/>
+  </svg></div>
+  <div class="piece" style="--x:3;--y:22;--w:20;--ar:20/15;--d:.35"><svg viewBox="0 0 20 15"><g transform="rotate(-8 10 7.5)"><rect x="1" y="1" width="18" height="12" rx=".8" style="fill:var(--cloth)"/><rect x="2.6" y="2.6" width="14.8" height="8.8" style="fill:var(--sky)"/><circle cx="12.8" cy="5.4" r="1.5" style="fill:var(--sun)"/><path d="M2.6 11.4l4-4 3 3 2-1.6 5.8 2.6z" style="fill:var(--grass)"/></g></svg></div>
+  <div class="piece" style="--x:77;--y:21;--w:20;--ar:20/17;--d:.42"><svg viewBox="0 0 20 17"><g transform="rotate(7 10 8.5)"><rect x="1" y="1" width="18" height="15" style="fill:var(--white)"/><g style="fill:none;stroke:var(--wall-dark);stroke-width:.5"><path d="M1 5h18M1 9h18M1 13h18M7 1v15M13 1v15"/></g><g style="fill:none;stroke:var(--escola);stroke-width:.9;stroke-linecap:round;stroke-linejoin:round"><path d="M8.4 6.8l1.2 1.1 2-2.2M14.4 10.8l1.2 1.1 2-2.2M2.4 14.8l1.2 1.1 2-2.2"/></g></g></svg></div>
+  <div class="piece" style="--x:60;--y:31;--w:17;--ar:17/13;--d:.5"><svg viewBox="0 0 17 13"><g transform="rotate(-5 8.5 6.5)"><rect x="1" y="1.4" width="15" height="11" style="fill:var(--white)"/><rect x="1" y="1.4" width="15" height="2.6" style="fill:var(--red)"/><g style="fill:var(--wall-dark)"><rect x="2.6" y="5.4" width="2" height="2"/><rect x="5.6" y="5.4" width="2" height="2"/><rect x="11.6" y="5.4" width="2" height="2"/><rect x="2.6" y="8.8" width="2" height="2"/><rect x="5.6" y="8.8" width="2" height="2"/><rect x="8.6" y="8.8" width="2" height="2"/></g><circle cx="9.6" cy="6.4" r="1.9" style="fill:none;stroke:var(--red);stroke-width:.6"/></g></svg></div>
+  <div class="piece" style="--x:12;--y:34;--w:30;--ar:30/5;--d:.55"><svg viewBox="0 0 30 5"><path d="M4 .8h22v3.4H4z" style="fill:var(--yellow)"/><path d="M26 .8h3v3.4h-3z" style="fill:var(--pink)"/><path d="M4 .8 0 2.5l4 1.7z" style="fill:var(--sand)"/><path d="M0 2.5l1.4-.6v1.2z" style="fill:var(--black)"/></svg></div>
+</div>

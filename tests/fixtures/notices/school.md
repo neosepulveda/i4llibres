@@ -3,6 +3,7 @@ title: "Avís d’escola de prova"
 description: "Un segon avís fictici per comprovar els filtres."
 order: 10
 category: escola
+scene: holiday
 event:
   allDay: true
   title: "Festiu de prova"

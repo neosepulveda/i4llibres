@@ -1,50 +1,75 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { eventTimeLabel } from '../lib/calendar';
+import { leaf, fullDate, dayAndTime } from '../lib/date-labels';
 import { messages, type Language } from '../lib/i18n';
 interface Props { notices: CollectionEntry<'notices'>[]; language: Language }
 const { notices, language } = Astro.props;
 const t = messages[language];
 const events = notices.filter(notice => notice.data.event).sort((a,b) => a.data.event!.start.localeCompare(b.data.event!.start));
-const format = (value: string, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(language, { ...options, timeZone:'Europe/Madrid' }).format(new Date(value.length === 10 ? value + 'T12:00:00Z' : value));
 ---
-{events.length > 0 && <section class="upcoming" aria-labelledby="upcoming-title">
+<div class="sheet paper upcoming" id="dates">
+  <span class="bookmark" aria-hidden="true"></span>
   <h2 id="upcoming-title">{t.upcoming}</h2>
-  {events.map(({id,data}) => {
-    const event = data.event!;
-    return <a class={`upcoming-event ${data.category}`} href={`#avis-${id}`} data-end={event.end} data-all-day={String(!!event.allDay)}>
-      <time class="upcoming-day" datetime={event.start}><strong>{format(event.start,{day:'numeric'})}</strong><span>{format(event.start,{month:'short'}).replace(/\.$/,'')}</span></time>
-      <span class="upcoming-text"><strong class="upcoming-when">{eventTimeLabel(event, language)}{' '}<small>{format(event.start,{weekday:'long'})}</small></strong><span class="upcoming-title">{event.title || data.title}</span></span>
-      <span class="upcoming-arrow" aria-hidden="true"></span>
-    </a>;
-  })}
-</section>}
+  {events.length > 0 && <div class="upcoming-list" id="upcoming-list">
+    {events.map(({id,data}) => {
+      const event = data.event!;
+      const { month, day } = leaf(event, language);
+      return <a class={`upcoming-event ${data.category}`} href={`#avis-${id}`} data-end={event.end} data-all-day={String(!!event.allDay)}>
+        <span class="date-leaf" aria-hidden="true"><b>{month}</b><span>{day}</span></span>
+        <span class="upcoming-text"><span class="upcoming-title">{event.title || data.title}</span><span class="upcoming-when"><span class="sr-only"><time datetime={event.start}>{fullDate(event.start, language)}</time>, </span>{dayAndTime(event, language)}</span></span>
+      </a>;
+    })}
+  </div>}
+  <div class="upcoming-empty" hidden={events.length > 0}>
+    <span class="date-leaf blank" aria-hidden="true"><b></b><span>–</span></span>
+    <p>{t.noDates}</p>
+    <p>{t.noDatesBody}</p>
+  </div>
+  <button class="more-dates" type="button" aria-expanded="false" aria-controls="upcoming-list" data-one={t.moreDate} data-many={t.moreDates} data-fewer={t.fewerDates} hidden><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg><span></span></button>
+  <a class="school-calendar" href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer">{t.schoolCalendar}<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h7v7M13 3 4 12"/></svg><span class="sr-only"> ({t.newTab.toLocaleLowerCase(language)})</span></a>
+</div>
 <script>
+  const motion = document.documentElement.classList.contains('motion');
+  const page = document.getElementById('dates')!;
+  const rows = Array.from(page.querySelectorAll<HTMLAnchorElement>('.upcoming-event'));
+
   // Static hosting: expire dates without waiting for another deployment.
   function refreshDates() {
     const today = new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Madrid',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-    document.querySelectorAll<HTMLElement>('.upcoming-event').forEach(row => {
+    rows.forEach(row => {
       row.hidden = row.dataset.allDay === 'true' ? row.dataset.end! <= today : Date.parse(row.dataset.end!) <= Date.now();
     });
-    const upcoming = document.querySelector<HTMLElement>('.upcoming');
-    if (upcoming) upcoming.hidden = !upcoming.querySelector('.upcoming-event:not([hidden])');
+    page.dispatchEvent(new Event('dates-change'));
   }
   refreshDates();
   setInterval(refreshDates, 60_000);
   document.addEventListener('visibilitychange', refreshDates);
 
-  // A date row opens its notice. Without JavaScript the anchor link still reaches the card.
-  document.querySelectorAll<HTMLAnchorElement>('.upcoming-event').forEach(row => row.addEventListener('click', event => {
+  // A date turns the pages to its notice and opens it. Without JavaScript the anchor link still
+  // reaches the card.
+  const riffle = document.querySelector<HTMLElement>('.riffle');
+  const leaves = Array.from(riffle?.children ?? []) as HTMLElement[];
+  function arrive(card: HTMLElement) {
+    card.scrollIntoView({ block:'start' });
+    const details = card.querySelector<HTMLDetailsElement>('details');
+    if (details) details.open = true;
+    card.classList.add('highlight');
+    setTimeout(() => card.classList.remove('highlight'), 2600);
+    card.dispatchEvent(new Event('llibres:arrive', { bubbles:true }));
+    card.querySelector<HTMLElement>('summary')?.focus({ preventScroll:true });
+  }
+  rows.forEach(row => row.addEventListener('click', event => {
     const card = document.querySelector<HTMLElement>(row.getAttribute('href')!);
     if (!card) return;
     event.preventDefault();
-    if (card.hidden) document.querySelector<HTMLButtonElement>('.filters button[data-filter="tot"]')?.click();
-    const details = card.querySelector<HTMLDetailsElement>('details');
-    if (details) details.open = true;
+    if (card.hidden) document.dispatchEvent(new Event('llibres:show-all'));
     row.blur();
-    card.scrollIntoView({block:'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
-    card.classList.add('highlight');
-    card.querySelector<HTMLElement>('summary')?.focus({preventScroll:true});
-    setTimeout(() => card.classList.remove('highlight'), 2500);
+    if (!motion || !riffle) { arrive(card); return; }
+    leaves.forEach((leaf, index) => { leaf.style.animationDelay = `${120 + index * 85}ms`; leaf.style.zIndex = String(10 - index); });
+    riffle.classList.remove('turning');
+    void riffle.offsetWidth;
+    riffle.classList.add('turning');
+    requestAnimationFrame(() => arrive(card));
+    setTimeout(() => riffle.classList.remove('turning'), 120 + leaves.length * 85 + 700);
   }));
 </script>

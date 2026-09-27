@@ -1,12 +1,13 @@
 ---
-import { googleCalendarUrl, calendarPath, eventTimeLabel, type CalendarEvent } from '../lib/calendar';
+import { googleCalendarUrl, calendarPath, type CalendarEvent } from '../lib/calendar';
+import { ticketLabel } from '../lib/date-labels';
 import { messages, languagePath, type Language } from '../lib/i18n';
 interface Props { id: string; title: string; event: CalendarEvent; language: Language }
 const { id, title, event, language } = Astro.props;
 const t = messages[language];
 ---
 <div class="calendar-options">
-  <a href={googleCalendarUrl(title, event)} target="_blank" rel="noopener noreferrer">Google Calendar <span aria-hidden="true">↗</span></a>
+  <a href={googleCalendarUrl(title, event)} target="_blank" rel="noopener noreferrer">Google Calendar <small>{t.newTab}</small></a>
   <a href={calendarPath(languagePath(import.meta.env.BASE_URL, language), id)} download>{t.others} <small>{t.ics}</small></a>
-  <p>{eventTimeLabel(event, language)}{!event.allDay && ` · ${t.barcelona}`}</p>
+  <p>{ticketLabel(event, language)}</p>
 </div>

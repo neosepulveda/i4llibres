@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { sceneNames } from './lib/scenes';
 
 const notices = defineCollection({
   loader: glob({
@@ -13,6 +14,8 @@ const notices = defineCollection({
     category: z.enum(['classe', 'escola', 'menjador', 'afa']),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     note: z.string().optional(),
+    scene: z.enum(sceneNames).optional(),
+    expanded: z.boolean().default(false),
     images: z.array(z.object({
       src: z.string().startsWith('/downloads/'),
       title: z.string().min(1),

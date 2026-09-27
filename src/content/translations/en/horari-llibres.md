@@ -3,12 +3,10 @@ title: "What do we do each day? The Els Llibres timetable"
 description: "Library, English, workshops, movement activities and music: I4B’s activities throughout the week."
 note: "View and download the timetables"
 images:
-  - title: "Timetable as a list"
-    alt: "I4B activities in Catalan, listed from Monday to Friday. The English translation is available below."
   - title: "Timetable by day"
-    alt: "I4B activities in Catalan, grouped by weekday. The English translation is available below."
+    alt: "I4B activities in Catalan, grouped by weekday. The English translation is in the notice text."
 ---
-These are the activities on the timetable shared with I4B families. The original images are in Catalan.
+These are the activities on the timetable shared with I4B families. The original image is in Catalan.
 
 - **Monday:** library in the afternoon.
 - **Tuesday:** English with the whole class, 11:30–12:30; workshops, 15:00–16:10.

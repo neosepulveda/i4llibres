@@ -1,0 +1,83 @@
+---
+import type { Language } from '../lib/i18n';
+import type { SceneName } from '../lib/scenes';
+import Letter from './scenes/Letter.astro';
+import Activities from './scenes/Activities.astro';
+import Dining from './scenes/Dining.astro';
+import Holiday from './scenes/Holiday.astro';
+import Timetable from './scenes/Timetable.astro';
+import Playground from './scenes/Playground.astro';
+interface Props { name?: SceneName; language: Language }
+const { name, language } = Astro.props;
+const Pieces = name && { letter:Letter, activities:Activities, dining:Dining, holiday:Holiday, timetable:Timetable, playground:Playground }[name];
+---
+{Pieces ? <div class="popup" aria-hidden="true"><div class="popup-inner"><Pieces language={language} /></div></div>
+  : <div class="scene-plate" aria-hidden="true"><svg viewBox="0 0 100 78" preserveAspectRatio="xMidYMax slice"><rect width="100" height="78" style="fill:var(--sky)" /><use href="#school-scene" x="0" y="-8" width="100" height="90" /></svg></div>}
+<script>
+  // Each pop-up is a small spring: its floor folds up and its paper pieces stand, one after
+  // another, as the scene comes up the screen, and fold down again as it leaves the top.
+  if (document.documentElement.classList.contains('motion')) {
+    const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+    const popups = Array.from(document.querySelectorAll<HTMLElement>('.popup')).map(element => ({
+      element, inner:element.querySelector<HTMLElement>('.popup-inner')!, floor:element.querySelector<HTMLElement>('.floor')!,
+      pieces:Array.from(element.querySelectorAll<HTMLElement>('.piece')).map(piece => ({ element:piece, delay:parseFloat(piece.style.getPropertyValue('--d')) || 0, last:-9 })),
+      value:0, velocity:0, visible:false, lastFloor:-9, lastOrigin:'',
+    }));
+    type Popup = typeof popups[number];
+    let frame = 0, last = 0, pointerX = 0;
+    const kick = () => { if (!frame && !document.hidden) frame = requestAnimationFrame(tick); };
+    function paint(popup: Popup) {
+      const floor = clamp(popup.value / .7, 0, 1.04);
+      if (Math.abs(floor - popup.lastFloor) > .002) { popup.floor.style.setProperty('--t', floor.toFixed(3)); popup.lastFloor = floor; }
+      for (const piece of popup.pieces) {
+        const rise = Math.max(0, (popup.value - piece.delay) / (1 - piece.delay));
+        if (Math.abs(rise - piece.last) > .002) { piece.element.style.setProperty('--r', rise.toFixed(3)); piece.last = rise; }
+      }
+    }
+    function restart(popup: Popup, value = 0) {
+      popup.value = Math.min(popup.value, value);
+      popup.velocity = 0;
+    }
+    function tick(now: number) {
+      frame = 0;
+      const step = Math.min(.05, last ? (now - last) / 1000 : .016);
+      last = now;
+      let moving = false;
+      for (const popup of popups) {
+        if (!popup.visible) continue;
+        const box = popup.element.getBoundingClientRect();
+        const target = Math.min(clamp((innerHeight - box.top) / (innerHeight * .5)), clamp(box.bottom / (innerHeight * .32)));
+        popup.velocity += (170 * (target - popup.value) - 15 * popup.velocity) * step;
+        popup.value += popup.velocity * step;
+        if (Math.abs(target - popup.value) > .001 || Math.abs(popup.velocity) > .001) moving = true;
+        else { popup.value = target; popup.velocity = 0; }
+        // The viewpoint follows the scene up the screen, and the mouse across it.
+        const height = clamp((box.top + box.height / 2) / innerHeight, -.2, 1.2);
+        const origin = `${(50 + pointerX * 14).toFixed(1)}% ${(-6 + height * 26).toFixed(1)}%`;
+        if (origin !== popup.lastOrigin) { popup.inner.style.perspectiveOrigin = origin; popup.lastOrigin = origin; }
+        paint(popup);
+      }
+      if (moving) frame = requestAnimationFrame(tick); else last = 0;
+    }
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      const popup = popups.find(item => item.element === entry.target)!;
+      popup.visible = entry.isIntersecting;
+      popup.element.classList.toggle('playing', entry.isIntersecting);
+      kick();
+    }), { rootMargin:'15% 0px' });
+    popups.forEach(popup => observer.observe(popup.element));
+    addEventListener('scroll', kick, { passive:true });
+    addEventListener('resize', kick, { passive:true });
+    addEventListener('pointermove', event => { if (event.pointerType === 'mouse') { pointerX = event.clientX / innerWidth * 2 - 1; kick(); } }, { passive:true });
+    document.addEventListener('visibilitychange', () => { last = 0; kick(); });
+    // Arriving from a date replays the notice's scene; filtering lets the remaining scenes rise again.
+    document.addEventListener('llibres:arrive', event => {
+      const popup = popups.find(item => (event.target as HTMLElement).contains(item.element));
+      if (popup) { restart(popup); popup.lastFloor = -9; popup.pieces.forEach(piece => piece.last = -9); kick(); }
+    });
+    document.addEventListener('llibres:filtered', () => {
+      popups.forEach(popup => { if (!popup.element.closest<HTMLElement>('.notice')?.hidden) restart(popup, .15); });
+      kick();
+    });
+  }
+</script>

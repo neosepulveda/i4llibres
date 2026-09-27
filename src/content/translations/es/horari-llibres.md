@@ -3,12 +3,10 @@ title: "¿Qué hacemos cada día? El horario de Els Llibres"
 description: "Biblioteca, inglés, talleres, psicomotricidad y música: las actividades de I4B a lo largo de la semana."
 note: "Ver y descargar los horarios"
 images:
-  - title: "Horario en lista"
-    alt: "Actividades de I4B en catalán, en formato de lista de lunes a viernes. La traducción se puede leer a continuación."
   - title: "Horario por días"
-    alt: "Actividades de I4B en catalán, agrupadas por día de la semana. La traducción se puede leer a continuación."
+    alt: "Actividades de I4B en catalán, agrupadas por día de la semana. La traducción está en el texto del aviso."
 ---
-Estas son las actividades del horario compartido con las familias de I4B. Las imágenes originales están en catalán.
+Estas son las actividades del horario compartido con las familias de I4B. La imagen original está en catalán.
 
 - **Lunes:** biblioteca por la tarde.
 - **Martes:** inglés con todo el grupo, de 11:30 a 12:30; talleres, de 15:00 a 16:10.

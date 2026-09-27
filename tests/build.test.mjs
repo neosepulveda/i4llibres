@@ -46,7 +46,7 @@ test('AFA notice and filter explain the monthly enrolment and cancellation windo
   ['en/','enrolment and cancellation open on the 1st','from the 1st to the 20th of every month'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
-  assert.match(html,/data-filter="afa"[^>]*>.*?AFA<\/button>/);
+  assert.match(html,/data-filter="afa"[^>]*>.*?AFA<span class="filter-count"/);
   const card=html.match(/<article class="notice afa" id="avis-extraescolars-afa"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card,'AFA notice has its own category');
   assert.ok(card.includes(opening));
@@ -88,5 +88,38 @@ test('AFA instructions include the exact deadline, payment requirement and appli
   const ics=readFileSync(`dist/${path}calendar/extraescolars-afa.ics`,'utf8').replace(/\r\n /g,'');
   assert.ok(ics.includes('23:55'));
   assert.ok(ics.includes('https://ampalamarbella.ampasoft.net/'));
+ }
+});
+
+test('the first page of the book lists the dates, under a cloth cover with the school',()=>{
+ for(const [path,title,cover]of[['','Properes dates','I4B, curs 2026–27'],['es/','Próximas fechas','I4B, curso 2026–27'],['en/','Upcoming dates','I4B, school year 2026–27']]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const book=html.match(/<section class="opening"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(book,'the book opens the page');
+  assert.ok(book.includes(`<h2 id="upcoming-title">${title}</h2>`));
+  assert.match(book,/<div class="cover" aria-hidden="true">/);
+  assert.ok(book.includes(cover));
+  assert.match(book,/<use href="#school-scene"/);
+  assert.match(book,/<a class="school-calendar" href="https:\/\/lamarbella\.cat\/calendari-escolar\/" target="_blank" rel="noopener noreferrer">/);
+  assert.ok(html.indexOf('class="opening"')<html.indexOf('id="avisos"'));
+ }
+});
+
+test('every published notice opens with its own pop-up scene',()=>{
+ const html=readFileSync('dist/index.html','utf8');
+ const cards=Array.from(html.matchAll(/<article class="notice[\s\S]*?<\/article>/g),([card])=>card);
+ assert.ok(cards.length>0);
+ for(const card of cards) assert.match(card,/<div class="notice-scene paper"><div class="popup" aria-hidden="true">/);
+});
+
+test('the timetable shows its week on the page, then the picture by day to open or download',()=>{
+ for(const path of ['','es/','en/']){
+  const card=readFileSync(`dist/${path}index.html`,'utf8').match(/<article class="notice classe" id="avis-horari-llibres"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card);
+  assert.doesNotMatch(card,/<details class="tab">/);
+  assert.match(card,/<div class="notice-body open">/);
+  assert.equal(card.match(/<img /g).length,1);
+  assert.match(card,/href="\/downloads\/activitats-i4b-per-dies\.jpg" download/);
+  assert.ok(card.indexOf('<ul>')<card.indexOf('class="notice-images"'));
  }
 });

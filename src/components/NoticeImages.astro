@@ -1,0 +1,12 @@
+---
+import { messages, type Language } from '../lib/i18n';
+interface Props { images: { src: string; title: string; alt: string }[]; language: Language }
+const { images, language } = Astro.props;
+const t = messages[language];
+const assetUrl = (src: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${src}`;
+---
+{images.length > 0 && <div class="notice-images" role="group" aria-label={t.images}>{images.map(image => <figure>
+  <a class="image-preview" href={assetUrl(image.src)} target="_blank" rel="noopener noreferrer" aria-label={`${t.openImage}: ${image.title}`}><img src={assetUrl(image.src)} alt={image.alt} loading="lazy" width="1024" height="2048" /></a>
+  <figcaption><b>{image.title}</b>{t.tapImage}</figcaption>
+  <a class="image-download" href={assetUrl(image.src)} download>{t.download} <span class="sr-only">{image.title.toLowerCase()}</span><span aria-hidden="true">↓</span></a>
+</figure>)}</div>}
