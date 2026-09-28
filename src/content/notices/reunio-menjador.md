@@ -14,6 +14,9 @@ event:
   description: >-
     Reunió amb Menjadors Biosca sobre el servei, el projecte nutricional i la proposta educativa de l’espai migdia.
     Reserva d’una hora al calendari. Acollida per als infants: https://forms.gle/rdxGsYhpomXyddHy9
+files:
+  - src: "/downloads/menjador-pla-funcionament-2026-2027.pdf"
+    title: "Pla de funcionament del temps de migdia 2026–27"
 ---
 La reunió serà el **dilluns 5 d’octubre, a les 17 h**, al **menjador de l’Escola La Mar Bella**.
 

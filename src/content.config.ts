@@ -3,6 +3,9 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { sceneNames } from './lib/scenes';
 
+// Downloads keep lowercase ASCII names with hyphens, so links and saved files need no escaping.
+const download = z.string().regex(/^\/downloads\/[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+$/, 'Name downloads like /downloads/menjador-pla-2026-2027.pdf');
+
 const notices = defineCollection({
   loader: glob({
     pattern: '**/*.md',
@@ -17,10 +20,11 @@ const notices = defineCollection({
     scene: z.enum(sceneNames).optional(),
     expanded: z.boolean().default(false),
     images: z.array(z.object({
-      src: z.string().startsWith('/downloads/'),
+      src: download,
       title: z.string().min(1),
       alt: z.string().min(1),
     })).default([]),
+    files: z.array(z.object({ src: download, title: z.string().min(1) })).default([]),
     event: z.intersection(z.discriminatedUnion('allDay', [
       z.object({ allDay: z.literal(true), start: z.iso.date(), end: z.iso.date() }),
       z.object({ allDay: z.literal(false).optional(), start: z.iso.datetime({ offset: true }), end: z.iso.datetime({ offset: true }) }),
@@ -39,6 +43,7 @@ const translations = defineCollection({
     title:z.string().min(1), description:z.string().min(1), note:z.string().min(1),
     event:z.object({title:z.string().min(1),location:z.string().min(1),description:z.string().min(1)}).optional(),
     images:z.array(z.object({title:z.string().min(1),alt:z.string().min(1)})).optional(),
+    files:z.array(z.object({title:z.string().min(1)})).optional(),
   }),
 });
 export const collections = { notices, translations };

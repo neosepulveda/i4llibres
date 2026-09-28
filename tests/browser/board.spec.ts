@@ -280,6 +280,20 @@ test('timetable images load, open separately and download their originals',async
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
+test('a notice file downloads directly from its own row',async({page})=>{
+ await page.setViewportSize({width:320,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ const row=page.locator('#avis-class .file-row');
+ await expect(row).toHaveText(/Pla de prova\s*PDF · 15,2 MB/);
+ await expect(row).not.toHaveAttribute('target');
+ const download=page.waitForEvent('download');
+ await row.click();
+ expect((await download).suggestedFilename()).toBe('menjador-pla-funcionament-2026-2027.pdf');
+ await page.goto('http://127.0.0.1:4323/en/');
+ await expect(page.locator('#avis-class .file-row')).toHaveText(/Test plan \(in Catalan\)\s*PDF · 15.2 MB/);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
 test('a notice opens with its pop-up scene, or the school when it has none',async({page})=>{
  await page.goto('http://127.0.0.1:4323');
  await expect(page.locator('#avis-school .popup .piece').first()).toBeAttached();

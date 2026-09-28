@@ -333,18 +333,22 @@ html.motion .reader{animation-name:reader}
 .notice.highlight{outline:3px solid var(--c);outline-offset:4px;border-radius:6px}
 @media (prefers-reduced-motion:no-preference){.notice{transition:outline-color .6s}}
 
-/* details and calendar exports: full-width rows between perforated lines, with a plus that turns into a minus */
+/* details, files and calendar exports: full-width rows between perforated lines, with a plus that turns into a minus, or an arrow for a file */
 .tab{border-top:1.5px dashed color-mix(in srgb,var(--ink) 26%,transparent)}
 .notice-summary+.tab,.notice-body.open+.tab{margin-top:14px}
 .tab:last-child{border-bottom:1.5px dashed color-mix(in srgb,var(--ink) 26%,transparent)}
-.tab summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:6px 0;font-weight:600;font-size:16px;line-height:1.3}
+.tab summary,.file-row{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:6px 0;font-weight:600;font-size:16px;line-height:1.3}
 .tab summary::-webkit-details-marker{display:none}
-.tab summary:focus-visible{outline-offset:2px}
+.tab summary:focus-visible,.file-row:focus-visible{outline-offset:2px}
 .tab-mark{position:relative;flex-shrink:0;width:32px;height:32px;border-radius:50%;background:color-mix(in srgb,var(--c) 15%,var(--paper))}
 .tab-mark::before,.tab-mark::after{content:"";position:absolute;left:10px;top:15px;width:12px;height:2px;border-radius:1px;background:var(--c-text);transition:transform .25s}
 .tab-mark::after{transform:rotate(90deg)}
 .tab[open] .tab-mark::after{transform:rotate(0)}
-@media (hover:hover){.tab summary:hover .tab-mark{background:color-mix(in srgb,var(--c) 26%,var(--paper))}}
+@media (hover:hover){.tab summary:hover .tab-mark,.file-row:hover .tab-mark{background:color-mix(in srgb,var(--c) 26%,var(--paper))}}
+.file-row{color:inherit;text-decoration:none;overflow-wrap:anywhere}
+.file-row small{display:block;margin-top:2px;font-weight:400;font-size:14px;color:var(--muted)}
+.file-row .tab-mark::before{left:15px;top:8px;width:2px;height:14px}
+.file-row .tab-mark::after{box-sizing:border-box;left:11px;top:11px;width:10px;height:10px;border:solid var(--c-text);border-width:0 2px 2px 0;border-radius:0;background:none;transform:rotate(45deg)}
 .notice-body{padding:0 0 14px;font-size:16.5px;overflow-wrap:anywhere}
 .notice-body p{margin:0 0 12px}
 .notice-body ul{margin:4px 0 12px;padding-left:20px}

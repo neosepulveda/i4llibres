@@ -11,6 +11,9 @@ event:
     Reunió amb Menjadors Biosca sobre el servei, el projecte nutricional i la proposta educativa de l’espai migdia.
     Reserva d’una hora al calendari. Acollida per als infants: https://forms.gle/rdxGsYhpomXyddHy9
 date: "2026-10-02"
+files:
+  - src: "/downloads/menjador-pla-funcionament-2026-2027.pdf"
+    title: "Pla de prova"
 ---
 Detall del conte de prova.
 

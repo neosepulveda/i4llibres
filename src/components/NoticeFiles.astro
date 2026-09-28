@@ -1,0 +1,14 @@
+---
+import { statSync } from 'node:fs';
+import type { Language } from '../lib/i18n';
+interface Props { files: { src: string; title: string }[]; language: Language }
+const { files, language } = Astro.props;
+const assetUrl = (src: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${src}`;
+// Families on mobile data see the type and size before they tap. Decimal units, as phones show them.
+const meta = (src: string) => {
+  const bytes = statSync(`public${src}`).size;
+  const [unit, value, digits] = bytes < 1e6 ? ['kilobyte', bytes / 1e3, 0] : ['megabyte', bytes / 1e6, 1];
+  return `${src.split('.').pop()!.toUpperCase()} · ${new Intl.NumberFormat(language, { style:'unit', unit, maximumFractionDigits:digits }).format(value)}`;
+};
+---
+{files.map(file => <a class="tab file-row" href={assetUrl(file.src)} download><span>{file.title}<small>{meta(file.src)}</small></span><span class="tab-mark" aria-hidden="true"></span></a>)}

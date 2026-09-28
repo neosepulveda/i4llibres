@@ -1,6 +1,7 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import CalendarLinks from './CalendarLinks.astro';
+import NoticeFiles from './NoticeFiles.astro';
 import NoticeImages from './NoticeImages.astro';
 import Scene from './Scene.astro';
 import { stampLabel, shortDate } from '../lib/date-labels';
@@ -9,7 +10,7 @@ interface Props { notice: CollectionEntry<'notices'>; content: CollectionEntry<'
 const { notice, content, language } = Astro.props;
 const t = messages[language];
 const { Content } = await render(content);
-const { title, description, category, date, note, event, images, scene, expanded } = notice.data;
+const { title, description, category, date, note, event, images, files, scene, expanded } = notice.data;
 // The stamp repeats the date row from the dates page: short weekday, day, month, then the time.
 const stamp = event ? { datetime:event.start, label:stampLabel(event, language) } : date && { datetime:date, label:shortDate(date, language) };
 ---
@@ -22,6 +23,7 @@ const stamp = event ? { datetime:event.start, label:stampLabel(event, language) 
     <p class="notice-summary">{description}</p>
     {expanded ? <div class="notice-body open"><Content /><NoticeImages images={images} language={language} /></div>
       : <details class="tab"><summary><span>{note || t.more}</span><span class="tab-mark" aria-hidden="true"></span></summary><div class="notice-body"><Content /><NoticeImages images={images} language={language} /></div></details>}
+    <NoticeFiles files={files} language={language} />
     {event && <details class="tab calendar-actions"><summary><span>{t.add}</span><span class="tab-mark" aria-hidden="true"></span></summary><CalendarLinks id={notice.id} title={title} event={event} language={language} /></details>}
   </div>
 </article>

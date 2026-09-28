@@ -114,6 +114,23 @@ test('every published notice opens with its own pop-up scene',()=>{
  for(const card of cards) assert.match(card,/<div class="notice-scene paper"><div class="popup" aria-hidden="true">/);
 });
 
+test('the school meals meeting offers the lunchtime plan as a PDF between its details and calendar rows',()=>{
+ for(const [path,title,meta] of [
+  ['','Pla de funcionament del temps de migdia 2026–27','PDF · 15,2 MB'],
+  ['es/','Plan de funcionamiento del mediodía 2026–27 (en catalán)','PDF · 15,2 MB'],
+  ['en/','Lunchtime service plan 2026–27 (in Catalan)','PDF · 15.2 MB'],
+ ]){
+  const card=readFileSync(`dist/${path}index.html`,'utf8').match(/<article class="notice menjador" id="avis-reunio-menjador"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card);
+  const row=card.match(/<a class="tab file-row" href="\/downloads\/menjador-pla-funcionament-2026-2027\.pdf" download>[\s\S]*?<\/a>/)?.[0];
+  assert.ok(row,path);
+  assert.ok(row.includes(title),path);
+  assert.ok(row.includes(meta),path);
+  assert.ok(card.indexOf('<details class="tab">')<card.indexOf(row));
+  assert.ok(card.indexOf(row)<card.indexOf('calendar-actions'));
+ }
+});
+
 test('the timetable shows its week on the page, then the picture by day to open or download',()=>{
  for(const path of ['','es/','en/']){
   const card=readFileSync(`dist/${path}index.html`,'utf8').match(/<article class="notice classe" id="avis-horari-llibres"[\s\S]*?<\/article>/)?.[0];

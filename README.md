@@ -165,6 +165,18 @@ images:
 
 Add corresponding translated image text to both translation files. Images appear after the notice text, like snapshots pinned to the page, behind the details row or directly on the page for an `expanded` notice. Tapping one opens it in a new tab, and each has a download link. Original timetable images remain in Catalan; the translated notice body provides their contents in Spanish and English.
 
+## Add files
+
+For a document such as a PDF, place the original in `public/downloads/` under a lowercase, hyphenated name and add:
+
+```yaml
+files:
+  - src: "/downloads/menjador-pla-funcionament-2026-2027.pdf"
+    title: "Pla de funcionament del temps de migdia 2026–27"
+```
+
+Add a translated `title` to both translation files, noting the document language when it differs (“(in Catalan)”). Each file is a full-width row after the details, before the calendar row, with its type and size. Tapping it downloads the file.
+
 ## Language and appearance preferences
 
 - `/` defaults to Catalan; `/es/` is Spanish; `/en/` is English.

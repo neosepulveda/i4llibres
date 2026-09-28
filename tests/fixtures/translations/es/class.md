@@ -6,5 +6,7 @@ event:
   title: "Reunión de prueba"
   location: "Comedor del colegio"
   description: "Reunión de prueba"
+files:
+  - title: "Plan de prueba (en catalán)"
 ---
 Detalle de prueba.
