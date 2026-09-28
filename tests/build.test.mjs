@@ -165,6 +165,16 @@ test('the timetable shows its week on the page, then the picture by day to open 
  }
 });
 
+test('the timetable’s train carries each day’s activities in open wagons, as the timetable lists them',()=>{
+ for(const [path,days] of [['',['dl','dt','dc','dj','dv']],['es/',['L','M','X','J','V']],['en/',['Mo','Tu','We','Th','Fr']]]){
+  const train=readFileSync(`dist/${path}index.html`,'utf8').match(/<div class="piece train"[\s\S]*?<\/svg><\/div>/)?.[0];
+  assert.ok(train,path);
+  const loads=train.split('<g class="cargo">').slice(1).map(load=>Array.from(load.matchAll(/<g class="(library|english|workshop|families|movement|music)"/g),([,activity])=>activity));
+  assert.deepEqual(loads,[['library'],['workshop','english'],['english','families'],['movement','music'],['workshop']],path);
+  assert.deepEqual(Array.from(train.matchAll(/<text[^>]*>([^<]+)<\/text>/g),([,day])=>day),days,path);
+ }
+});
+
 // The menus change every month (bin/menus), so this reads whichever month the site has.
 test('the dates page links to the month’s menus, kept in a pocket inside the back cover',()=>{
  const lists=readdirSync('src/content/menus').filter(name=>name.endsWith('.yaml'));
