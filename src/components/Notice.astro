@@ -21,7 +21,7 @@ const stamp = event ? { datetime:event.start, label:stampLabel(event, language) 
     <h3>{title}</h3>
     <p class="notice-summary">{description}</p>
     {expanded ? <div class="notice-body open"><Content /><NoticeImages images={images} language={language} /></div>
-      : <details class="tab"><summary><span>{note || t.more}</span><span class="tab-hole" aria-hidden="true"></span></summary><div class="notice-body"><Content /><NoticeImages images={images} language={language} /></div></details>}
-    {event && <details class="tab calendar-actions"><summary><span>{t.add}</span><span class="tab-hole" aria-hidden="true"></span></summary><CalendarLinks id={notice.id} title={title} event={event} language={language} /></details>}
+      : <details class="tab"><summary><span>{note || t.more}</span><span class="tab-mark" aria-hidden="true"></span></summary><div class="notice-body"><Content /><NoticeImages images={images} language={language} /></div></details>}
+    {event && <details class="tab calendar-actions"><summary><span>{t.add}</span><span class="tab-mark" aria-hidden="true"></span></summary><CalendarLinks id={notice.id} title={title} event={event} language={language} /></details>}
   </div>
 </article>
