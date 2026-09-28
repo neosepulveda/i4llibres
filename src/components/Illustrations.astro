@@ -19,7 +19,8 @@
     <symbol id="stars" viewBox="0 0 100 50">
       <g style="fill:var(--sun)"><circle cx="8" cy="8" r=".6"/><circle cx="22" cy="4" r=".45"/><circle cx="35" cy="12" r=".55"/><circle cx="47" cy="5" r=".4"/><circle cx="58" cy="15" r=".5"/><circle cx="70" cy="6" r=".6"/><circle cx="90" cy="22" r=".45"/><circle cx="14" cy="24" r=".4"/><circle cx="96" cy="8" r=".5"/><circle cx="40" cy="26" r=".35"/></g>
     </symbol>
-    <symbol id="school-scene" viewBox="0 0 100 90" overflow="visible">
+    {/* The school from the cover comes in three layers, so the cover can slip last year's monster between them. */}
+    <symbol id="school-back" viewBox="0 0 100 90" overflow="visible">
       <svg x="0" y="0" width="100" height="50" viewBox="0 0 100 50" preserveAspectRatio="none">
               <rect width="100" height="50" style="fill:var(--sky)"/>
               <use href="#stars" class="night" width="100" height="50" style="display:var(--show-night)"/>
@@ -35,7 +36,9 @@
               <g class="night" style="display:var(--show-night);fill:var(--window)"><rect x="64.5" y="37" width=".9" height=".9"/><rect x="66.8" y="40" width=".9" height=".9"/><rect x="64.5" y="43" width=".9" height=".9"/><rect x="55.5" y="42" width=".9" height=".9"/><rect x="29" y="43" width=".9" height=".9"/><rect x="86" y="44" width=".9" height=".9"/></g>
             </svg>
       <svg x="0" y="50" width="100" height="40" viewBox="0 0 100 40" preserveAspectRatio="none"><rect width="100" height="40" style="fill:var(--sand)"/><rect y="29" width="100" height="11" style="fill:var(--sea)"/><g style="fill:var(--sand-dark)"><circle cx="20" cy="10" r=".8"/><circle cx="60" cy="18" r=".7"/><circle cx="80" cy="8" r=".9"/></g></svg>
-      <g filter="url(#piece-shadow)"><svg x="26" y="26.00" width="48" height="30.00" viewBox="0 0 48 30" overflow="visible">
+    </symbol>
+    <symbol id="school-building" viewBox="0 0 100 90" overflow="visible">
+      <svg x="26" y="26.00" width="48" height="30.00" viewBox="0 0 48 30" overflow="visible">
                 <rect x="40.3" y="-5" width=".6" height="12.5" style="fill:var(--black)"/><path d="M40.9-5h5.4l-1.4 1.6 1.4 1.6h-5.4z" style="fill:var(--yellow)"/>
                 <rect x="2" y="8.5" width="44" height="21.5" style="fill:var(--wall)"/>
                 <path d="M17 8 24 1.6 31 8z" style="fill:var(--red)"/><circle cx="24" cy="5.4" r="1.5" style="fill:var(--white)"/><path d="M24 4.4v1h.8" style="fill:none;stroke:var(--black);stroke-width:.3"/>
@@ -45,6 +48,8 @@
                 <rect x="4.5" y="19.6" width="4.4" height="4.2" rx=".4"/><rect x="10.5" y="19.6" width="4.4" height="4.2" rx=".4"/><rect x="33" y="19.6" width="4.4" height="4.2" rx=".4"/><rect x="39" y="19.6" width="4.4" height="4.2" rx=".4"/></g>
                 <path d="M19.8 30v-6.2a4.2 4.2 0 0 1 8.4 0V30z" style="fill:var(--cloth)"/><path d="M24 20.4V30" style="stroke:var(--wall);stroke-width:.35"/>
               </svg>
+    </symbol>
+    <symbol id="school-front" viewBox="0 0 100 90" overflow="visible">
 <svg x="5" y="26.00" width="16" height="34.00" viewBox="0 0 16 34" overflow="visible">
                 <path d="M8.6 34C8.2 26 8.8 18 7.4 11l1.7-.2C10.4 18 10.1 26 10.5 34z" style="fill:var(--wood)"/>
                 <g class="palm part" style="transform-origin:50% 100%"><g style="fill:var(--grass)"><path d="M8 11C5 7 2 7 0 9.6 3 8.6 5.4 9.4 8 11z"/><path d="M8 11C6.5 5.5 3.5 3.5 1.2 4 4 5 6 7.5 8 11z"/><path d="M8 11c1-5.5 4-7.5 6.8-6.8C12 5.2 10 7.6 8 11z"/><path d="M8 11c3-3.8 6-3.6 8-1.4-3-.8-5.4-.2-8 1.4z"/></g><path d="M8 11c0-5 .6-8.4 1.6-10-.4 3-.6 6.4-1.6 10z" style="fill:var(--grass-dark)"/><circle cx="7.6" cy="11.6" r=".9" style="fill:var(--wood-dark)"/><circle cx="9.1" cy="11.8" r=".9" style="fill:var(--wood-dark)"/></g>
@@ -63,7 +68,20 @@
               </svg>
 <svg x="-2" y="73.50" width="104" height="7.00" viewBox="0 0 104 7" overflow="visible"><path d="M0 7V3.2C9 1 17 4 29 2.2s22-1.4 34 .8 23 2 41-.8V7z" style="fill:var(--sand-dark)"/><g style="fill:var(--white)"><path d="M20 4.6l1.2-1 1.2 1z"/><circle cx="70" cy="4" r=".6"/></g></svg>
 <svg x="-3" y="76.00" width="106" height="8.00" viewBox="0 0 106 8" overflow="visible"><g class="wave"><path d="M0 8V3.8q6.5-4 13 0t13 0 13 0 13 0 13 0 13 0 13 0 13 0 13 0V8z" style="fill:var(--sea-light)"/></g></svg>
-<svg x="-3" y="80.60" width="106" height="8.00" viewBox="0 0 106 8" overflow="visible"><g class="wave b"><path d="M-6 8V4.2q6.5-4 13 0t13 0 13 0 13 0 13 0 13 0 13 0 13 0 13 0V8z" style="fill:var(--sea)"/><path d="M-6 4.2q6.5-4 13 0t13 0 13 0 13 0 13 0 13 0 13 0 13 0 13 0" style="fill:none;stroke:var(--foam);stroke-width:.7;stroke-linecap:round"/></g></svg></g>
+<svg x="-3" y="80.60" width="106" height="8.00" viewBox="0 0 106 8" overflow="visible"><g class="wave b"><path d="M-6 8V4.2q6.5-4 13 0t13 0 13 0 13 0 13 0 13 0 13 0 13 0 13 0V8z" style="fill:var(--sea)"/><path d="M-6 4.2q6.5-4 13 0t13 0 13 0 13 0 13 0 13 0 13 0 13 0 13 0" style="fill:none;stroke:var(--foam);stroke-width:.7;stroke-linecap:round"/></g></svg>
+    </symbol>
+    <symbol id="school-scene" viewBox="0 0 100 90" overflow="visible">
+      <use href="#school-back" width="100" height="90"/>
+      <g filter="url(#piece-shadow)"><use href="#school-building" width="100" height="90"/><use href="#school-front" width="100" height="90"/></g>
+    </symbol>
+    {/* Last year the class were the Monstres, and one stayed on. Its feet are at 0,0; the waving arm is drawn beside it. */}
+    <symbol id="monster" viewBox="-5 -13 10 14" overflow="visible">
+      <ellipse cx="-1.4" cy="-.1" rx="1.1" ry=".5" style="fill:var(--black)"/><ellipse cx="1.4" cy="-.1" rx="1.1" ry=".5" style="fill:var(--black)"/>
+      <path d="M-1.8-9.8-2.8-12.5-.6-10.5zM1.8-9.8l1-2.7-2.2 2z" style="fill:var(--white)"/>
+      <path d="M-2.8-6q-1.3.9-1.5 2.4" style="fill:none;stroke:var(--lilac);stroke-width:1;stroke-linecap:round"/>
+      <path d="M-3 0C-3.2-4-3.3-8-2.6-9.6c.7-1.6 4.5-1.6 5.2 0 .7 1.6.6 5.6.4 9.6z" style="fill:var(--lilac)"/>
+      <circle cy="-7.4" r="1.55" style="fill:var(--white)"/><circle cx=".2" cy="-7.2" r=".72" style="fill:var(--black)"/>
+      <path d="M-1-5.3q1 .8 2 0" style="fill:none;stroke:var(--black);stroke-width:.4;stroke-linecap:round"/>
     </symbol>
     <filter id="piece-shadow" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx=".45" dy=".75" stdDeviation=".45" flood-color="#281c0a" flood-opacity=".28"/></filter>
   </defs>

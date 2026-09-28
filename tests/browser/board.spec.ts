@@ -54,7 +54,10 @@ test('empty state works without JavaScript',async({browser})=>{
   const context=await browser.newContext({javaScriptEnabled:false});
   const page=await context.newPage();await page.goto('http://127.0.0.1:4322');
   await expect(page.getByRole('heading',{name:'Encara no hi ha cap avís'})).toBeVisible();
-  await expect(page.locator('#theme-toggle')).toBeHidden();await context.close();
+  await expect(page.locator('#theme-toggle')).toBeHidden();
+  expect(await page.locator('.cover .reader').evaluate(reader=>getComputedStyle(reader).opacity)).toBe('1');
+  expect(await page.locator('.cover .monster.walking').evaluate(monster=>getComputedStyle(monster).opacity)).toBe('0');
+  await context.close();
 });
 
 for (const width of [390,1280]) {
@@ -83,6 +86,36 @@ for (const width of [390,1280]) {
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  });
 }
+
+test('last year’s monster moves into the school as the page loads, and hurries once the page scrolls',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ const scene=page.locator('.cover-scene');
+ const opacity=(selector:string)=>page.locator(selector).evaluate(element=>getComputedStyle(element).opacity);
+ // It starts hidden behind the school, so the cover first looks as it always has.
+ expect(await opacity('.cover .reader')).toBe('0');
+ expect(await scene.evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBeGreaterThan(5);
+ // Animating transform or opacity directly puts the school on a layer of its own, which the tilted
+ // book paints at a fraction of the resolution, so the story only animates numbers.
+ const animated=await scene.evaluate(svg=>svg.getAnimations({subtree:true}).flatMap(animation=>(animation.effect as KeyframeEffect).getKeyframes().flatMap(frame=>Object.keys(frame))));
+ expect(animated.filter(name=>['transform','opacity','scale','rotate','translate'].includes(name))).toEqual([]);
+ // Scrolling sends it straight to its seat by the window, so the cover never turns mid-story,
+ // and no animation stays behind once the story ends.
+ await page.evaluate(()=>window.scrollTo(0,40));
+ await expect.poll(()=>scene.evaluate(svg=>svg.getAnimations({subtree:true}).length),{timeout:2500}).toBe(0);
+ expect(await opacity('.cover .reader')).toBe('1');
+ expect(await opacity('.cover .monster.walking')).toBe('0');
+ await expect(scene).toHaveAttribute('viewBox','0 0 100 82');
+});
+
+test('near the end of the story the view closes in on the window where the monster reads',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ const scene=page.locator('.cover-scene');
+ await scene.evaluate(svg=>svg.getAnimations({subtree:true}).forEach(animation=>{animation.pause();animation.currentTime=7000;}));
+ await expect.poll(async()=>Number((await scene.getAttribute('viewBox'))!.split(' ')[2])).toBeLessThan(30);
+ expect(await page.locator('.cover .reader').evaluate(reader=>getComputedStyle(reader).opacity)).toBe('1');
+});
 
 for (const width of [390,1180]) {
  test(`an arrow on the table points to the notices once the cover is halfway open at ${width}px`,async({page})=>{
@@ -147,6 +180,9 @@ test('with reduced motion the cover and every date simply sit on the page',async
  await page.goto('http://127.0.0.1:4323');
  await expect(page.locator('html')).not.toHaveClass(/motion/);
  await expect(page.getByRole('button',{name:'Obre el llibre'})).toBeHidden();
+ // Last year's monster is already in its window, reading.
+ expect(await page.locator('.cover-scene').evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);
+ expect(await page.locator('.cover .reader').evaluate(reader=>getComputedStyle(reader).opacity)).toBe('1');
  await expect(page.locator('.upcoming-event:visible')).toHaveCount(2);
  const cover=(await page.locator('.cover').boundingBox())!, dates=(await page.locator('#dates').boundingBox())!;
  expect(dates.y).toBeGreaterThan(cover.y+cover.height);

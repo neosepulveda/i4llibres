@@ -1,0 +1,60 @@
+---
+// The school through the arched window on the cover. Last year the class were the Monstres (I3B),
+// and one of their monsters stayed on: it reads in an upstairs window. With motion it gets there
+// as the page loads, peeking out from behind the school and hopping in through the front door.
+---
+<svg class="cover-scene" viewBox="0 0 100 82" preserveAspectRatio="xMidYMax slice">
+  <g class="cover-zoom">
+    <rect width="100" height="82" style="fill:var(--sky)"/>
+    <g transform="translate(0 -6)">
+      <use href="#school-back" width="100" height="90"/>
+      <g filter="url(#piece-shadow)">
+        <g transform="translate(70 55.5)"><g class="monster peeking"><use href="#monster" x="-5" y="-13" width="10" height="14"/><path d="M2.7-6q1.3.9 1.5 2.4" style="fill:none;stroke:var(--lilac);stroke-width:1;stroke-linecap:round"/></g></g>
+        <use href="#school-building" width="100" height="90"/>
+        <svg x="26" y="26" width="48" height="30" viewBox="0 0 48 30" overflow="visible">
+          <path d="M19.8 30v-6.2a4.2 4.2 0 0 1 8.4 0V30z" style="fill:var(--sun)"/>
+          <g transform="translate(19.8 0)"><g class="door-leaf"><path d="M0 30v-6.2a4.2 4.2 0 0 1 4.2-4.2V30z" style="fill:var(--cloth)"/><rect x="4.03" y="20" width=".17" height="10" style="fill:var(--wall)"/></g></g>
+          <g transform="translate(28.2 0)"><g class="door-leaf"><path d="M0 30v-6.2a4.2 4.2 0 0 0-4.2-4.2V30z" style="fill:var(--cloth)"/><rect x="-4.2" y="20" width=".17" height="10" style="fill:var(--wall)"/></g></g>
+          <rect class="reading-halo" x="31.8" y="9.8" width="6.8" height="6.6" rx="1.6" style="fill:var(--sun)"/>
+          <rect class="reading-light" x="33" y="11" width="4.4" height="4.2" rx=".4" style="fill:var(--sun)"/>
+          <svg x="33" y="11" width="4.4" height="4.2" viewBox="33 11 4.4 4.2" style="overflow:hidden"><g class="reader">
+            <rect x="35.7" y="13.75" width="1.8" height=".25" style="fill:var(--wood)"/>
+            <rect x="35.9" y="12.1" width=".45" height="1.65" style="fill:var(--menjador)"/><rect x="36.4" y="12.35" width=".4" height="1.4" style="fill:var(--escola)"/><rect x="36.85" y="12" width=".45" height="1.75" style="fill:var(--classe)"/>
+            <path d="M34 12.8 33.6 11.7 34.4 12.4zM35.2 12.8l.4-1.1-.8.7z" style="fill:var(--white)"/>
+            <rect x="33.3" y="14.3" width="2.6" height="1.4" rx=".6" style="fill:var(--lilac)"/><circle cx="34.6" cy="13.8" r="1.3" style="fill:var(--lilac)"/>
+            <circle cx="34.6" cy="13.5" r=".52" style="fill:var(--white)"/><circle cx="34.7" cy="13.66" r=".25" style="fill:var(--black)"/>
+            <path d="M33.2 15.3v-1l1.4.3 1.4-.3v1l-1.4.3z" style="fill:var(--escola)"/>
+            <path d="M34.6 15.1q-.6-.35-1.25-.28v-.85q.65-.07 1.25.28zM34.6 15.1q.6-.35 1.25-.28v-.85q-.65-.07-1.25.28z" style="fill:var(--white)"/>
+          </g></svg>
+          <rect x="33" y="11" width="4.4" height="4.2" rx=".4" style="fill:none;stroke:var(--white);stroke-width:.35"/>
+        </svg>
+        <g transform="translate(79 57)"><g class="monster walking"><use href="#monster" x="-5" y="-13" width="10" height="14"/><g transform="translate(2.7 -6)"><path class="waving" d="M0 0q1.3.9 1.5 2.4" style="fill:none;stroke:var(--lilac);stroke-width:1;stroke-linecap:round"/></g></g></g>
+        <use href="#school-front" width="100" height="90"/>
+      </g>
+    </g>
+  </g>
+</svg>
+<script>
+  // The story plays once, as the page loads. As soon as the page scrolls it hurries to the end,
+  // so the monster is back in its window before the cover turns.
+  const scene = document.querySelector<SVGSVGElement>('.cover-scene');
+  if (scene && document.documentElement.classList.contains('motion')) {
+    // The view closes in on the reading window, at 61.2, 33.1, by following the animated --zoom.
+    const zoom = scene.querySelector<SVGGElement>('.cover-zoom')!;
+    const [clock] = zoom.getAnimations();
+    const follow = () => {
+      const scale = parseFloat(getComputedStyle(zoom).getPropertyValue('--zoom')) || 1;
+      const view = [61.2 * (1 - 1 / scale), 33.1 * (1 - 1 / scale), 100 / scale, 82 / scale].map(value => +value.toFixed(3)).join(' ');
+      if (scene.getAttribute('viewBox') !== view) scene.setAttribute('viewBox', view);
+      if (clock && clock.playState !== 'finished') requestAnimationFrame(follow);
+    };
+    requestAnimationFrame(follow);
+    const hurry = () => {
+      if (scrollY < 4) return;
+      scene.getAnimations({ subtree:true }).forEach(animation => animation.updatePlaybackRate(10));
+      removeEventListener('scroll', hurry);
+    };
+    addEventListener('scroll', hurry, { passive:true });
+    hurry();
+  }
+</script>

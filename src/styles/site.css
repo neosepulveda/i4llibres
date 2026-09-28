@@ -120,10 +120,71 @@ html:not(.motion) .front{aspect-ratio:100/128}
 /* an arched window cut through the cloth onto the school */
 .cover-window{position:relative;flex:1;width:100%;min-height:0;overflow:hidden;border-radius:calc(39 * var(--u)) calc(39 * var(--u)) 4px 4px;background:var(--sky);
   box-shadow:0 0 0 calc(1.6 * var(--u)) var(--cloth-dark),0 0 0 calc(1.6 * var(--u) + 1px) rgba(255,255,255,.14)}
-.cover-window svg{position:absolute;inset:0;display:block;width:100%;height:100%}
+.cover-window>svg{position:absolute;inset:0;display:block;width:100%;height:100%}
 .cover-window::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 calc(2.6 * var(--u)) calc(3 * var(--u)) rgba(0,0,0,.38),inset calc(1.6 * var(--u)) 0 calc(2.2 * var(--u)) rgba(0,0,0,.2)}
 .cover-foot{font-size:calc(4.6 * var(--u));line-height:1.4}
 .cover-foot b{display:block;font-weight:600;font-size:calc(5 * var(--u))}
+/* Last year's monster reads in an upstairs window. With motion it gets there as the page loads: it
+   peeks out from behind the school, waves, hops in through the front door, and the view closes in on
+   its window and back out. Every part follows the same eight seconds; at rest it is simply reading.
+   The keyframes move plain numbers, never transform or opacity themselves: Chrome paints those on a
+   layer of their own, which inside the tilted book comes out at a fraction of the resolution. For the
+   same reason the animations drop away once the story ends, and the zoom is a number the script turns
+   into the window's viewBox. */
+@property --zoom{syntax:"<number>";inherits:false;initial-value:1}
+@property --story-x{syntax:"<number>";inherits:false;initial-value:0}
+@property --story-y{syntax:"<number>";inherits:false;initial-value:0}
+@property --story-turn{syntax:"<number>";inherits:false;initial-value:0}
+@property --story-scale{syntax:"<number>";inherits:false;initial-value:1}
+@property --story-scale-x{syntax:"<number>";inherits:false;initial-value:1}
+@property --story-opacity{syntax:"<number>";inherits:false;initial-value:1}
+.cover-scene :is(.monster,.waving,.door-leaf,.reading-light,.reading-halo,.reader){opacity:var(--story-opacity);
+  transform:translate(calc(var(--story-x) * 1px),calc(var(--story-y) * 1px)) rotate(calc(var(--story-turn) * 1deg)) scale(calc(var(--story-scale) * var(--story-scale-x)),var(--story-scale))}
+.monster.peeking,.monster.walking{--story-opacity:0}
+.reading-halo{--story-opacity:.45}
+/* longhands: the minifier turns a shorthand without a name into "animation:none" */
+html.motion :is(.cover-zoom,.monster,.waving,.door-leaf,.reading-light,.reading-halo,.reader){animation-duration:8s;animation-timing-function:ease-in-out;animation-fill-mode:backwards}
+html.motion .cover-zoom{animation-name:cover-zoom}
+html.motion .monster.peeking{animation-name:monster-peek}
+html.motion .monster.walking{animation-name:monster-walk}
+html.motion .waving{animation-name:monster-wave}
+html.motion .door-leaf{animation-name:door}
+html.motion .reading-light{animation-name:light}
+html.motion .reading-halo{animation-name:halo}
+html.motion .reader{animation-name:reader}
+@keyframes monster-peek{
+  0%,7.5%{--story-opacity:1;--story-x:-4;--story-y:0;--story-turn:0}
+  15%,20%{--story-opacity:1;--story-x:0;--story-y:0;--story-turn:24}
+  25.5%{--story-opacity:1;--story-x:9;--story-y:1.5;--story-turn:0}
+  25.6%,100%{--story-opacity:0;--story-x:9;--story-y:1.5;--story-turn:0}
+}
+@keyframes monster-walk{
+  0%,25.5%{--story-opacity:0;--story-x:0;--story-y:0;--story-scale:1}
+  25.6%,35%{--story-opacity:1;--story-x:0;--story-y:0;--story-scale:1;animation-timing-function:ease-out}
+  37.2%{--story-x:-3.6;--story-y:-2;--story-scale:.98;animation-timing-function:ease-in}
+  39.4%{--story-x:-7.2;--story-y:-.2;--story-scale:.96;animation-timing-function:ease-out}
+  41.6%{--story-x:-10.9;--story-y:-2.2;--story-scale:.94;animation-timing-function:ease-in}
+  43.8%{--story-x:-14.5;--story-y:-.4;--story-scale:.93;animation-timing-function:ease-out}
+  46%{--story-x:-18.1;--story-y:-2.4;--story-scale:.91;animation-timing-function:ease-in}
+  48.1%{--story-x:-21.8;--story-y:-.6;--story-scale:.89;animation-timing-function:ease-out}
+  50.3%{--story-x:-25.4;--story-y:-2.6;--story-scale:.87;animation-timing-function:ease-in}
+  52.5%,53.75%{--story-opacity:1;--story-x:-29;--story-y:-.8;--story-scale:.85}
+  60%,100%{--story-opacity:0;--story-x:-29;--story-y:-1.8;--story-scale:.47}
+}
+@keyframes monster-wave{
+  0%,26.25%{--story-turn:0}
+  28%{--story-turn:-130}
+  29.5%{--story-turn:-100}
+  31%{--story-turn:-135}
+  32.5%{--story-turn:-105}
+  33.5%{--story-turn:-125}
+  35%,100%{--story-turn:0}
+}
+@keyframes door{0%,51.25%{--story-scale-x:1}55%,60%{--story-scale-x:.18}63.75%,100%{--story-scale-x:1}}
+@keyframes light{0%,62.5%{--story-opacity:0}66.25%,100%{--story-opacity:1}}
+@keyframes halo{0%,62.5%{--story-opacity:0}66.25%,100%{--story-opacity:.45}}
+@keyframes reader{0%,65%{--story-opacity:0;--story-y:4}65.1%{--story-opacity:1;--story-y:4}70%,100%{--story-opacity:1;--story-y:0}}
+@keyframes cover-zoom{0%,67.5%{--zoom:1}77.5%,90%{--zoom:4.2}100%{--zoom:1}}
 /* the inside of the cover, seen once it has turned */
 .inside{display:grid;place-items:center;padding:28px;overflow:hidden;background:var(--paper-shade)}
 .endpapers{position:absolute;inset:0;width:100%;height:100%}
