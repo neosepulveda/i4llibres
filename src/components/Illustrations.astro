@@ -65,7 +65,16 @@
     </symbol>
     <symbol id="school-children" viewBox="0 0 100 90" overflow="visible">
 <svg x="14" y="54.00" width="72" height="18.00" viewBox="0 0 72 18" overflow="visible">
-                <g style="fill:none;stroke-width:1.2;stroke-linecap:round"><path d="M11.2 9.4q3.2 1.8 6.6 0" style="stroke:var(--skin-1)"/><path d="M25.2 9.4q3.2 1.8 6.6 0" style="stroke:var(--skin-2)"/><path d="M39.2 9.4q3.2 1.8 6.6 0" style="stroke:var(--skin-3)"/><path d="M53.2 9.4q3.2 1.8 6.6 0" style="stroke:var(--skin-4)"/></g>
+                {/* Each child reaches halfway with an arm of their own, and neighbours' hands meet in the middle. The first
+                    child's free arm steps aside with --first-arm-free when someone holds that hand. */}
+                <g style="fill:none;stroke-width:1.2;stroke-linecap:round">
+                  <path d="M5.4 8.6Q3 9.9 1.9 12.2" style="stroke:var(--skin-1);display:var(--first-arm-free,inline)"/>
+                  <path d="M10.4 8.7Q12.6 11 14.9 10.8" style="stroke:var(--skin-1)"/><path d="M19.6 8.7Q17.4 11 15.1 10.8" style="stroke:var(--skin-2)"/>
+                  <path d="M24.4 8.7Q26.6 11 28.9 10.8" style="stroke:var(--skin-2)"/><path d="M33.6 8.7Q31.4 11 29.1 10.8" style="stroke:var(--skin-3)"/>
+                  <path d="M38.4 8.7Q40.6 11 42.9 10.8" style="stroke:var(--skin-3)"/><path d="M47.6 8.7Q45.4 11 43.1 10.8" style="stroke:var(--skin-4)"/>
+                  <path d="M52.4 8.7Q54.6 11 56.9 10.8" style="stroke:var(--skin-4)"/><path d="M61.6 8.7Q59.4 11 57.1 10.8" style="stroke:var(--skin-5)"/>
+                  <path d="M66.6 8.6Q69 9.9 70.1 12.2" style="stroke:var(--skin-5)"/>
+                </g>
                 <use class="hop" href="#child" x="2" y="0" width="12" height="18" style="--clothes:var(--classe);--skin:var(--skin-1);--hair:var(--hair-4)"/>
                 <use class="hop" href="#child" x="16" y="0" width="12" height="18" style="--clothes:var(--escola);--skin:var(--skin-2);--hair:var(--hair-1);animation-delay:-.3s"/>
                 <use class="hop" href="#child" x="30" y="0" width="12" height="18" style="--clothes:var(--red);--skin:var(--skin-3);--hair:var(--hair-3);animation-delay:-.6s"/>

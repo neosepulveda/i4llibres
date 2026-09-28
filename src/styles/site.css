@@ -14,7 +14,7 @@
   --red:#dd4a3b;--pink:#f3a3a6;--lilac:#b79ce0;--lilac-light:#ece3f7;--white:#fffdf7;--black:#1d2533;
   --yellow:#f2c14e;--orange:#ef8a3a;--window:#a7d8ec;--steel:#c7d0d5;--cardboard:#caa06a;
   --tile:#b9dcd8;--court:#9fd3b7;--envelope:#ecc98a;--envelope-dark:#dcb06a;
-  --skin-1:#f2c9a6;--skin-2:#d39a6a;--skin-3:#8e5b3c;--skin-4:#e9b58c;--skin-5:#b07650;--skin-6:#f7dcc6;
+  --skin-1:#f2c9a6;--skin-2:#d39a6a;--skin-3:#8e5b3c;--skin-4:#e9b58c;--skin-5:#b07650;--skin-6:#efcbab;
   --hair-1:#3b2a20;--hair-2:#7a4a26;--hair-3:#1d1a18;--hair-4:#c98b3a;--hair-5:#2b211c;
   /* day and night inside shared drawings, where a class can't reach */
   --show-day:inline;--show-night:none;
@@ -34,7 +34,7 @@
   --red:#a93c31;--pink:#b98081;--lilac:#7d6aa6;--lilac-light:#433a60;--white:#ece0c3;--black:#16110b;
   --yellow:#caa347;--orange:#b56a31;--window:#ffd66b;--steel:#8d989e;--cardboard:#94764c;
   --tile:#31504e;--court:#3c6a56;--envelope:#b39562;--envelope-dark:#98794a;
-  --skin-1:#c9a283;--skin-2:#a97a53;--skin-3:#6e4630;--skin-4:#bf9170;--skin-5:#8b5d40;--skin-6:#d4b59e;
+  --skin-1:#c9a283;--skin-2:#a97a53;--skin-3:#6e4630;--skin-4:#bf9170;--skin-5:#8b5d40;--skin-6:#c9a588;
   --show-day:none;--show-night:inline;
 }
 

@@ -105,8 +105,25 @@ test('the first page of the book lists the dates, under a cloth cover with the s
   // Their teacher leads the line on the cover only; notices keep the children on their own.
   assert.match(book,/<g class="teacher"[\s\S]*?<use href="#teacher"/);
   assert.match(book,/<g class="book-wave">/);
+  // She holds the first child's hand, so the arm that child keeps free elsewhere reaches for hers.
+  assert.match(book,/<use href="#school-children" x="5" width="100" height="90" style="--first-arm-free:none"/);
+  assert.match(book,/<path class="reaching"[^>]*stroke:var\(--skin-1\)/);
   assert.match(book,/<a class="school-calendar" href="https:\/\/lamarbella\.cat\/calendari-escolar\/" target="_blank" rel="noopener noreferrer">/);
   assert.ok(html.indexOf('class="opening"')<html.indexOf('id="avisos"'));
+ }
+});
+
+test('every child in the line has two arms, reaching halfway to join hands',()=>{
+ const html=readFileSync('dist/index.html','utf8');
+ const children=html.match(/<symbol id="school-children"[\s\S]*?<\/symbol>/)?.[0];
+ assert.ok(children,'the children are a layer of their own');
+ const arms=Array.from(children.matchAll(/<path d="M([\d.]+) ([\d.]+)Q[\d.]+ [\d.]+ ([\d.]+) ([\d.]+)" style="stroke:var\(--skin-(\d)\)[^"]*"/g),([,fromX,,toX,toY,skin])=>({fromX:+fromX,toX:+toX,toY:+toY,skin:+skin}));
+ for(const skin of [1,2,3,4,5]) assert.equal(arms.filter(arm=>arm.skin===skin).length,2,`child ${skin} has two arms`);
+ // Between neighbours, each child's arm ends where the other's does, in the middle of the gap.
+ for(const skin of [1,2,3,4]){
+  const right=arms.find(arm=>arm.skin===skin&&arm.toX>arm.fromX&&arm.toY<11.5), left=arms.find(arm=>arm.skin===skin+1&&arm.toX<arm.fromX&&arm.toY<11.5);
+  assert.ok(right&&left,`children ${skin} and ${skin+1} hold hands`);
+  assert.ok(Math.abs(right.toX-left.toX)<.5&&Math.abs(right.toY-left.toY)<.5,`children ${skin} and ${skin+1} meet in the middle`);
  }
 });
 
