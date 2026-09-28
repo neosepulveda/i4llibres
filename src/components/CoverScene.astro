@@ -2,6 +2,8 @@
 // The school through the arched window on the cover. Last year the class were the Monstres (I3B),
 // and one of their monsters stayed on: it reads in an upstairs window. With motion it gets there
 // as the page loads, peeking out from behind the school and hopping in through the front door.
+// The children's teacher leads their line, holding a book up high like a guide's flag, and waves it
+// back when the monster waves. She is only on the cover; notices keep the children on their own.
 ---
 <svg class="cover-scene" viewBox="0 0 100 82" preserveAspectRatio="xMidYMax slice">
   <g class="cover-zoom">
@@ -30,6 +32,18 @@
         </svg>
         <g transform="translate(79 57)"><g class="monster walking"><use href="#monster" x="-5" y="-13" width="10" height="14"/><g transform="translate(2.7 -6)"><path class="waving" d="M0 0q1.3.9 1.5 2.4" style="fill:none;stroke:var(--lilac);stroke-width:1;stroke-linecap:round"/></g></g></g>
         <use href="#school-front" width="100" height="90"/>
+        <use href="#school-children" x="5" width="100" height="90"/>
+        <g class="teacher" transform="translate(6 45)">
+          <use href="#teacher" width="14" height="27"/>
+          <path d="M10.6 8.9q1.7 3.6 2.8 7.6" style="fill:none;stroke:var(--cloth);stroke-width:1.5;stroke-linecap:round"/><path d="M13.2 16.3q2 2.6 5.4 2.1" style="fill:none;stroke:var(--skin-6);stroke-width:1.2;stroke-linecap:round"/>
+          <g transform="translate(3.4 8.9)"><g class="book-wave">
+            <path d="M0 0q-.9-3.6-1.3-7.6" style="fill:none;stroke:var(--cloth);stroke-width:1.5;stroke-linecap:round"/><circle cx="-1.3" cy="-7.7" r=".75" style="fill:var(--skin-6)"/>
+            <g transform="translate(-1.3 -8.6)">
+              <path d="M0 .6-2.9-.5v-3l2.9 1.1zM0 .6l2.9-1.1v-3L0-2.4z" style="fill:var(--white)"/><path d="M-3.3-.2 0 1.1 3.3-.2v.6L0 1.7-3.3.4z" style="fill:var(--classe)"/>
+              <path d="M-2.3-1.2l1.7.6M-2.3-2l1.7.6M.6-.6l1.7-.6M.6-1.4l1.7-.6" style="fill:none;stroke:var(--muted);stroke-width:.22;stroke-linecap:round"/>
+            </g>
+          </g></g>
+        </g>
       </g>
     </g>
   </g>

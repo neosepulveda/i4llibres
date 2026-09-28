@@ -14,8 +14,8 @@
   --red:#dd4a3b;--pink:#f3a3a6;--lilac:#b79ce0;--lilac-light:#ece3f7;--white:#fffdf7;--black:#1d2533;
   --yellow:#f2c14e;--orange:#ef8a3a;--window:#a7d8ec;--steel:#c7d0d5;--cardboard:#caa06a;
   --tile:#b9dcd8;--court:#9fd3b7;--envelope:#ecc98a;--envelope-dark:#dcb06a;
-  --skin-1:#f2c9a6;--skin-2:#d39a6a;--skin-3:#8e5b3c;--skin-4:#e9b58c;--skin-5:#b07650;
-  --hair-1:#3b2a20;--hair-2:#7a4a26;--hair-3:#1d1a18;--hair-4:#c98b3a;
+  --skin-1:#f2c9a6;--skin-2:#d39a6a;--skin-3:#8e5b3c;--skin-4:#e9b58c;--skin-5:#b07650;--skin-6:#f7dcc6;
+  --hair-1:#3b2a20;--hair-2:#7a4a26;--hair-3:#1d1a18;--hair-4:#c98b3a;--hair-5:#2b211c;
   /* day and night inside shared drawings, where a class can't reach */
   --show-day:inline;--show-night:none;
 }
@@ -34,7 +34,7 @@
   --red:#a93c31;--pink:#b98081;--lilac:#7d6aa6;--lilac-light:#433a60;--white:#ece0c3;--black:#16110b;
   --yellow:#caa347;--orange:#b56a31;--window:#ffd66b;--steel:#8d989e;--cardboard:#94764c;
   --tile:#31504e;--court:#3c6a56;--envelope:#b39562;--envelope-dark:#98794a;
-  --skin-1:#c9a283;--skin-2:#a97a53;--skin-3:#6e4630;--skin-4:#bf9170;--skin-5:#8b5d40;
+  --skin-1:#c9a283;--skin-2:#a97a53;--skin-3:#6e4630;--skin-4:#bf9170;--skin-5:#8b5d40;--skin-6:#d4b59e;
   --show-day:none;--show-night:inline;
 }
 
@@ -126,7 +126,7 @@ html:not(.motion) .front{aspect-ratio:100/128}
 .cover-foot b{display:block;font-weight:600;font-size:calc(5 * var(--u))}
 /* Last year's monster reads in an upstairs window. With motion it gets there as the page loads: it
    peeks out from behind the school, waves, hops in through the front door, and the view closes in on
-   its window and back out. Every part follows the same eight seconds; at rest it is simply reading.
+   its window and back out. The children's teacher, at the head of their line, waves her book back. Every part follows the same eight seconds; at rest it is simply reading.
    The keyframes move plain numbers, never transform or opacity themselves: Chrome paints those on a
    layer of their own, which inside the tilted book comes out at a fraction of the resolution. For the
    same reason the animations drop away once the story ends, and the zoom is a number the script turns
@@ -138,16 +138,17 @@ html:not(.motion) .front{aspect-ratio:100/128}
 @property --story-scale{syntax:"<number>";inherits:false;initial-value:1}
 @property --story-scale-x{syntax:"<number>";inherits:false;initial-value:1}
 @property --story-opacity{syntax:"<number>";inherits:false;initial-value:1}
-.cover-scene :is(.monster,.waving,.door-leaf,.reading-light,.reading-halo,.reader){opacity:var(--story-opacity);
+.cover-scene :is(.monster,.waving,.book-wave,.door-leaf,.reading-light,.reading-halo,.reader){opacity:var(--story-opacity);
   transform:translate(calc(var(--story-x) * 1px),calc(var(--story-y) * 1px)) rotate(calc(var(--story-turn) * 1deg)) scale(calc(var(--story-scale) * var(--story-scale-x)),var(--story-scale))}
 .monster.peeking,.monster.walking{--story-opacity:0}
 .reading-halo{--story-opacity:.45}
 /* longhands: the minifier turns a shorthand without a name into "animation:none" */
-html.motion :is(.cover-zoom,.monster,.waving,.door-leaf,.reading-light,.reading-halo,.reader){animation-duration:8s;animation-timing-function:ease-in-out;animation-fill-mode:backwards}
+html.motion :is(.cover-zoom,.monster,.waving,.book-wave,.door-leaf,.reading-light,.reading-halo,.reader){animation-duration:8s;animation-timing-function:ease-in-out;animation-fill-mode:backwards}
 html.motion .cover-zoom{animation-name:cover-zoom}
 html.motion .monster.peeking{animation-name:monster-peek}
 html.motion .monster.walking{animation-name:monster-walk}
 html.motion .waving{animation-name:monster-wave}
+html.motion .book-wave{animation-name:book-wave}
 html.motion .door-leaf{animation-name:door}
 html.motion .reading-light{animation-name:light}
 html.motion .reading-halo{animation-name:halo}
@@ -180,6 +181,7 @@ html.motion .reader{animation-name:reader}
   33.5%{--story-turn:-125}
   35%,100%{--story-turn:0}
 }
+@keyframes book-wave{0%,28.5%{--story-turn:0}30.5%{--story-turn:18}32.5%{--story-turn:-14}34.5%{--story-turn:18}36.5%{--story-turn:-12}38.5%,100%{--story-turn:0}}
 @keyframes door{0%,51.25%{--story-scale-x:1}55%,60%{--story-scale-x:.18}63.75%,100%{--story-scale-x:1}}
 @keyframes light{0%,62.5%{--story-opacity:0}66.25%,100%{--story-opacity:1}}
 @keyframes halo{0%,62.5%{--story-opacity:0}66.25%,100%{--story-opacity:.45}}

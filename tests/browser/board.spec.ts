@@ -108,6 +108,22 @@ test('last year’s monster moves into the school as the page loads, and hurries
  await expect(scene).toHaveAttribute('viewBox','0 0 100 82');
 });
 
+test('their teacher leads the line with a book held high and waves it back when the monster waves',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ await expect(page.locator('.cover .teacher')).toBeVisible();
+ const book=page.locator('.cover .book-wave');
+ const turn=()=>book.evaluate(arm=>getComputedStyle(arm).getPropertyValue('--story-turn').trim());
+ const at=(time:number)=>page.locator('.cover-scene').evaluate((svg,time)=>svg.getAnimations({subtree:true}).forEach(animation=>{animation.pause();animation.currentTime=time;}),time);
+ // Still while the monster peeks, rocking the book while it waves, and still again as it hops to the door.
+ await at(1500);
+ expect(await turn()).toBe('0');
+ await at(2600);
+ expect(await turn()).toBe('-14');
+ await at(4000);
+ expect(await turn()).toBe('0');
+});
+
 test('near the end of the story the view closes in on the window where the monster reads',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('http://127.0.0.1:4323');

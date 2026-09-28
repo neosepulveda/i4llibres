@@ -100,8 +100,11 @@ test('the first page of the book lists the dates, under a cloth cover with the s
   assert.match(book,/<div class="cover" aria-hidden="true">/);
   assert.ok(book.includes(cover));
   // The school comes in layers, so last year's monster can slip behind it and read in a window.
-  for(const layer of ['school-back','school-building','school-front']) assert.match(book,new RegExp(`<use href="#${layer}"`));
+  for(const layer of ['school-back','school-building','school-front','school-children']) assert.match(book,new RegExp(`<use href="#${layer}"`));
   assert.match(book,/<g class="reader"/);
+  // Their teacher leads the line on the cover only; notices keep the children on their own.
+  assert.match(book,/<g class="teacher"[\s\S]*?<use href="#teacher"/);
+  assert.match(book,/<g class="book-wave">/);
   assert.match(book,/<a class="school-calendar" href="https:\/\/lamarbella\.cat\/calendari-escolar\/" target="_blank" rel="noopener noreferrer">/);
   assert.ok(html.indexOf('class="opening"')<html.indexOf('id="avisos"'));
  }
