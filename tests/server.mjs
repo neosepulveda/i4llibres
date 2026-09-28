@@ -16,6 +16,10 @@ try {
   rmSync(join(root,'src/content/translations'),{recursive:true,force:true});
   mkdirSync(join(root,'src/content/translations'),{recursive:true});
   if (mode==='populated') cpSync(join(source,'tests/fixtures/translations'),join(root,'src/content/translations'),{recursive:true});
+  rmSync(join(root,'src/content/menus'),{recursive:true,force:true});
+  mkdirSync(join(root,'src/content/menus'),{recursive:true});
+  if (mode==='populated') cpSync(join(source,'tests/fixtures/menus'),join(root,'src/content/menus'),{recursive:true});
+  if (mode==='populated') cpSync(join(source,'tests/fixtures/downloads'),join(root,'public/downloads'),{recursive:true});
   const cli=join(source,'node_modules/.bin/astro');
   const build=spawnSync(process.execPath,[cli,'build'],{cwd:root,stdio:'inherit'});
   if(build.status!==0) throw new Error('Fixture build failed');

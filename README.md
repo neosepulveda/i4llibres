@@ -177,6 +177,34 @@ files:
 
 Add a translated `title` to both translation files, noting the document language when it differs (“(in Catalan)”). Each file is a full-width row after the details, before the calendar row, with its type and size. Tapping it downloads the file.
 
+## Replace the month’s menus
+
+Menjadors Biosca sends a picture of each menu every month, and the AFA forwards them to families by email. The site shows the newest month in the pocket inside the back cover, reached from the “Menús de …” link on the dates page.
+
+In Claude Code, run the project skill with the email’s subject:
+
+```text
+/replace-menus Fwd: menús d'octubre
+```
+
+It finds the email, downloads the pictures through Chrome, replaces the menus, runs the checks and offers to publish. The steps are in [`.claude/skills/replace-menus/SKILL.md`](.claude/skills/replace-menus/SKILL.md).
+
+By hand, save the pictures into a folder and run:
+
+```sh
+bin/menus ~/Downloads/menus-2026-10 2026-10
+```
+
+`bin/menus` recognises each picture by Biosca’s file name, typos included. It resizes them to 1600 px wide JPEGs in `public/downloads/menjador-<kind>-<YYYY-MM>.jpg` and writes the month’s list in `src/content/menus/<YYYY-MM>.yaml`, in the order families see them. It also removes the previous month. If any picture is not a menu it knows, or two are the same menu, it changes nothing and says which files.
+
+| Kind | Biosca’s picture |
+| --- | --- |
+| `basal`, `fitxa`, `sopars` | Menú basal, Fitxa del mes, Sopars. These are for every family. |
+| `sense-gluten`, `sense-lactosa`, `sense-plv`, `sense-cacauet`, `sense-nous`, `sense-soja` | Sense gluten, Sense lactosa, Sense P.L.V, Sense cacahuet, Sense anous (a typo for “nous”, nuts), Sense soja. |
+| `sense-peix`, `sense-carn`, `sense-porc`, `sense-integral`, `vegetaria`, `ovolactovegetaria` | Sense peix, Sense carn, Sense porc, Sense integral, Vegetarià, Ovolactovegetarià. |
+
+Labels for every kind, in all three languages, are in `src/lib/i18n.ts`. A new kind needs its name in `src/lib/menus.ts`, a file-name rule in `scripts/menus.mjs` and its labels.
+
 ## Language and appearance preferences
 
 - `/` defaults to Catalan; `/es/` is Spanish; `/en/` is English.

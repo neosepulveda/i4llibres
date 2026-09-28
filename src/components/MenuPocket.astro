@@ -1,0 +1,53 @@
+---
+import { fileMeta } from '../lib/file-meta';
+import { menusLabel, monthName } from '../lib/date-labels';
+import { messages, type Language } from '../lib/i18n';
+import type { MenuMonth } from '../lib/menus';
+interface Props { menus: MenuMonth; language: Language }
+const { menus, language } = Astro.props;
+const t = messages[language];
+const assetUrl = (src: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${src}`;
+const newTab = t.newTab.toLocaleLowerCase(language);
+// The closed pocket shows the tops of three cards: the menus for everyone, and the adapted ones last.
+const adapted = menus.adapted.length ? [t.adaptedMenus] : [];
+const peeking = [...menus.main.slice(0, 3 - adapted.length).map(({ kind }) => t.menuKinds[kind]), ...adapted];
+---
+<section class="back-endpaper" id="menus" aria-labelledby="menus-heading">
+  <svg class="endpapers" aria-hidden="true"><rect width="100%" height="100%" fill="url(#endpaper-back)"/></svg>
+  <div class="menus-label"><h2 id="menus-heading">{menusLabel(menus.month, language)}</h2><p class="menus-hint">{t.menusHint}</p></div>
+  <div class="menu-cards" id="menu-cards">
+    {menus.main.map(({ kind, src }, index) => <a class="menu-card" href={assetUrl(src)} target="_blank" rel="noopener noreferrer" style={`--i:${index}`}>
+      <span>{t.menuKinds[kind]}<small>{fileMeta(src, language)}</small></span>
+      <span class="menu-card-mark" aria-hidden="true"><svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M3 11.5l3.2-3.2 2.6 2.6 1.7-1.7 2.5 2.5"/><circle cx="10.6" cy="6.2" r="1.1"/></svg></span>
+      <span class="sr-only"> ({newTab})</span>
+    </a>)}
+    {menus.adapted.length > 0 && <>
+      <h3 class="adapted-heading">{t.adaptedMenus}</h3>
+      <div class="adapted-cards">{menus.adapted.map(({ kind, src }, index) => <a class="menu-card small" href={assetUrl(src)} target="_blank" rel="noopener noreferrer" style={`--i:${menus.main.length + 1 + index}`}>{t.menuKinds[kind]}<span class="sr-only">, {fileMeta(src, language)} ({newTab})</span></a>)}</div>
+    </>}
+  </div>
+  <button class="pocket" type="button" aria-expanded="true" aria-controls="menu-cards" data-open={t.putMenusBack} data-closed={t.takeMenusOut} hidden>
+    <span class="pocket-cards" aria-hidden="true">{peeking.map((label, index) => <span class="peek" style={`--i:${index}`}>{label}</span>)}</span>
+    <span class="pocket-front"><span class="pocket-print" aria-hidden="true">{t.menusPocket}<b>{monthName(menus.month, language)}</b></span><span class="pocket-action">{t.putMenusBack}</span></span>
+  </button>
+</section>
+<script>
+  // Without JavaScript the menus lie open on the page. With it they wait in the pocket until someone
+  // takes them out. Each menu is only a link, so no picture downloads until it is opened.
+  const section = document.getElementById('menus');
+  if (section) {
+    const pocket = section.querySelector<HTMLButtonElement>('.pocket')!;
+    const cards = document.getElementById('menu-cards')!;
+    const action = pocket.querySelector<HTMLElement>('.pocket-action')!;
+    function show(open: boolean, animate = true) {
+      cards.hidden = !open;
+      section!.classList.toggle('closed', !open);
+      section!.classList.toggle('sliding', animate);
+      pocket.setAttribute('aria-expanded', String(open));
+      action.textContent = open ? pocket.dataset.open! : pocket.dataset.closed!;
+    }
+    pocket.hidden = false;
+    show(false, false);
+    pocket.addEventListener('click', () => show(pocket.getAttribute('aria-expanded') !== 'true'));
+  }
+</script>

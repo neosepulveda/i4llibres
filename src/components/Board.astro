@@ -1,9 +1,12 @@
 ---
+import { getCollection } from 'astro:content';
 import { localizedNotices } from '../lib/localized-notices';
 import { messages, type Language } from '../lib/i18n';
+import { latestMenus } from '../lib/menus';
 import Layout from '../layouts/Layout.astro';
 import Notice from './Notice.astro';
 import Book from './Book.astro';
+import MenuPocket from './MenuPocket.astro';
 import OpeningBook from './OpeningBook.astro';
 import UpcomingDates from './UpcomingDates.astro';
 interface Props { language?: Language }
@@ -11,11 +14,12 @@ const { language = 'ca' } = Astro.props;
 const t = messages[language];
 const entries = await localizedNotices(language);
 const notices = entries.map(entry => entry.notice);
+const menus = latestMenus(await getCollection('menus'));
 const filters = [['tot', t.filterAll], ...Object.entries(t.categories)];
 ---
 <Layout language={language}>
   <h1 class="sr-only">{t.heading}</h1>
-  <OpeningBook language={language}><UpcomingDates notices={notices} language={language} /></OpeningBook>
+  <OpeningBook language={language}><UpcomingDates notices={notices} menuMonth={menus?.month} language={language} /></OpeningBook>
   <div class="pages">
     <section id="avisos" class="notices-section" aria-labelledby="notices-heading">
       <h2 id="notices-heading" class="notices-heading">{t.notices}</h2>
@@ -31,6 +35,7 @@ const filters = [['tot', t.filterAll], ...Object.entries(t.categories)];
         <div class="filter-empty sheet paper" hidden><h3>{t.noCategory}</h3><button id="reset-filter" type="button">{t.reset}</button></div>
       </>}
     </section>
+    {menus && <MenuPocket menus={menus} language={language} />}
   </div>
   <Fragment slot="overlays">
     {notices.length > 0 && <button class="filters-shortcut" type="button" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg><span>{t.filtersShortcut}: <b>{t.filterAll}</b></span></button>}

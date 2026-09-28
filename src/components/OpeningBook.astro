@@ -24,7 +24,7 @@ const children = [['classe','skin-1','hair-4'],['escola','skin-2','hair-1'],['re
           <div class="cover-foot"><b>Escola La Mar Bella</b>{t.courseCover}</div>
         </div>
         <div class="face inside">
-          <svg class="endpapers" viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice"><defs><pattern id="endpaper" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M2 14q2.5-3 5 0t5 0" fill="none" style="stroke:var(--cloth)" stroke-width=".9" opacity=".35"/><path d="M13 4h5v5h-5z" style="fill:var(--classe)" opacity=".35"/><path d="M15.5 4v5" style="stroke:var(--cloth)" stroke-width=".6" opacity=".35"/></pattern></defs><rect width="120" height="160" fill="url(#endpaper)"/></svg>
+          <svg class="endpapers" viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice"><rect width="120" height="160" fill="url(#endpaper)"/></svg>
           <div class="bookplate"><svg viewBox="0 0 72 18">{children.map(([clothes,skin,hair],index) => <use href="#child" x={2 + index * 14} width="12" height="18" style={`--clothes:var(--${clothes});--skin:var(--${skin});--hair:var(--${hair})`}/>)}</svg><p>{t.bookplate}</p></div>
         </div>
       </div>

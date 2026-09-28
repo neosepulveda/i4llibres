@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { leaf, fullDate, dayAndTime, stampLabel, shortDate, ticketLabel } from '../src/lib/date-labels.ts';
+import { leaf, fullDate, dayAndTime, stampLabel, shortDate, ticketLabel, menusLabel, monthName } from '../src/lib/date-labels.ts';
 const meeting={start:'2026-10-05T17:00:00+02:00',end:'2026-10-05T18:00:00+02:00',location:'Menjador',description:'Reunió'};
 const holiday={allDay:true,start:'2026-10-12',end:'2026-10-13',location:'Escola',description:'Festiu'};
 
@@ -27,6 +27,16 @@ test('card stamps and calendar notes read naturally in each language',()=>{
  assert.equal(ticketLabel(meeting,'ca'),'17:00–18:00 h, hora de Barcelona');
  assert.equal(ticketLabel({...holiday,start:'2026-10-20',end:'2026-10-21'},'ca'),'Tot el dia, dimarts 20 d’octubre');
  assert.equal(ticketLabel(holiday,'en'),'All day, Monday 12 October');
+});
+
+test('the menus link names its month with the right preposition, and the pocket prints the month',()=>{
+ assert.equal(menusLabel('2026-09','ca'),'Menús de setembre');
+ assert.equal(menusLabel('2026-10','ca'),'Menús d’octubre');
+ assert.equal(menusLabel('2027-04','es'),'Menús de abril');
+ assert.equal(menusLabel('2026-10','en'),'October menus');
+ assert.equal(monthName('2026-09','ca'),'Setembre');
+ assert.equal(monthName('2026-09','es'),'Septiembre');
+ assert.equal(monthName('2027-01','en'),'January');
 });
 
 test('Barcelona dates hold across the daylight-saving change',()=>{

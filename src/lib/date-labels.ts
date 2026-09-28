@@ -28,6 +28,18 @@ export function stampLabel(event: CalendarEvent, language: Language) {
 }
 /** "2 d’oct": the stamp for a notice with a date but no event. */
 export const shortDate = (value: string, language: Language) => trimDot(format(value, language, { day:'numeric', month:'short' }));
+/** "Menús de setembre", "Menús d’octubre", "September menus": the link to a month's menus. */
+export function menusLabel(month: string, language: Language) {
+  const middle = `${month}-15`;
+  // A full date lends Catalan and Spanish their preposition: "15 d’octubre" gives "d’octubre".
+  const name = language === 'en' ? format(middle, language, { month:'long' }) : format(middle, language, { day:'numeric', month:'long' }).replace(/^15\s/, '');
+  return messages[language].menus.replace('{month}', name);
+}
+/** "Setembre", "Septiembre", "September": the month printed on the menus pocket. */
+export function monthName(month: string, language: Language) {
+  const name = format(`${month}-15`, language, { month:'long' });
+  return name[0].toLocaleUpperCase(language) + name.slice(1);
+}
 /** "Tot el dia, dimarts 20 d’octubre" or "17:00–18:00 h, hora de Barcelona": below the calendar buttons. */
 export function ticketLabel(event: CalendarEvent, language: Language) {
   const t = messages[language];

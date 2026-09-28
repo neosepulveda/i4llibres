@@ -1,0 +1,8 @@
+# A smaller month than a real one, with its own pictures in tests/fixtures/downloads, so the
+# tests keep working whichever month the site shows: two menus for everyone and two adapted ones.
+month: "2026-06"
+menus:
+  - basal
+  - sopars
+  - sense-gluten
+  - vegetaria

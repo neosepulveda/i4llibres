@@ -1,6 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,readdirSync} from 'node:fs';
+import {readFileSync,readdirSync,existsSync} from 'node:fs';
+import {menusLabel} from '../src/lib/date-labels.ts';
+import {messages} from '../src/lib/i18n.ts';
 test('production HTML excludes fixtures and renders the empty state when there are no notices',()=>{
   const html=readFileSync('dist/index.html','utf8');
   if (readdirSync('src/content/notices',{recursive:true}).filter(p=>p.endsWith('.md')).length===0) assert.match(html,/Encara no hi ha cap avís/);
@@ -160,5 +162,37 @@ test('the timetable shows its week on the page, then the picture by day to open 
   assert.equal(card.match(/<img /g).length,1);
   assert.match(card,/href="\/downloads\/activitats-i4b-per-dies\.jpg" download/);
   assert.ok(card.indexOf('<ul>')<card.indexOf('class="notice-images"'));
+ }
+});
+
+// The menus change every month (bin/menus), so this reads whichever month the site has.
+test('the dates page links to the month’s menus, kept in a pocket inside the back cover',()=>{
+ const lists=readdirSync('src/content/menus').filter(name=>name.endsWith('.yaml'));
+ assert.ok(lists.length<=1,'bin/menus keeps one month at a time');
+ for(const [path,language] of [['','ca'],['es/','es'],['en/','en']]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  if(!lists.length){
+   assert.doesNotMatch(html,/class="menus-link"|id="menus"/);
+   continue;
+  }
+  const list=readFileSync(`src/content/menus/${lists[0]}`,'utf8');
+  const month=list.match(/^month: "(\d{4}-\d{2})"$/m)[1];
+  const kinds=Array.from(list.matchAll(/^ {2}- ([a-z-]+)$/gm),([,kind])=>kind);
+  const label=menusLabel(month,language);
+  assert.ok(html.includes(`<a class="menus-link" href="#menus">${label}<svg`),path);
+  // Inside the back cover: after the notices, before the back cover itself.
+  assert.ok(html.indexOf('id="avisos"')<html.indexOf('id="menus"'));
+  assert.ok(html.indexOf('id="menus"')<html.indexOf('class="back-cover"'));
+  const pocket=html.match(/<section class="back-endpaper" id="menus"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(pocket,path);
+  assert.ok(pocket.includes(`<h2 id="menus-heading">${label}</h2>`));
+  const cards=Array.from(pocket.matchAll(/<a class="menu-card[^"]*" href="([^"]+)" target="_blank" rel="noopener noreferrer"/g),([,href])=>({href}));
+  assert.deepEqual(cards.map(({href})=>href).sort(),kinds.map(kind=>`/downloads/menjador-${kind}-${month}.jpg`).sort(),path);
+  for(const {href} of cards) assert.ok(existsSync(`public${href}`),href);
+  for(const kind of kinds) assert.ok(pocket.includes(messages[language].menuKinds[kind]),`${path}${kind}`);
+  // The pictures are only links: none downloads with the page.
+  assert.doesNotMatch(pocket,/<img/);
+  // Without JavaScript the menus lie open and the pocket button stays out of the way.
+  assert.match(pocket,/<button class="pocket" type="button" aria-expanded="true" aria-controls="menu-cards"[^>]* hidden>/);
  }
 });

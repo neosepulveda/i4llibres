@@ -21,6 +21,8 @@ for (const width of [1440,390,320]) {
       await expect(page.getByRole('link',{name:'Calendari escolar 2026–27'})).toHaveAttribute('href','https://lamarbella.cat/calendari-escolar/');
       await expect(page.locator('.notice-count')).toHaveText('0 avisos');
       await expect(page.locator('.filters')).toHaveCount(0);
+      await expect(page.locator('.menus-link')).toHaveCount(0);
+      await expect(page.locator('#menus')).toHaveCount(0);
       await expect(page.locator('html')).toHaveAttribute('data-theme',colorScheme==='dark'?'fosc':'clar');
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
       await page.getByRole('button',{name:/Activa el mode/}).click();
@@ -309,6 +311,84 @@ test('a notice file downloads directly from its own row',async({page})=>{
  await expect(page.locator('#avis-class .file-row')).toHaveText(/Test plan \(in Catalan\)\s*PDF · 15.2 MB/);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+test('the menus wait in a pocket at the back of the book, and no picture loads until one is opened',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ const pictures:string[]=[];
+ page.context().on('request',request=>{ if(request.url().includes('/downloads/menjador-')) pictures.push(request.url()); });
+ await page.goto('http://127.0.0.1:4323');
+ const cards=page.locator('#menu-cards');
+ await expect(cards).toBeHidden();
+ await expect(page.locator('.peek')).toHaveText(['Menú basal','Proposta de sopars','Al·lèrgies i dietes']);
+ await page.getByRole('button',{name:'Treu els menús'}).click();
+ await expect(cards).toBeVisible();
+ const pocket=page.getByRole('button',{name:'Torna’ls a la butxaca'});
+ await expect(pocket).toHaveAttribute('aria-expanded','true');
+ const menus=page.locator('.menu-card');
+ await expect(menus).toHaveText([/^Menú basal\s*JPG · \d+ kB/,/^Proposta de sopars\s*JPG · \d+ kB/,/^Sense gluten/,/^Vegetarià/]);
+ for(const menu of await menus.all()){
+  await expect(menu).toHaveAttribute('target','_blank');
+  expect((await menu.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+ }
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ expect(pictures).toEqual([]);
+ // Only the menu that is opened downloads.
+ const tab=page.waitForEvent('popup');
+ await page.getByRole('link',{name:/^Sense gluten/}).click();
+ await expect.poll(async()=>(await tab).url()).toMatch(/\/downloads\/menjador-sense-gluten-2026-06\.jpg$/);
+ expect(pictures).toEqual(['http://127.0.0.1:4323/downloads/menjador-sense-gluten-2026-06.jpg']);
+ await pocket.click();
+ await expect(cards).toBeHidden();
+ await expect(page.getByRole('button',{name:'Treu els menús'})).toHaveAttribute('aria-expanded','false');
+ await page.goto('http://127.0.0.1:4323/en/');
+ await page.getByRole('button',{name:'Take the menus out'}).click();
+ await expect(page.getByRole('heading',{name:'June menus'})).toBeVisible();
+ await expect(page.locator('.menu-card').first()).toHaveText(/^Main menu/);
+ await expect(page.getByText('The menus are in Catalan.')).toBeVisible();
+});
+
+test('the menus link on the dates page jumps straight to the pocket, without turning the pages',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ await openBook(page);
+ await page.getByRole('link',{name:'Menús de juny'}).click();
+ await expect(page.locator('.riffle')).not.toHaveClass(/turning/);
+ await expect(page).toHaveURL(/#menus$/);
+ await expect(page.getByRole('button',{name:'Treu els menús'})).toBeInViewport();
+ await expect(page.locator('#menu-cards')).toBeHidden();
+});
+
+test('without JavaScript the menus lie open at the back of the book',async({browser})=>{
+ const context=await browser.newContext({javaScriptEnabled:false});
+ const page=await context.newPage();await page.goto('http://127.0.0.1:4323');
+ await expect(page.getByRole('link',{name:'Menús de juny'})).toHaveAttribute('href','#menus');
+ await expect(page.locator('.pocket')).toBeHidden();
+ await expect(page.locator('#menu-cards')).toBeVisible();
+ await expect(page.locator('.menu-card')).toHaveCount(4);
+ await context.close();
+});
+
+for (const colorScheme of ['light','dark'] as const) {
+ test(`the pocket and its menus stay readable ${colorScheme}`,async({page})=>{
+  await page.emulateMedia({colorScheme});
+  await page.goto('http://127.0.0.1:4323');
+  await page.getByRole('button',{name:'Treu els menús'}).click();
+  for(const [text,background] of [['.pocket-action','.pocket-front'],['.pocket-print b','.pocket-front'],['.menus-hint','.menus-label'],['.menu-card small','.menu-card'],['.adapted-heading','.adapted-heading']]){
+   const ratio=await page.locator(text).first().evaluate((element,background)=>{
+    const luminance=(rgb:string)=>{
+     const channels=rgb.match(/[\d.]+/g)!.slice(0,3).map(Number).map(value=>{
+      const channel=value/255;
+      return channel<=0.04045 ? channel/12.92 : ((channel+0.055)/1.055)**2.4;
+     });
+     return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+    };
+    const foreground=luminance(getComputedStyle(element).color), paper=luminance(getComputedStyle(element.closest(background)!).backgroundColor);
+    return (Math.max(foreground,paper)+0.05)/(Math.min(foreground,paper)+0.05);
+   },background);
+   expect(ratio,text).toBeGreaterThanOrEqual(4.5);
+  }
+ });
+}
 
 test('a notice opens with its pop-up scene, or the school when it has none',async({page})=>{
  await page.goto('http://127.0.0.1:4323');

@@ -22,6 +22,7 @@ Daily/weekly recaps, a CMS approval queue, authentication, and automatic transla
 - Night mode is a desk lamp: the table goes dark, the pages stay warm. The lamp button in the header switches it.
 - Catalan is the default; Spanish and English cover interface text, notices, and calendar exports.
 - Upcoming dates are the first page of the book, not a month grid and not a month-specific heading, since dates can span months. Each date is a calendar leaf showing only the month and day; the line under the title gives the weekday and time without repeating the date. Dates that do not fit the page wait behind “Show N more dates”, which lets the open book grow; with no dates, the page says so and keeps the school calendar link. Each row links to its notice card, which holds the details and calendar exports; with JavaScript the pages riffle to the card, which opens and is highlighted on arrival. Keep the notices as a distinct section with its own heading and spacing.
+- The month’s school menus live in a library pocket glued inside the back cover, after the last notice, facing the bookplate inside the front cover on the same endpaper. A link under the school calendar on the dates page (“Menús de setembre”) jumps straight there, a plain anchor link: the page riffle the dates use was distracting over the whole book, so it stays off this link. Closed, the pocket shows the tops of three cards; tapped, the menus come out: the main menu, the monthly sheet and the dinner ideas as cards with type and size, then the adapted menus for allergies and diets as small cards, since a family needs one of them at most. Each menu is only a link to its picture, opening in a new tab, so no menu picture downloads with the page. Without JavaScript the menus lie open. Menus are standing reference rather than notices: no category, filter or card. Only the newest month shows; replace it when the next one arrives.
 - Notice filters affect cards only, not the upcoming-dates list.
 - Keep all category filters visible, with the same compact category labels used on notice cards; do not replace them with action sorting. The filters are buttons with a category dot and a count, with no label in front of them; the chosen one fills with its colour and shows a tick. A status line names the result (“1 avís del menjador”) with a way back to all notices, and once the filters scroll away a floating “Filters: …” button returns to them. It replaces the earlier back-to-top button. Use the current board before deciding whether action or freshness badges are needed.
 - Each notice is a chapter: a pop-up scene chosen with `scene`, then a page of text with a category ribbon, a date stamp for events, and full-width rows for details, files and calendar exports, between dashed lines. Details and calendar rows have a plus that turns into a minus; a file row has a down arrow, shows the file type and size, and downloads directly. A notice without a scene shows the school from the cover. Text on category colours and coloured text on paper must keep at least 4.5:1 contrast in both themes.
@@ -30,7 +31,7 @@ Daily/weekly recaps, a CMS approval queue, authentication, and automatic transla
 - Calendar export is opt-in through event metadata. Do not infer event durations or add exports to every dated announcement.
 - The AFA cancellation reminder marks the final day to cancel activities for the following month, not the whole application window. Use a one-day all-day event and state the exact cutoff in its description.
 - External web links open in a new tab with `noopener noreferrer`. Downloads stay direct downloads.
-- Download names are lowercase ASCII words joined by hyphens, topic first, with the school year when the document is yearly (`menjador-pla-funcionament-2026-2027.pdf`). The schema rejects anything else.
+- Download names are lowercase ASCII words joined by hyphens, topic first, with the school year when the document is yearly (`menjador-pla-funcionament-2026-2027.pdf`). The schema rejects anything else. Menu pictures are named by kind and month (`menjador-sense-gluten-2026-09.jpg`) and resized to 1600 px wide, which keeps them readable when zoomed at under 300 kB each.
 - Preserve downloadable original timetable images. Their contents are also available as translated text. The class timetable is `expanded`: its week reads on the page, followed by the “Horari per dies” picture only.
 - The site and repository history are public. `noindex, nofollow` discourages indexing but does not restrict access.
 - Do not publish school Google Docs links that grant unrestricted editing. The existing announcement refers families to the teacher's email instead.
@@ -62,6 +63,10 @@ Build output is deterministic given source files, configuration, and build time.
 | `src/content.config.ts` | Original and translation schemas; timed/all-day event validation. |
 | `src/content/notices/` | Canonical Catalan notices, shared metadata, attachment paths. |
 | `src/content/translations/{es,en}/` | Translated text, matching original notice IDs. |
+| `src/content/menus/` | One YAML file per month listing which menu pictures arrived; the newest month is shown. |
+| `src/lib/menus.ts` | Menu kinds, which of them are for every family, and the newest month’s picture paths. |
+| `bin/menus`, `scripts/menus.mjs` | Replace the month’s menus from a folder of Biosca’s pictures: recognise, resize, list, and remove the previous month. |
+| `.claude/skills/replace-menus/` | The monthly routine from the AFA’s email to publication. |
 | `src/lib/localized-notices.ts` | Merge translations with shared original metadata; reject incomplete translations; sort notices. |
 | `src/lib/i18n.ts` | Interface strings, category labels, supported languages, base-aware language paths. |
 | `src/pages/index.astro` | Catalan entry point. |
@@ -69,11 +74,12 @@ Build output is deterministic given source files, configuration, and build time.
 | `src/components/Board.astro` | Shared page layout, the book, notice section, filters and the filters shortcut. |
 | `src/components/OpeningBook.astro` | The cover and its scroll-driven opening; fits the dates page to the cover and releases the book when more dates show. |
 | `src/layouts/Layout.astro` | HTML language/metadata, header, language picker, lamp theme switch, preference handling, back cover. |
-| `src/components/Illustrations.astro` | Shared SVG symbols: the children and their teacher, trees, clouds, stars, last year's monster, and the school scene in four layers (back, building, front, children) plus the whole scene. |
+| `src/components/Illustrations.astro` | Shared SVG symbols: the children and their teacher, trees, clouds, stars, last year's monster, and the school scene in four layers (back, building, front, children) plus the whole scene. Also the endpaper pattern inside both covers. |
 | `src/components/CoverScene.astro` | The school through the cover window with the teacher at the head of the line, and the monster's story on load. Its timeline is CSS keyframes in `site.css`; the script zooms by moving the viewBox and hurries the story when the page scrolls. The keyframes animate registered numbers, never `transform` or `opacity` directly, and don't fill forwards: otherwise Chrome paints the school at low resolution inside the tilted book. |
-| `src/components/Notice.astro` | Chapter cards, translated Markdown, optional calendar controls. `NoticeImages.astro` renders pictures with open and download links; `NoticeFiles.astro` renders file rows, reading each size from `public/` at build time. |
+| `src/components/Notice.astro` | Chapter cards, translated Markdown, optional calendar controls. `NoticeImages.astro` renders pictures with open and download links; `NoticeFiles.astro` renders file rows. `src/lib/file-meta.ts` reads each file’s size from `public/` at build time, for these rows and the menus. |
+| `src/components/MenuPocket.astro` | The inside of the back cover: the menus pocket, its cards, and taking them out. |
 | `src/components/Scene.astro`, `src/components/scenes/` | Pop-up scenes and their spring animation; `src/lib/scenes.ts` lists the names a notice can use. |
-| `src/components/UpcomingDates.astro` | The dates page: calendar leaves linking to notice cards, empty state, client-side expiry, travel to a card. |
+| `src/components/UpcomingDates.astro` | The dates page: calendar leaves linking to notice cards, empty state, client-side expiry, the school calendar and menus links, travel to a card. |
 | `src/lib/date-labels.ts` | Leaf, stamp and calendar-ticket labels in Barcelona time for each language. |
 | `src/components/CalendarLinks.astro` | Shared Google Calendar and download actions. |
 | `src/lib/calendar.ts` | Calendar URL/file generation, time labels, stable event UIDs, escaping and UTF-8 line folding. |
@@ -94,6 +100,8 @@ Notice order is `order`, then optional `date`, then ID. A notice date is descrip
 
 For timed events, retain explicit offsets and display Barcelona time. All-day events use date-only start/end with an exclusive end. Keep the same event UID across languages. Exports are individual calendar entries, not a live subscription. Do not promise imported entries will automatically update or deduplicate in every calendar app.
 
+The menus change every month. Follow [`.claude/skills/replace-menus/SKILL.md`](.claude/skills/replace-menus/SKILL.md) from the AFA’s email; `bin/menus` does the file work and changes nothing when a picture isn’t a menu it knows. A new kind of menu is a product change: its name in `src/lib/menus.ts`, a file-name rule in `scripts/menus.mjs` and labels in all three languages.
+
 To retire content, remove the original and both translations. Ended events disappear from the upcoming list with JavaScript, but cards do not expire automatically. Without JavaScript, static event rows remain visible until source removal and deployment, and each row is a plain anchor link to its card. Category filtering and automatic expiry are progressive enhancements; reading details and following language/download links must work without scripts.
 
 For UI changes, edit shared components rather than copying separate language layouts. Add all interface translations together. Reuse the existing theme variables. Check long Spanish/English labels on phones as well as Catalan.
@@ -111,7 +119,7 @@ On Norman, use a login shell or include `/opt/homebrew/bin` in `PATH` for SSH co
 5. Inspect the relevant UI at phone widths in both themes and all affected languages.
 6. Verify Norman's preview URL responds before handing off changes for phone review, leave the preview running, and include its URL in the response. Report what changed and whether it is local, committed, pushed, or deployed.
 
-`bin/ci` runs shell syntax checks, `astro check`, the production build, Node tests, and Playwright tests. `npm test` expects a production build to exist. Unit tests cover calendar serialization, date labels, external links, script execution with injected command fakes, and generated production output. Browser tests cover fixtures, the opening book and its dates page, themes, filters and their shortcut, downloads, expiry, language preferences, reduced motion, contrast and layout.
+`bin/ci` runs shell syntax checks, `astro check`, the production build, Node tests, and Playwright tests. `npm test` expects a production build to exist. Unit tests cover calendar serialization, date labels, the newest month of menus, recognising and replacing menu pictures, external links, script execution with injected command fakes, and generated production output. Browser tests cover fixtures, the opening book and its dates page, the menus pocket, themes, filters and their shortcut, downloads, expiry, language preferences, reduced motion, contrast and layout.
 
 `tests/server.mjs` builds isolated temporary projects on ports 4322 and 4323. Never run fixture builds inside the working checkout: shared Astro content stores previously caused fixture contamination. Keep fixture translations alongside fixture originals. Some production-output tests refer to the current published notices; update these assertions deliberately if those notices are retired.
 

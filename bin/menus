@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# The folder is where you ran the command from; common moves to the repository next.
+if [ -n "${1:-}" ] && [ -d "$1" ]; then set -- "$(cd "$1" && pwd)" "${@:2}"; fi
+source "$(dirname "$0")/common"
+ensure_runtime "$@"
+exec node scripts/menus.mjs "$@"

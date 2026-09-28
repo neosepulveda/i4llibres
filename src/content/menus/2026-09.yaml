@@ -1,0 +1,18 @@
+# Written by bin/menus from Menjadors Biosca's pictures.
+month: "2026-09"
+menus:
+  - basal
+  - fitxa
+  - sopars
+  - sense-gluten
+  - sense-lactosa
+  - sense-plv
+  - sense-cacauet
+  - sense-nous
+  - sense-soja
+  - sense-peix
+  - sense-carn
+  - sense-porc
+  - sense-integral
+  - vegetaria
+  - ovolactovegetaria
