@@ -395,6 +395,15 @@ for (const colorScheme of ['light','dark'] as const) {
  });
 }
 
+// No published notice uses the castanyera's stall yet, so a fixture keeps it drawn.
+test('the castanyera’s stall, kept for the Castanyada, stands with its sign in each language',async({page})=>{
+ for (const [path,sign] of [['','Castanyes'],['es/','Castañas'],['en/','Chestnuts']]){
+  await page.goto(`http://127.0.0.1:4323/${path}`);
+  await expect(page.locator('#avis-school .popup .piece')).toHaveCount(6);
+  await expect(page.locator('#avis-school .popup text')).toHaveText(sign);
+ }
+});
+
 test('a notice opens with its pop-up scene, or the school when it has none',async({page})=>{
  await page.goto('http://127.0.0.1:4323');
  await expect(page.locator('#avis-school .popup .piece').first()).toBeAttached();
