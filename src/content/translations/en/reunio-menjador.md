@@ -8,6 +8,7 @@ event:
   description: "Meeting with Menjadors Biosca about the service, nutrition programme and lunchtime educational activities. A one-hour slot in your calendar. Childcare: https://forms.gle/rdxGsYhpomXyddHy9"
 files:
   - title: "Lunchtime service plan 2026–27 (in Catalan)"
+  - title: "Lunchtime service: contacts and prices (in Catalan)"
 ---
 The meeting is on **Monday 5 October at 17:00**, in the **dining hall at Escola La Mar Bella**.
 

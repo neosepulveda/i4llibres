@@ -17,6 +17,8 @@ event:
 files:
   - src: "/downloads/menjador-pla-funcionament-2026-2027.pdf"
     title: "Pla de funcionament del temps de migdia 2026–27"
+  - src: "/downloads/menjador-informacions-espai-migdia-2026-2027.jpg"
+    title: "Informacions de l’espai migdia: contacte i preus"
 ---
 La reunió serà el **dilluns 5 d’octubre, a les 17 h**, al **menjador de l’Escola La Mar Bella**.
 
