@@ -175,15 +175,22 @@ test('the timetable shows its week on the page, then the picture by day to open 
  }
 });
 
-test('the lunchtime activities read week by week behind the tab, then the programme itself, the same picture the pocket holds',()=>{
- for(const [path,weeks] of [['',['1 i 2 d’octubre','Del 5 al 9 d’octubre','Del 12 al 16 d’octubre','Del 19 al 23 d’octubre','Del 26 al 30 d’octubre']],['es/',['1 y 2 de octubre','Del 5 al 9 de octubre','Del 12 al 16 de octubre','Del 19 al 23 de octubre','Del 26 al 30 de octubre']],['en/',['1 and 2 October','5 to 9 October','12 to 16 October','19 to 23 October','26 to 30 October']]]){
+test('the lunchtime activities read week by week behind the tab, then Biosca’s four play boxes, then the programme itself, the same picture the pocket holds',()=>{
+ for(const [path,weeks,boxes] of [
+  ['',['1 i 2 d’octubre','Del 5 al 9 d’octubre','Del 12 al 16 d’octubre','Del 19 al 23 d’octubre','Del 26 al 30 d’octubre'],['Emocions','Esports i moviment','Creativitat','Consciència ecològica']],
+  ['es/',['1 y 2 de octubre','Del 5 al 9 de octubre','Del 12 al 16 de octubre','Del 19 al 23 de octubre','Del 26 al 30 de octubre'],['Emociones','Deporte y movimiento','Creatividad','Conciencia ecológica']],
+  ['en/',['1 and 2 October','5 to 9 October','12 to 16 October','19 to 23 October','26 to 30 October'],['Emotions','Sport and movement','Creativity','Ecology']],
+ ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   const card=html.match(/<article class="notice menjador" id="avis-activitats-migdia-octubre"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card,path);
   const body=card.match(/<details class="tab">[\s\S]*?<\/details>/)?.[0];
   assert.ok(body,path);
   assert.deepEqual(Array.from(body.matchAll(/<p><strong>([^:<]+):/g),([,week])=>week),weeks,path);
-  assert.equal(body.match(/<li>/g).length,22,path);
+  // A list of days for each week, then the boxes the programme marks activities with.
+  const lists=body.match(/<ul>[\s\S]*?<\/ul>/g);
+  assert.deepEqual(lists.map(list=>list.match(/<li>/g).length),[2,5,5,5,5,4],path);
+  assert.deepEqual(Array.from(lists.at(-1).matchAll(/<li>([^:<]+):/g),([,box])=>box),boxes,path);
   assert.ok(body.lastIndexOf('</ul>')<body.indexOf('class="notice-images"'),path);
   assert.match(body,/href="\/downloads\/menjador-activitats-2026-10\.jpg" download/);
   assert.match(html.match(/<section class="back-endpaper" id="menus"[\s\S]*?<\/section>/)[0],/<a class="menu-card" href="\/downloads\/menjador-activitats-2026-10\.jpg"/,path);
