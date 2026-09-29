@@ -6,7 +6,7 @@ Read this file before changing the project. [README.md](README.md) contains comm
 
 Els Llibres is a public noticeboard for I4B families at Escola La Mar Bella in Barcelona. The children named their class **Llibres**. Class information is the priority, alongside relevant whole-school announcements, school meals, holidays, and closures.
 
-The goal is a small, useful board of current information that families can read on their phones. Notices should be edited or removed as circumstances change, rather than accumulating indefinitely. Items requiring action from families come before optional contributions or background information.
+The goal is a small, useful board of current information that families can read on their phones. Notices should be edited or removed as circumstances change, rather than accumulating indefinitely. Notices run from what families have to do, the nearest date first, to what is coming up that they should know, then standing reference such as the timetable, then voluntary contributions. A notice for this month comes before one that holds all year. The order is set by hand (`order`, in steps of ten), so re-sort the board whenever a notice arrives or goes; ordering by date alone would put a dated reminder above a class request with no date.
 
 The owner manually decides what gets published. A separate private project, `school-ingest`, runs on the Mac Mini known as Norman and processes school communications. This repository is the public presentation layer and has **no automated connection** to that service. Do not add ingestion, source credentials, database queries, or automatic publication as part of routine website work.
 

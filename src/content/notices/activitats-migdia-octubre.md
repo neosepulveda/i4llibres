@@ -1,7 +1,7 @@
 ---
 title: "Què fem al migdia? Les activitats d’octubre"
 description: "Cada dia l’espai migdia té una activitat: jocs, contes, el Dia Mundial de l’Alimentació i del Pa i, el dijous 29, la Castanyada."
-order: 35
+order: 50
 category: menjador
 scene: lunchtime
 note: "Veure l’activitat de cada dia"

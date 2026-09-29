@@ -3,7 +3,7 @@ title: "Extraescolars de l’AFA: altes i baixes a partir del dia 1"
 description: "Les sol·licituds d’alta i baixa de les extraescolars de l’AFA es poden fer de l’1 al 20 de cada mes, fins a les 23:55 h, a Ampasoft."
 category: afa
 scene: activities
-order: 15
+order: 40
 note: "Com sol·licitar una alta o una baixa"
 event:
   allDay: true

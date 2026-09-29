@@ -129,6 +129,16 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
  }
 });
 
+// The board runs from what families have to do, nearest first, to reference and voluntary notices.
+// This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
+test('the notices run from what to do next to what is voluntary',()=>{
+ const order=['reunio-menjador','reunio-families-inscripcions','proxim-dia-sense-escola','extraescolars-afa','activitats-migdia-octubre','horari-llibres','materials-infantil'];
+ for(const path of ['','es/','en/']){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
+ }
+});
+
 test('every published notice opens with its own pop-up scene',()=>{
  const html=readFileSync('dist/index.html','utf8');
  const cards=Array.from(html.matchAll(/<article class="notice[\s\S]*?<\/article>/g),([card])=>card);

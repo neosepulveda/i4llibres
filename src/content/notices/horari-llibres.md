@@ -1,7 +1,7 @@
 ---
 title: "Què fem cada dia? L’horari dels Llibres"
 description: "Biblioteca, anglès, tallers, psicomotricitat i música: les activitats d’I4B al llarg de la setmana."
-order: 30
+order: 60
 category: classe
 scene: timetable
 expanded: true

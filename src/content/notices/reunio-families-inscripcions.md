@@ -1,7 +1,7 @@
 ---
 title: "La presentació de la reunió i les inscripcions ja estan disponibles"
 description: "Al correu de la Sandra del 25 de setembre trobareu la presentació i les graelles per apuntar-vos a les activitats en família i a les entrevistes."
-order: 10
+order: 20
 category: classe
 scene: letter
 note: "Quin correu cal buscar?"
