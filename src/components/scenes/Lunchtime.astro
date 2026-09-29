@@ -1,0 +1,61 @@
+---
+import type { Language } from '../../lib/i18n';
+interface Props { language: Language }
+// Menjadors Biosca's programme gives each week of lunchtime a theme. A card for each is pegged up in
+// the dining hall, in the programme's order, with its dates. When the programme changes, change the cards.
+const weeks = [
+  { theme:'smile', band:'sun', dates:'1–2' },
+  { theme:'garland', band:'sea-light', dates:'5–9' },
+  { theme:'bread', band:'cardboard', dates:'12–16' },
+  { theme:'cook', band:'steel', dates:'19–23' },
+  { theme:'chestnuts', band:'orange', dates:'26–30' },
+];
+// The string sags between its ends, "M2 3Q50 11 98 3": at x = 2 + 96t it hangs at 3 + 16t(1 - t).
+const cards = weeks.map((week, i) => {
+  const x = 13 + 18.5 * i, t = (x - 2) / 96;
+  return { ...week, x, y:+(3 + 16 * t * (1 - t)).toFixed(2), lean:[-3, 2, -2, 3, -3][i] };
+});
+const garland = [['orange', -2.5, -.8], ['red', 0, 0], ['classe', 2.5, -.8]] as const;
+// The children at the table: left, clothes, skin and hair.
+const children = [[6, 'sea-light', 'skin-1', 'hair-4'], [20, 'classe', 'skin-3', 'hair-3'], [52, 'pink', 'skin-2', 'hair-1'], [66, 'escola', 'skin-5', 'hair-2']] as const;
+---
+<div class="backdrop"><svg viewBox="0 0 100 50" preserveAspectRatio="none">
+  <defs><pattern id="hall-tiles" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" style="fill:var(--tile)"/><path d="M0 0h5v5" style="fill:none;stroke:var(--white);stroke-width:.3;opacity:.8"/></pattern></defs>
+  <rect width="100" height="50" style="fill:var(--wall)"/><rect y="30" width="100" height="20" fill="url(#hall-tiles)"/><rect y="29.2" width="100" height="1.2" style="fill:var(--wall-dark)"/>
+  <g><rect x="8" y="1.6" width="22" height="10.4" rx=".6" style="fill:var(--wood-dark)"/><rect x="9.2" y="2.8" width="19.6" height="8" style="fill:var(--sky)"/><circle class="day" cx="14" cy="6.6" r="2.2" style="fill:var(--sun)"/><g class="night"><circle cx="14" cy="6.6" r="2.2" style="fill:var(--sun)"/><circle cx="15.2" cy="5.8" r="2" style="fill:var(--sky)"/></g><path d="M19 2.8v8M9.2 6.8h19.6" style="stroke:var(--wood-dark);stroke-width:.7"/></g>
+  <g><rect x="70" y="1.6" width="22" height="10.4" rx=".6" style="fill:var(--wood-dark)"/><rect x="71.2" y="2.8" width="19.6" height="8" style="fill:var(--sky)"/><use href="#autumn-tree" x="83" y="4" width="5.4" height="9"/><path d="M81 2.8v8M71.2 6.8h19.6" style="stroke:var(--wood-dark);stroke-width:.7"/></g>
+  <circle cx="50" cy="6.6" r="4.2" style="fill:var(--white)"/><circle cx="50" cy="6.6" r="4.2" style="fill:none;stroke:var(--red);stroke-width:.7"/><path d="M50 6.6V3.6M50 6.6l2 .7" style="stroke:var(--black);stroke-width:.6;stroke-linecap:round"/>
+</svg></div>
+<div class="floor"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><defs><pattern id="hall-floor" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" style="fill:var(--sand)"/><rect width="5" height="5" style="fill:var(--sand-dark)"/><rect x="5" y="5" width="5" height="5" style="fill:var(--sand-dark)"/></pattern></defs><rect width="100" height="40" fill="url(#hall-floor)"/></svg>
+  <div class="piece weeks" style="--x:0;--y:5;--w:100;--ar:100/40;--d:0"><svg viewBox="0 0 100 40">
+    <path d="M2 3Q50 11 98 3" style="fill:none;stroke:var(--black);stroke-width:.35;opacity:.6"/>
+    {cards.map(({ theme, band, dates, x, y, lean }) => <g class={`week ${theme}`} transform={`rotate(${lean} ${x} ${y})`}>
+      <rect x={x - 7.5} y={+(y + 1.2).toFixed(2)} width="15" height="17" rx=".4" style="fill:var(--white)"/><rect x={x - 7.5} y={+(y + 1.2).toFixed(2)} width="15" height="2.6" style={`fill:var(--${band})`}/>
+      <g transform={`translate(${x} ${+(y + 9.6).toFixed(2)})`}>
+        {theme === 'smile' && <><circle r="3.6" style="fill:var(--sun)"/><path d="M-1.9-.5q.6-.9 1.2 0M.7-.5q.6-.9 1.2 0" style="fill:none;stroke:var(--black);stroke-width:.4;stroke-linecap:round"/><path d="M-1.8.9q1.8 2 3.6 0" style="fill:none;stroke:var(--black);stroke-width:.45;stroke-linecap:round"/></>}
+        {theme === 'garland' && <><path d="M-4.2-3q4.2 3 8.4 0" style="fill:none;stroke:var(--black);stroke-width:.3"/>{garland.map(([colour, cx, cy]) => <use href="#leaf" x={cx - 1.4} y={cy - 1.4} width="2.8" height="2.8" transform={`rotate(180 ${cx} ${cy})`} style={`fill:var(--${colour})`}/>)}</>}
+        {theme === 'bread' && <><ellipse cy=".4" rx="4.2" ry="2.8" style="fill:var(--cardboard)"/><ellipse cx="-.6" cy="-.6" rx="2.6" ry="1.2" style="fill:var(--sand);opacity:.7"/><path d="M-2.6-.2l1.2 1.4M-.5-.8l1.2 1.4M1.6-.3l1.2 1.4" style="fill:none;stroke:var(--wood-dark);stroke-width:.5;stroke-linecap:round"/></>}
+        {theme === 'cook' && <><g style="fill:var(--black)"><circle cx="-2" cy="-1.6" r="2.15"/><circle cy="-2.6" r="2.35"/><circle cx="2" cy="-1.6" r="2.15"/><rect x="-2.55" y="-1.4" width="5.1" height="4.2" rx=".3"/></g><g style="fill:var(--white)"><circle cx="-2" cy="-1.6" r="1.8"/><circle cy="-2.6" r="2"/><circle cx="2" cy="-1.6" r="1.8"/><rect x="-2.2" y="-1.4" width="4.4" height="3.85"/></g><path d="M-2.2 1.1h4.4" style="stroke:var(--black);stroke-width:.3"/></>}
+        {theme === 'chestnuts' && <><use href="#chestnut" x="-3.8" y="-2.6" width="4" height="4"/><use href="#chestnut" x="-.2" y="-1.8" width="4" height="4"/><use href="#leaf" x=".6" y="-4.4" width="2.6" height="2.6" transform="rotate(40 1.9 -3.1)" style="fill:var(--orange)"/></>}
+      </g>
+      <text x={x} y={+(y + 16.6).toFixed(2)} text-anchor="middle" style="font-family:'Young Serif',Georgia,serif;font-size:3.1px;fill:var(--black)">{dates}</text>
+      <rect x={x - .6} y={+(y - 1.2).toFixed(2)} width="1.2" height="3.4" rx=".3" style="fill:var(--wood)"/>
+    </g>)}
+  </svg></div>
+  <div class="piece" style="--x:8;--y:20;--w:84;--ar:84/20;--d:.16"><svg viewBox="0 0 84 20">
+    {children.map(([x, clothes, skin, hair]) => <use href="#child" x={x} y="0" width="12" height="18" style={`--clothes:var(--${clothes});--skin:var(--${skin});--hair:var(--${hair})`}/>)}
+    <path d="M54.2 7 51.4 1.8M61.8 7l2.8-5.2" style="stroke:var(--skin-2);stroke-width:1.2;stroke-linecap:round"/>
+    <path d="M30.4 10V6.6h3.2V10" style="fill:var(--sea-light);opacity:.7"/><path d="M36 10l1.2-3.4h9.6L48 10z" style="fill:var(--wood)"/><ellipse cx="42" cy="6.2" rx="4" ry="2.2" style="fill:var(--cardboard)"/><path d="M40 5.6l.9 1M42 5.2l.9 1M44 5.6l.9 1" style="stroke:var(--wood-dark);stroke-width:.4;stroke-linecap:round"/>
+    <g style="fill:var(--white)"><ellipse cx="12" cy="10" rx="3.6" ry=".9"/><ellipse cx="26" cy="10" rx="3.6" ry=".9"/><ellipse cx="58" cy="10" rx="3.6" ry=".9"/><ellipse cx="72" cy="10" rx="3.6" ry=".9"/></g>
+    <rect x="0" y="10" width="84" height="5.4" style="fill:var(--white)"/><g style="fill:var(--menjador);opacity:.3"><rect x="0" y="10" width="84" height="1.3"/><rect x="0" y="12.6" width="84" height="1.3"/></g><g style="fill:var(--wood-dark)"><rect x="3" y="15.4" width="1.6" height="4.6"/><rect x="79.4" y="15.4" width="1.6" height="4.6"/></g>
+  </svg></div>
+  {/* The scales for weighing what is left on the plates, and the birthday cake for the month's birthdays. */}
+  <div class="piece" style="--x:11;--y:32;--w:16;--ar:16/14;--d:.3"><svg viewBox="0 0 16 14">
+    <path d="M3.4 5.6h9.2c0 2.6-2 4.2-4.6 4.2S3.4 8.2 3.4 5.6z" style="fill:var(--sea-light)"/><g style="fill:var(--grass)"><circle cx="6" cy="5.2" r=".9"/><circle cx="8.4" cy="4.8" r=".8"/></g><circle cx="10.4" cy="5.2" r=".8" style="fill:var(--orange)"/>
+    <rect x="2" y="10" width="12" height="4" rx=".6" style="fill:var(--steel)"/><circle cx="8" cy="12" r="1.5" style="fill:var(--white)"/><path d="M8 12l.9-.9" style="stroke:var(--red);stroke-width:.35"/>
+  </svg></div>
+  <div class="piece" style="--x:74;--y:32;--w:16;--ar:16/14;--d:.36"><svg viewBox="0 0 16 14">
+    <g style="fill:var(--sea-light)"><rect x="5" y="2.4" width=".8" height="3"/><rect x="7.6" y="2" width=".8" height="3.4"/><rect x="10.2" y="2.4" width=".8" height="3"/></g><g class="glow" style="fill:var(--sun)"><ellipse cx="5.4" cy="1.6" rx=".5" ry=".8"/><ellipse cx="8" cy="1.2" rx=".5" ry=".8"/><ellipse cx="10.6" cy="1.6" rx=".5" ry=".8"/></g>
+    <rect x="3" y="5.4" width="10" height="4" rx=".6" style="fill:var(--white)"/><path d="M3 6.6c1 1.2 1.6 1.2 2.5 0s1.6 1.2 2.5 0 1.6 1.2 2.5 0 1.6 1.2 2.5 0" style="fill:none;stroke:var(--pink);stroke-width:.7"/><rect x="1.4" y="9.4" width="13.2" height="4.6" rx=".6" style="fill:var(--pink)"/><path d="M1.4 11.6h13.2" style="stroke:var(--white);stroke-width:.5;stroke-dasharray:1 .8"/>
+  </svg></div>
+</div>

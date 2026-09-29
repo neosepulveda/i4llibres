@@ -1,9 +1,10 @@
 import type { Language } from './i18n.ts';
 
-// Menjadors Biosca sends the menus every month. These are for every family. The adapted menus
-// for allergies and diets change from month to month, so each month's list names its own, and a
-// family needs one of them at most.
-export const menuKinds = ['basal', 'fitxa', 'sopars', 'receptes'] as const;
+// Menjadors Biosca sends the menus every month. These are for every family, and so is the month's
+// programme of lunchtime activities, which rides along with them. The adapted menus for allergies
+// and diets change from month to month, so each month's list names its own, and a family needs
+// one of them at most.
+export const menuKinds = ['basal', 'fitxa', 'sopars', 'receptes', 'activitats'] as const;
 export type MenuKind = typeof menuKinds[number];
 
 // The lunchtime service's contacts and prices hold for the school year, so they stay in the

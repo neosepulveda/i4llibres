@@ -5,6 +5,7 @@ menus:
   - fitxa
   - sopars
   - receptes
+  - activitats
 adapted:
   - id: vegetaria
     ca: "Vegetarià"

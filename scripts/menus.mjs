@@ -15,11 +15,13 @@ import sharp from 'sharp';
 import { menuKinds } from '../src/lib/menus.ts';
 
 // The menus for every family. "Receptes dels sopars" names the dinners too, so it comes first.
+// The lunchtime activities come headed "Programació octubre", or as "actividades migdia".
 const forEveryFamily = [
   [/\bRECEPTES\b/, 'receptes'],
   [/\bFITXA\b/, 'fitxa'],
   [/\bSOPARS?\b/, 'sopars'],
   [/\bBASAL\b/, 'basal'],
+  [/\b(PROGRAMACIO|ACTIVITATS|ACTIVIDADES)\b/, 'activitats'],
 ];
 // Any other file is an adapted menu, named by its file name without the school, the month and
 // the like: "SENSE GLUTEN BASAL LA MAR BELLA SETEMBRE" is sense-gluten. Biosca's typos are fixed

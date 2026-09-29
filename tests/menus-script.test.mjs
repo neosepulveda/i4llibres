@@ -37,6 +37,9 @@ test('Biosca’s file names are recognised, typos and all',()=>{
     // A slash typed in Finder is a colon on disk.
     ['MENÚ S: KIWI I LES NOUS.jpg',{id:'sense-kiwi-i-les-nous'}],
     ['SENSE OU (1).jpg',{id:'sense-ou'}],
+    // The lunchtime activities are headed "Programació octubre"; October's came as "actividades migdia".
+    ['PROGRAMACIÓ OCTUBRE.jpg',{kind:'activitats'}],
+    ['actividades-migdia.jpeg',{kind:'activitats'}],
   ]) assert.deepEqual(menuFor(name),menu,name);
   // A name that says nothing once the school and the month are gone is not a menu.
   assert.equal(menuFor('MENÚS OCTUBRE.pdf'),undefined);

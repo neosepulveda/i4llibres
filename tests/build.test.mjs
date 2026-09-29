@@ -165,6 +165,31 @@ test('the timetable shows its week on the page, then the picture by day to open 
  }
 });
 
+test('the lunchtime activities read week by week behind the tab, then the programme itself, the same picture the pocket holds',()=>{
+ for(const [path,weeks] of [['',['1 i 2 d’octubre','Del 5 al 9 d’octubre','Del 12 al 16 d’octubre','Del 19 al 23 d’octubre','Del 26 al 30 d’octubre']],['es/',['1 y 2 de octubre','Del 5 al 9 de octubre','Del 12 al 16 de octubre','Del 19 al 23 de octubre','Del 26 al 30 de octubre']],['en/',['1 and 2 October','5 to 9 October','12 to 16 October','19 to 23 October','26 to 30 October']]]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice menjador" id="avis-activitats-migdia-octubre"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card,path);
+  const body=card.match(/<details class="tab">[\s\S]*?<\/details>/)?.[0];
+  assert.ok(body,path);
+  assert.deepEqual(Array.from(body.matchAll(/<p><strong>([^:<]+):/g),([,week])=>week),weeks,path);
+  assert.equal(body.match(/<li>/g).length,22,path);
+  assert.ok(body.lastIndexOf('</ul>')<body.indexOf('class="notice-images"'),path);
+  assert.match(body,/href="\/downloads\/menjador-activitats-2026-10\.jpg" download/);
+  assert.match(html.match(/<section class="back-endpaper" id="menus"[\s\S]*?<\/section>/)[0],/<a class="menu-card" href="\/downloads\/menjador-activitats-2026-10\.jpg"/,path);
+ }
+});
+
+test('the lunchtime activities open on the dining hall, with a card pegged up for each week’s theme in the programme’s order',()=>{
+ for(const path of ['','es/','en/']){
+  const card=readFileSync(`dist/${path}index.html`,'utf8').match(/<article class="notice menjador" id="avis-activitats-migdia-octubre"[\s\S]*?<\/article>/)?.[0];
+  const weeks=card?.match(/<div class="piece weeks"[\s\S]*?<\/svg><\/div>/)?.[0];
+  assert.ok(weeks,path);
+  assert.deepEqual(Array.from(weeks.matchAll(/<g class="week ([a-z]+)"/g),([,theme])=>theme),['smile','garland','bread','cook','chestnuts'],path);
+  assert.deepEqual(Array.from(weeks.matchAll(/<text[^>]*>([^<]+)<\/text>/g),([,dates])=>dates),['1–2','5–9','12–16','19–23','26–30'],path);
+ }
+});
+
 test('the timetable’s train carries each day’s activities in open wagons, as the timetable lists them',()=>{
  for(const [path,days] of [['',['dl','dt','dc','dj','dv']],['es/',['L','M','X','J','V']],['en/',['Mo','Tu','We','Th','Fr']]]){
   const train=readFileSync(`dist/${path}index.html`,'utf8').match(/<div class="piece train"[\s\S]*?<\/svg><\/div>/)?.[0];
