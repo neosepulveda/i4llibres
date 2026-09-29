@@ -1,0 +1,72 @@
+# Written by bin/menus from Menjadors Biosca's menus. Name each adapted menu as its sheet does.
+month: "2026-10"
+menus:
+  - basal
+  - fitxa
+  - sopars
+  - receptes
+adapted:
+  - id: vegetaria
+    ca: "Vegetarià"
+    es: "Vegetariano"
+    en: "Vegetarian"
+  - id: sense-carn
+    ca: "Sense carn"
+    es: "Sin carne"
+    en: "No meat"
+  - id: sense-peix
+    ca: "Sense peix"
+    es: "Sin pescado"
+    en: "No fish"
+  - id: allergia-marisc-peix-llegums-fruits-secs-fruita-pelada-no-porc
+    ca: "Al·lèrgia al marisc, peix, llegums i fruits secs. Fruita pelada, sense porc"
+    es: "Alergia al marisco, pescado, legumbres y frutos secos. Fruta pelada, sin cerdo"
+    en: "Allergic to shellfish, fish, pulses and nuts. Peeled fruit, no pork"
+  - id: halal
+    ca: "Halal"
+    es: "Halal"
+    en: "Halal"
+  - id: sense-lactosa-sense-llegums
+    ca: "Sense lactosa ni llegums"
+    es: "Sin lactosa ni legumbres"
+    en: "No lactose or pulses"
+  - id: sense-lactosa-sense-proteina-de-vaca
+    ca: "Sense lactosa ni proteïna de vaca"
+    es: "Sin lactosa ni proteína de vaca"
+    en: "No lactose, cow’s milk or beef"
+  - id: sense-p-vegetal-ni-iogurt
+    ca: "Sense proteïna vegetal ni iogurt"
+    es: "Sin proteína vegetal ni yogur"
+    en: "No plant protein or yoghurt"
+  - id: sense-bolets
+    ca: "Sense bolets"
+    es: "Sin setas"
+    en: "No mushrooms"
+  - id: allergia-fruits-secs-soja-sesam-llegums-kiwi-melo-pressec-peix-raim
+    ca: "Al·lèrgia a fruits secs, soja, sèsam, llegums, kiwi, meló, préssec, peix i raïm"
+    es: "Alergia a frutos secos, soja, sésamo, legumbres, kiwi, melón, melocotón, pescado y uva"
+    en: "Allergic to nuts, soy, sesame, pulses, kiwi, melon, peach, fish and grapes"
+  - id: sense-peix-ni-marisc
+    ca: "Sense peix ni marisc"
+    es: "Sin pescado ni marisco"
+    en: "No fish or shellfish"
+  - id: allergia-marisc-molluscs-sensibilitat-gluten-llegums-soja-lactis-no-fermentats-bolets-xampinyons
+    ca: "Al·lèrgia al marisc i mol·luscs. Sensibilitat al gluten, llegums, soja i derivats, lactis no fermentats, bolets i xampinyons"
+    es: "Alergia al marisco y moluscos. Sensibilidad al gluten, legumbres, soja y derivados, lácteos no fermentados, setas y champiñones"
+    en: "Allergic to shellfish and molluscs. Sensitive to gluten, pulses, soy and soy products, unfermented dairy and mushrooms"
+  - id: sense-nous
+    ca: "Sense nous"
+    es: "Sin frutos secos"
+    en: "No nuts"
+  - id: festucs-i-anacards
+    ca: "Sense festucs ni anacards"
+    es: "Sin pistachos ni anacardos"
+    en: "No pistachios or cashews"
+  - id: nous-i-avellanes
+    ca: "Sense nous ni avellanes"
+    es: "Sin nueces ni avellanas"
+    en: "No walnuts or hazelnuts"
+  - id: sense-kiwi-i-nous
+    ca: "Sense kiwi ni nous"
+    es: "Sin kiwi ni frutos secos"
+    en: "No kiwi or nuts"
