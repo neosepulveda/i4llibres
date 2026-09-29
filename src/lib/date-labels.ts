@@ -28,12 +28,11 @@ export function stampLabel(event: CalendarEvent, language: Language) {
 }
 /** "2 d’oct": the stamp for a notice with a date but no event. */
 export const shortDate = (value: string, language: Language) => trimDot(format(value, language, { day:'numeric', month:'short' }));
-/** "Menús de setembre", "Menús d’octubre", "September menus": the link to a month's menus. */
-export function menusLabel(month: string, language: Language) {
-  const middle = `${month}-15`;
+/** "Menús d’octubre", "Menús de setembre i d’octubre", "September and October menus": the link to the menus. */
+export function menusLabel(months: string[], language: Language) {
   // A full date lends Catalan and Spanish their preposition: "15 d’octubre" gives "d’octubre".
-  const name = language === 'en' ? format(middle, language, { month:'long' }) : format(middle, language, { day:'numeric', month:'long' }).replace(/^15\s/, '');
-  return messages[language].menus.replace('{month}', name);
+  const names = [...months].sort().map(month => language === 'en' ? format(`${month}-15`, language, { month:'long' }) : format(`${month}-15`, language, { day:'numeric', month:'long' }).replace(/^15\s/, ''));
+  return messages[language].menus.replace('{month}', new Intl.ListFormat(language, { type:'conjunction' }).format(names));
 }
 /** "Setembre", "Septiembre", "September": the month printed on the menus pocket. */
 export function monthName(month: string, language: Language) {

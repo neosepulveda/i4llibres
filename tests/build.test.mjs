@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync,existsSync} from 'node:fs';
-import {menusLabel} from '../src/lib/date-labels.ts';
+import {menusLabel,monthName} from '../src/lib/date-labels.ts';
 import {messages} from '../src/lib/i18n.ts';
 test('production HTML excludes fixtures and renders the empty state when there are no notices',()=>{
   const html=readFileSync('dist/index.html','utf8');
@@ -175,20 +175,25 @@ test('the timetable’s train carries each day’s activities in open wagons, as
  }
 });
 
-// The menus change every month (bin/menus), so this reads whichever month the site has.
-test('the dates page links to the month’s menus, kept in a pocket inside the back cover',()=>{
- const lists=readdirSync('src/content/menus').filter(name=>name.endsWith('.yaml'));
- assert.ok(lists.length<=1,'bin/menus keeps one month at a time');
+// The menus change every month (bin/menus), so this reads whichever months the site has.
+test('the dates page links to the menus, kept in a pocket inside the back cover',()=>{
+ const lists=readdirSync('src/content/menus').filter(name=>name.endsWith('.yaml')).sort().reverse();
+ assert.ok(lists.length<=2,'bin/menus keeps a month and the one before it');
  for(const [path,language] of [['','ca'],['es/','es'],['en/','en']]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   if(!lists.length){
    assert.doesNotMatch(html,/class="menus-link"|id="menus"/);
    continue;
   }
-  const list=readFileSync(`src/content/menus/${lists[0]}`,'utf8');
-  const month=list.match(/^month: "(\d{4}-\d{2})"$/m)[1];
-  const kinds=Array.from(list.matchAll(/^ {2}- ([a-z-]+)$/gm),([,kind])=>kind);
-  const label=menusLabel(month,language);
+  const months=lists.map(name=>{
+   const list=readFileSync(`src/content/menus/${name}`,'utf8');
+   return {
+    month:list.match(/^month: "(\d{4}-\d{2})"$/m)[1],
+    main:Array.from(list.matchAll(/^ {2}- ([a-z]+)$/gm),([,kind])=>kind),
+    adapted:Array.from(list.matchAll(/^ {2}- id: ([a-z0-9-]+)\n {4}ca: (".*")\n {4}es: (".*")\n {4}en: (".*")$/gm),([,id,ca,es,en])=>({id,name:JSON.parse({ca,es,en}[language])})),
+   };
+  });
+  const label=menusLabel(months.map(({month})=>month),language);
   assert.ok(html.includes(`<a class="menus-link" href="#menus">${label}<svg`),path);
   // Inside the back cover: after the notices, before the back cover itself.
   assert.ok(html.indexOf('id="avisos"')<html.indexOf('id="menus"'));
@@ -196,10 +201,20 @@ test('the dates page links to the month’s menus, kept in a pocket inside the b
   const pocket=html.match(/<section class="back-endpaper" id="menus"[\s\S]*?<\/section>/)?.[0];
   assert.ok(pocket,path);
   assert.ok(pocket.includes(`<h2 id="menus-heading">${label}</h2>`));
-  const cards=Array.from(pocket.matchAll(/<a class="menu-card[^"]*" href="([^"]+)" target="_blank" rel="noopener noreferrer"/g),([,href])=>({href}));
-  assert.deepEqual(cards.map(({href})=>href).sort(),kinds.map(kind=>`/downloads/menjador-${kind}-${month}.jpg`).sort(),path);
-  for(const {href} of cards) assert.ok(existsSync(`public${href}`),href);
-  for(const kind of kinds) assert.ok(pocket.includes(messages[language].menuKinds[kind]),`${path}${kind}`);
+  // The newest month first, each under its own name while there are two, then the lunchtime service.
+  // Long allergy lists take a whole row, after the adapted menus that share one.
+  const byWidth=menus=>[...menus.filter(({name})=>name.length<=48),...menus.filter(({name})=>name.length>48)];
+  const headings=Array.from(pocket.matchAll(/<h3 class="month-heading"[^>]*>([^<]+)<\/h3>/g),([,name])=>name);
+  assert.deepEqual(headings,months.length>1 ? months.map(({month})=>monthName(month,language)) : [],path);
+  const cards=Array.from(pocket.matchAll(/<a class="menu-card[^"]*" href="([^"]+)" target="_blank" rel="noopener noreferrer"/g),([,href])=>href);
+  const expected=[...months.flatMap(({month,main,adapted})=>[...main,...byWidth(adapted).map(({id})=>id)].map(name=>`/downloads/menjador-${name}-${month}`)),'/downloads/menjador-informacions-espai-migdia-2026-2027'];
+  assert.deepEqual(cards.map(href=>href.replace(/\.(jpg|pdf)$/,'')),expected,path);
+  for(const href of cards) assert.ok(existsSync(`public${href}`),href);
+  for(const {main,adapted} of months){
+   for(const kind of main) assert.ok(pocket.includes(messages[language].menuKinds[kind]),`${path}${kind}`);
+   for(const {id,name} of adapted) assert.match(pocket,new RegExp(`<a class="menu-card small${name.length>48 ? ' wide' : ''}" href="/downloads/menjador-${id}-`),`${path}${id}`);
+   for(const {id,name} of adapted) assert.ok(pocket.includes(name),`${path}${id}`);
+  }
   // The pictures are only links: none downloads with the page.
   assert.doesNotMatch(pocket,/<img/);
   // Without JavaScript the menus lie open and the pocket button stays out of the way.

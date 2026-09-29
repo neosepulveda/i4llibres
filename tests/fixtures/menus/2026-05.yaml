@@ -1,0 +1,9 @@
+# The month before, still in the pocket while June begins.
+month: "2026-05"
+menus:
+  - basal
+adapted:
+  - id: sense-ou
+    ca: "Sense ou"
+    es: "Sin huevo"
+    en: "No egg"

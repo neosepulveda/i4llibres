@@ -1,22 +1,30 @@
-// Menjadors Biosca sends a picture of each menu every month. The first three are for every
-// family; the rest are adapted menus, and a family needs one of them at most.
-export const menuKinds = [
-  'basal', 'fitxa', 'sopars',
-  'sense-gluten', 'sense-lactosa', 'sense-plv', 'sense-cacauet', 'sense-nous', 'sense-soja',
-  'sense-peix', 'sense-carn', 'sense-porc', 'sense-integral', 'vegetaria', 'ovolactovegetaria',
-] as const;
+import type { Language } from './i18n.ts';
+
+// Menjadors Biosca sends the menus every month. These are for every family. The adapted menus
+// for allergies and diets change from month to month, so each month's list names its own, and a
+// family needs one of them at most.
+export const menuKinds = ['basal', 'fitxa', 'sopars', 'receptes'] as const;
 export type MenuKind = typeof menuKinds[number];
-const forEveryFamily: readonly MenuKind[] = ['basal', 'fitxa', 'sopars'];
 
-export interface MenuMonth { month: string; main: MenuPicture[]; adapted: MenuPicture[] }
-export interface MenuPicture { kind: MenuKind; src: string }
+// The lunchtime service's contacts and prices hold for the school year, so they stay in the
+// pocket while the months come and go.
+export const lunchtimeInfo = '/downloads/menjador-informacions-espai-migdia-2026-2027.jpg';
 
-/** The newest month of menus, split into the ones for everyone and the adapted ones. */
-export function latestMenus(entries: { data: { month: string; menus: MenuKind[] } }[]): MenuMonth | undefined {
-  const [latest] = [...entries].sort((a, b) => b.data.month.localeCompare(a.data.month));
-  if (!latest) return undefined;
-  const { month, menus } = latest.data;
-  // The pictures keep predictable names, so each month lists only which menus arrived.
-  const pictures = menus.map(kind => ({ kind, src: `/downloads/menjador-${kind}-${month}.jpg` }));
-  return { month, main: pictures.filter(({ kind }) => forEveryFamily.includes(kind)), adapted: pictures.filter(({ kind }) => !forEveryFamily.includes(kind)) };
+export interface MenuList { month: string; menus: MenuKind[]; adapted: ({ id: string } & Record<Language, string>)[] }
+export interface MenuMonth { month: string; main: MenuFile[]; adapted: AdaptedMenu[] }
+export interface MenuFile { kind: MenuKind; src: string }
+export interface AdaptedMenu { id: string; name: Record<Language, string>; src: string }
+
+/** The months in the pocket, newest first. `downloads` are the file names in public/downloads. */
+export function menuMonths(entries: { data: MenuList }[], downloads: string[]): MenuMonth[] {
+  return entries.map(({ data }) => data).sort((a, b) => b.month.localeCompare(a.month)).map(({ month, menus, adapted }) => {
+    // Files keep predictable names, so a list says only which menus arrived. Most are pictures;
+    // a sheet of several pages stays a PDF.
+    const src = (name: string) => {
+      const file = ['jpg', 'pdf'].map(type => `menjador-${name}-${month}.${type}`).find(file => downloads.includes(file));
+      if (!file) throw new Error(`The ${month} list names ${name}, but public/downloads has no menjador-${name}-${month}.jpg or .pdf`);
+      return `/downloads/${file}`;
+    };
+    return { month, main: menus.map(kind => ({ kind, src: src(kind) })), adapted: adapted.map(({ id, ...name }) => ({ id, name, src: src(id) })) };
+  });
 }

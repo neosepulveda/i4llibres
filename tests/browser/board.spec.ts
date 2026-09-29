@@ -319,13 +319,17 @@ test('the menus wait in a pocket at the back of the book, and no picture loads u
  await page.goto('http://127.0.0.1:4323');
  const cards=page.locator('#menu-cards');
  await expect(cards).toBeHidden();
- await expect(page.locator('.peek')).toHaveText(['Menú basal','Proposta de sopars','Al·lèrgies i dietes']);
+ await expect(page.locator('.peek')).toHaveText(['Menú basal','Fitxa del mes','Al·lèrgies i dietes']);
+ await expect(page.locator('.pocket-print b')).toHaveText('Maig · Juny');
  await page.getByRole('button',{name:'Treu els menús'}).click();
  await expect(cards).toBeVisible();
  const pocket=page.getByRole('button',{name:'Torna’ls a la butxaca'});
  await expect(pocket).toHaveAttribute('aria-expanded','true');
  const menus=page.locator('.menu-card');
- await expect(menus).toHaveText([/^Menú basal\s*JPG · \d+ kB/,/^Proposta de sopars\s*JPG · \d+ kB/,/^Sense gluten/,/^Vegetarià/]);
+ // While May's menus stay, June's come first, and the lunchtime service's sheet follows both.
+ await expect(page.locator('.month-heading')).toHaveText(['Juny','Maig']);
+ await expect(page.getByRole('heading',{name:'Menús de maig i de juny'})).toBeVisible();
+ await expect(menus).toHaveText([/^Menú basal\s*JPG · \d+ kB/,/^Fitxa del mes\s*PDF · \d+ kB/,/^Proposta de sopars\s*JPG · \d+ kB/,/^Sense gluten/,/^Vegetarià/,/^Menú basal\s*JPG · \d+ kB/,/^Sense ou/,/^Espai migdia: contacte i preus\s*JPG · \d+ kB/]);
  for(const menu of await menus.all()){
   await expect(menu).toHaveAttribute('target','_blank');
   expect((await menu.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -342,7 +346,8 @@ test('the menus wait in a pocket at the back of the book, and no picture loads u
  await expect(page.getByRole('button',{name:'Treu els menús'})).toHaveAttribute('aria-expanded','false');
  await page.goto('http://127.0.0.1:4323/en/');
  await page.getByRole('button',{name:'Take the menus out'}).click();
- await expect(page.getByRole('heading',{name:'June menus'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'May and June menus'})).toBeVisible();
+ await expect(page.getByRole('link',{name:/^No egg/})).toHaveAttribute('href',/\/downloads\/menjador-sense-ou-2026-05\.jpg$/);
  await expect(page.locator('.menu-card').first()).toHaveText(/^Main menu/);
  await expect(page.getByText('The menus are in Catalan.')).toBeVisible();
 });
@@ -351,7 +356,7 @@ test('the menus link on the dates page jumps straight to the pocket, without tur
  await page.setViewportSize({width:390,height:844});
  await page.goto('http://127.0.0.1:4323');
  await openBook(page);
- await page.getByRole('link',{name:'Menús de juny'}).click();
+ await page.getByRole('link',{name:'Menús de maig i de juny'}).click();
  await expect(page.locator('.riffle')).not.toHaveClass(/turning/);
  await expect(page).toHaveURL(/#menus$/);
  await expect(page.getByRole('button',{name:'Treu els menús'})).toBeInViewport();
@@ -361,10 +366,10 @@ test('the menus link on the dates page jumps straight to the pocket, without tur
 test('without JavaScript the menus lie open at the back of the book',async({browser})=>{
  const context=await browser.newContext({javaScriptEnabled:false});
  const page=await context.newPage();await page.goto('http://127.0.0.1:4323');
- await expect(page.getByRole('link',{name:'Menús de juny'})).toHaveAttribute('href','#menus');
+ await expect(page.getByRole('link',{name:'Menús de maig i de juny'})).toHaveAttribute('href','#menus');
  await expect(page.locator('.pocket')).toBeHidden();
  await expect(page.locator('#menu-cards')).toBeVisible();
- await expect(page.locator('.menu-card')).toHaveCount(4);
+ await expect(page.locator('.menu-card')).toHaveCount(8);
  await context.close();
 });
 
@@ -373,7 +378,7 @@ for (const colorScheme of ['light','dark'] as const) {
   await page.emulateMedia({colorScheme});
   await page.goto('http://127.0.0.1:4323');
   await page.getByRole('button',{name:'Treu els menús'}).click();
-  for(const [text,background] of [['.pocket-action','.pocket-front'],['.pocket-print b','.pocket-front'],['.menus-hint','.menus-label'],['.menu-card small','.menu-card'],['.adapted-heading','.adapted-heading']]){
+  for(const [text,background] of [['.pocket-action','.pocket-front'],['.pocket-print b','.pocket-front'],['.menus-hint','.menus-label'],['.menu-card small','.menu-card'],['.month-heading','.month-heading'],['.adapted-heading','.adapted-heading']]){
    const ratio=await page.locator(text).first().evaluate((element,background)=>{
     const luminance=(rgb:string)=>{
      const channels=rgb.match(/[\d.]+/g)!.slice(0,3).map(Number).map(value=>{

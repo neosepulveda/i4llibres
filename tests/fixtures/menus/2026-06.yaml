@@ -1,8 +1,17 @@
-# A smaller month than a real one, with its own pictures in tests/fixtures/downloads, so the
-# tests keep working whichever month the site shows: two menus for everyone and two adapted ones.
+# A smaller month than a real one, with its own files in tests/fixtures/downloads, so the tests
+# keep working whichever months the site shows: three menus for everyone, one of them a PDF, and
+# two adapted ones.
 month: "2026-06"
 menus:
   - basal
+  - fitxa
   - sopars
-  - sense-gluten
-  - vegetaria
+adapted:
+  - id: sense-gluten
+    ca: "Sense gluten"
+    es: "Sin gluten"
+    en: "No gluten"
+  - id: vegetaria
+    ca: "Vegetarià"
+    es: "Vegetariano"
+    en: "Vegetarian"

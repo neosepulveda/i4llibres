@@ -47,13 +47,21 @@ const translations = defineCollection({
     files:z.array(z.object({title:z.string().min(1)})).optional(),
   }),
 });
-// One file per month, named after it. The pictures live in public/downloads as
-// menjador-<kind>-<month>.jpg; the list says which ones arrived, in the order families see them.
+// One file per month, named after it. The files live in public/downloads as
+// menjador-<kind or id>-<month>.jpg (or .pdf); the list says which ones arrived, in the order
+// families see them. Adapted menus change every month, so the list names each one as its sheet
+// does, in all three languages.
+const unique = (ids: string[]) => new Set(ids).size === ids.length;
+const menuName = z.string().min(1, 'Name the menu as its sheet does');
 const menus = defineCollection({
   loader: glob({ pattern:'*.yaml', base:'./src/content/menus' }),
   schema: z.object({
     month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Write the month as YYYY-MM'),
-    menus: z.array(z.enum(menuKinds)).min(1).refine(kinds => new Set(kinds).size === kinds.length, 'List each menu once'),
+    menus: z.array(z.enum(menuKinds)).min(1).refine(unique, 'List each menu once'),
+    adapted: z.array(z.object({
+      id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Write the id like sense-gluten'),
+      ca: menuName, es: menuName, en: menuName,
+    })).default([]).refine(menus => unique(menus.map(({ id }) => id)), 'List each menu once'),
   }),
 });
 export const collections = { notices, translations, menus };

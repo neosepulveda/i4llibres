@@ -1,18 +1,55 @@
-# Written by bin/menus from Menjadors Biosca's pictures.
+# Written by bin/menus from Menjadors Biosca's menus. Name each adapted menu as its sheet does.
 month: "2026-09"
 menus:
   - basal
   - fitxa
   - sopars
-  - sense-gluten
-  - sense-lactosa
-  - sense-plv
-  - sense-cacauet
-  - sense-nous
-  - sense-soja
-  - sense-peix
-  - sense-carn
-  - sense-porc
-  - sense-integral
-  - vegetaria
-  - ovolactovegetaria
+adapted:
+  - id: sense-gluten
+    ca: "Sense gluten"
+    es: "Sin gluten"
+    en: "No gluten"
+  - id: sense-lactosa
+    ca: "Sense lactosa"
+    es: "Sin lactosa"
+    en: "No lactose"
+  - id: sense-plv
+    ca: "Sense llet de vaca"
+    es: "Sin leche de vaca"
+    en: "No cow’s milk"
+  - id: sense-cacauet
+    ca: "Sense cacauet"
+    es: "Sin cacahuete"
+    en: "No peanuts"
+  - id: sense-nous
+    ca: "Sense nous"
+    es: "Sin frutos secos"
+    en: "No nuts"
+  - id: sense-soja
+    ca: "Sense soja"
+    es: "Sin soja"
+    en: "No soy"
+  - id: sense-peix
+    ca: "Sense peix"
+    es: "Sin pescado"
+    en: "No fish"
+  - id: sense-carn
+    ca: "Sense carn"
+    es: "Sin carne"
+    en: "No meat"
+  - id: sense-porc
+    ca: "Sense porc"
+    es: "Sin cerdo"
+    en: "No pork"
+  - id: sense-integral
+    ca: "Sense integral"
+    es: "Sin integrales"
+    en: "No wholegrain"
+  - id: vegetaria
+    ca: "Vegetarià"
+    es: "Vegetariano"
+    en: "Vegetarian"
+  - id: ovolactovegetaria
+    ca: "Ovolactovegetarià"
+    es: "Ovolactovegetariano"
+    en: "Lacto-ovo vegetarian"

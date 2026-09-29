@@ -2,33 +2,61 @@
 import { fileMeta } from '../lib/file-meta';
 import { menusLabel, monthName } from '../lib/date-labels';
 import { messages, type Language } from '../lib/i18n';
-import type { MenuMonth } from '../lib/menus';
-interface Props { menus: MenuMonth; language: Language }
-const { menus, language } = Astro.props;
+import { lunchtimeInfo, type MenuMonth } from '../lib/menus';
+interface Props { months: MenuMonth[]; language: Language }
+const { months, language } = Astro.props;
 const t = messages[language];
 const assetUrl = (src: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${src}`;
 const newTab = t.newTab.toLocaleLowerCase(language);
-// The closed pocket shows the tops of three cards: the menus for everyone, and the adapted ones last.
-const adapted = menus.adapted.length ? [t.adaptedMenus] : [];
-const peeking = [...menus.main.slice(0, 3 - adapted.length).map(({ kind }) => t.menuKinds[kind]), ...adapted];
+// When the next month arrives before this one ends, both show for a while: the newest first,
+// each under its own name. A single month needs no name, since the heading gives it.
+const grouped = months.length > 1;
+const AdaptedHeading = grouped ? 'h4' : 'h3';
+// Most adapted menus leave out one or two things and share a row. The long allergy lists get a
+// row of their own, after the rest, so the cards read in the order they sit.
+const wide = (label: string) => label.length > 48;
+const byWidth = (menus: MenuMonth['adapted']) => [...menus.filter(({ name }) => !wide(name[language])), ...menus.filter(({ name }) => wide(name[language]))];
+// The cards come out of the pocket one after another, so each knows its place in the pile.
+let pile = 0;
+const groups = months.map(({ month, main, adapted }) => ({
+  month, heading: grouped ? pile++ : 0,
+  main: main.map(({ src, kind }) => ({ src, label: t.menuKinds[kind], i: pile++ })),
+  adaptedHeading: adapted.length ? pile++ : 0,
+  adapted: byWidth(adapted).map(({ src, name }) => ({ src, label: name[language], i: pile++ })),
+}));
+const lunchtime = pile;
+// The closed pocket shows the tops of three cards: the newest month's menus for everyone, and the adapted ones last.
+const adapted = months[0].adapted.length ? [t.adaptedMenus] : [];
+const peeking = [...groups[0].main.slice(0, 3 - adapted.length).map(({ label }) => label), ...adapted];
+const printed = months.map(({ month }) => monthName(month, language)).reverse().join(' · ');
 ---
 <section class="back-endpaper" id="menus" aria-labelledby="menus-heading">
   <svg class="endpapers" aria-hidden="true"><rect width="100%" height="100%" fill="url(#endpaper-back)"/></svg>
-  <div class="menus-label"><h2 id="menus-heading">{menusLabel(menus.month, language)}</h2><p class="menus-hint">{t.menusHint}</p></div>
+  <div class="menus-label"><h2 id="menus-heading">{menusLabel(months.map(({ month }) => month), language)}</h2><p class="menus-hint">{t.menusHint}</p></div>
   <div class="menu-cards" id="menu-cards">
-    {menus.main.map(({ kind, src }, index) => <a class="menu-card" href={assetUrl(src)} target="_blank" rel="noopener noreferrer" style={`--i:${index}`}>
-      <span>{t.menuKinds[kind]}<small>{fileMeta(src, language)}</small></span>
+    {groups.map(({ month, heading, main, adaptedHeading, adapted }) => <>
+      {grouped && <h3 class="month-heading" style={`--i:${heading}`}>{monthName(month, language)}</h3>}
+      {main.map(({ src, label, i }) => <a class="menu-card" href={assetUrl(src)} target="_blank" rel="noopener noreferrer" style={`--i:${i}`}>
+        <span>{label}<small>{fileMeta(src, language)}</small></span>
+        <span class="menu-card-mark" aria-hidden="true">{src.endsWith('.pdf')
+          ? <svg viewBox="0 0 16 16"><path d="M4 1.8h5.2L12 4.6v9.6H4z"/><path d="M9 1.8v3h3M6 8.2h4M6 10.8h4"/></svg>
+          : <svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M3 11.5l3.2-3.2 2.6 2.6 1.7-1.7 2.5 2.5"/><circle cx="10.6" cy="6.2" r="1.1"/></svg>}</span>
+        <span class="sr-only"> ({newTab})</span>
+      </a>)}
+      {adapted.length > 0 && <>
+        <AdaptedHeading class="adapted-heading" style={`--i:${adaptedHeading}`}>{t.adaptedMenus}</AdaptedHeading>
+        <div class="adapted-cards">{adapted.map(({ src, label, i }) => <a class:list={['menu-card small', { wide: wide(label) }]} href={assetUrl(src)} target="_blank" rel="noopener noreferrer" style={`--i:${i}`}>{label}<span class="sr-only">, {fileMeta(src, language)} ({newTab})</span></a>)}</div>
+      </>}
+    </>)}
+    <a class="menu-card lunchtime-info" href={assetUrl(lunchtimeInfo)} target="_blank" rel="noopener noreferrer" style={`--i:${lunchtime}`}>
+      <span>{t.lunchtimeInfo}<small>{fileMeta(lunchtimeInfo, language)}</small></span>
       <span class="menu-card-mark" aria-hidden="true"><svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M3 11.5l3.2-3.2 2.6 2.6 1.7-1.7 2.5 2.5"/><circle cx="10.6" cy="6.2" r="1.1"/></svg></span>
       <span class="sr-only"> ({newTab})</span>
-    </a>)}
-    {menus.adapted.length > 0 && <>
-      <h3 class="adapted-heading">{t.adaptedMenus}</h3>
-      <div class="adapted-cards">{menus.adapted.map(({ kind, src }, index) => <a class="menu-card small" href={assetUrl(src)} target="_blank" rel="noopener noreferrer" style={`--i:${menus.main.length + 1 + index}`}>{t.menuKinds[kind]}<span class="sr-only">, {fileMeta(src, language)} ({newTab})</span></a>)}</div>
-    </>}
+    </a>
   </div>
   <button class="pocket" type="button" aria-expanded="true" aria-controls="menu-cards" data-open={t.putMenusBack} data-closed={t.takeMenusOut} hidden>
     <span class="pocket-cards" aria-hidden="true">{peeking.map((label, index) => <span class="peek" style={`--i:${index}`}>{label}</span>)}</span>
-    <span class="pocket-front"><span class="pocket-print" aria-hidden="true">{t.menusPocket}<b>{monthName(menus.month, language)}</b></span><span class="pocket-action">{t.putMenusBack}</span></span>
+    <span class="pocket-front"><span class="pocket-print" aria-hidden="true">{t.menusPocket}<b class:list={{ months: grouped }}>{printed}</b></span><span class="pocket-action">{t.putMenusBack}</span></span>
   </button>
 </section>
 <script>

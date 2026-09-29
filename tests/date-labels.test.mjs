@@ -29,11 +29,15 @@ test('card stamps and calendar notes read naturally in each language',()=>{
  assert.equal(ticketLabel(holiday,'en'),'All day, Monday 12 October');
 });
 
-test('the menus link names its month with the right preposition, and the pocket prints the month',()=>{
- assert.equal(menusLabel('2026-09','ca'),'Menús de setembre');
- assert.equal(menusLabel('2026-10','ca'),'Menús d’octubre');
- assert.equal(menusLabel('2027-04','es'),'Menús de abril');
- assert.equal(menusLabel('2026-10','en'),'October menus');
+test('the menus link names its months with the right preposition, and the pocket prints the month',()=>{
+ assert.equal(menusLabel(['2026-09'],'ca'),'Menús de setembre');
+ assert.equal(menusLabel(['2026-10'],'ca'),'Menús d’octubre');
+ assert.equal(menusLabel(['2027-04'],'es'),'Menús de abril');
+ assert.equal(menusLabel(['2026-10'],'en'),'October menus');
+ // While two months show, the older one comes first, however they are passed.
+ assert.equal(menusLabel(['2026-10','2026-09'],'ca'),'Menús de setembre i d’octubre');
+ assert.equal(menusLabel(['2026-10','2026-09'],'es'),'Menús de septiembre y de octubre');
+ assert.equal(menusLabel(['2026-10','2026-09'],'en'),'September and October menus');
  assert.equal(monthName('2026-09','ca'),'Setembre');
  assert.equal(monthName('2026-09','es'),'Septiembre');
  assert.equal(monthName('2027-01','en'),'January');

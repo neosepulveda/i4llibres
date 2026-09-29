@@ -2,8 +2,8 @@
 import type { CollectionEntry } from 'astro:content';
 import { leaf, fullDate, dayAndTime, menusLabel } from '../lib/date-labels';
 import { messages, type Language } from '../lib/i18n';
-interface Props { notices: CollectionEntry<'notices'>[]; menuMonth?: string; language: Language }
-const { notices, menuMonth, language } = Astro.props;
+interface Props { notices: CollectionEntry<'notices'>[]; menuMonths: string[]; language: Language }
+const { notices, menuMonths, language } = Astro.props;
 const t = messages[language];
 const events = notices.filter(notice => notice.data.event).sort((a,b) => a.data.event!.start.localeCompare(b.data.event!.start));
 ---
@@ -28,7 +28,7 @@ const events = notices.filter(notice => notice.data.event).sort((a,b) => a.data.
   <button class="more-dates" type="button" aria-expanded="false" aria-controls="upcoming-list" data-one={t.moreDate} data-many={t.moreDates} data-fewer={t.fewerDates} hidden><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg><span></span></button>
   <div class="page-links">
     <a class="school-calendar" href="https://lamarbella.cat/calendari-escolar/" target="_blank" rel="noopener noreferrer">{t.schoolCalendar}<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h7v7M13 3 4 12"/></svg><span class="sr-only"> ({t.newTab.toLocaleLowerCase(language)})</span></a>
-    {menuMonth && <a class="menus-link" href="#menus">{menusLabel(menuMonth, language)}<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v11M3.5 9 8 13.5 12.5 9"/></svg></a>}
+    {menuMonths.length > 0 && <a class="menus-link" href="#menus">{menusLabel(menuMonths, language)}<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v11M3.5 9 8 13.5 12.5 9"/></svg></a>}
   </div>
 </div>
 <script>

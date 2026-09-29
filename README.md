@@ -177,9 +177,9 @@ files:
 
 Add a translated `title` to both translation files, noting the document language when it differs (“(in Catalan)”). Each file is a full-width row after the details, before the calendar row, with its type and size. Tapping it downloads the file.
 
-## Replace the month’s menus
+## Add the month’s menus
 
-Menjadors Biosca sends a picture of each menu every month, and the AFA forwards them to families by email. The site shows the newest month in the pocket inside the back cover, reached from the “Menús de …” link on the dates page.
+Menjadors Biosca sends the menus every month, and the AFA forwards them to families by email: pictures, sometimes PDFs. The pocket inside the back cover shows each month the site lists, newest first, reached from the “Menús de …” link on the dates page. A new month usually arrives before the current one ends, so both show until the older one is retired.
 
 In Claude Code, run the project skill with the email’s subject:
 
@@ -187,23 +187,32 @@ In Claude Code, run the project skill with the email’s subject:
 /replace-menus Fwd: menús d'octubre
 ```
 
-It finds the email, downloads the pictures through Chrome, replaces the menus, runs the checks and offers to publish. The steps are in [`.claude/skills/replace-menus/SKILL.md`](.claude/skills/replace-menus/SKILL.md).
+It finds the email, downloads the attachments through Chrome, adds the menus, names any new adapted menu, runs the checks and offers to publish. The steps are in [`.claude/skills/replace-menus/SKILL.md`](.claude/skills/replace-menus/SKILL.md).
 
-By hand, save the pictures into a folder and run:
+By hand, save the menus into a folder and run:
 
 ```sh
 bin/menus ~/Downloads/menus-2026-10 2026-10
+bin/menus retire 2026-09
 ```
 
-`bin/menus` recognises each picture by Biosca’s file name, typos included. It resizes them to 1600 px wide JPEGs in `public/downloads/menjador-<kind>-<YYYY-MM>.jpg` and writes the month’s list in `src/content/menus/<YYYY-MM>.yaml`, in the order families see them. It also removes the previous month. If any picture is not a menu it knows, or two are the same menu, it changes nothing and says which files.
+`bin/menus` recognises each file by Biosca’s file name, typos included. Pictures and one-page PDFs become 1600 px wide JPEGs, without the black frame Biosca’s PDFs have, in `public/downloads/menjador-<kind or menu>-<YYYY-MM>.jpg`; a sheet of several pages, such as the monthly sheet, stays a PDF. PDF pages are rendered by `scripts/pdf-pages.swift` with macOS’s PDFKit. It writes the month’s list in `src/content/menus/<YYYY-MM>.yaml`, keeps the month before and removes anything older. If a file is not a menu, two files are the same menu, or a PDF of several pages holds adapted menus, it changes nothing and says which files. `bin/menus retire <YYYY-MM>` takes a month out of the pocket.
 
-| Kind | Biosca’s picture |
+The menus for every family have fixed kinds, with labels in `src/lib/i18n.ts`:
+
+| Kind | Biosca’s file |
 | --- | --- |
-| `basal`, `fitxa`, `sopars` | Menú basal, Fitxa del mes, Sopars. These are for every family. |
-| `sense-gluten`, `sense-lactosa`, `sense-plv`, `sense-cacauet`, `sense-nous`, `sense-soja` | Sense gluten, Sense lactosa, Sense P.L.V, Sense cacahuet, Sense anous (a typo for “nous”, nuts), Sense soja. |
-| `sense-peix`, `sense-carn`, `sense-porc`, `sense-integral`, `vegetaria`, `ovolactovegetaria` | Sense peix, Sense carn, Sense porc, Sense integral, Vegetarià, Ovolactovegetarià. |
+| `basal`, `fitxa`, `sopars`, `receptes` | Menú basal, Fitxa del mes, Sopars, Receptes dels sopars. |
 
-Labels for every kind, in all three languages, are in `src/lib/i18n.ts`. A new kind needs its name in `src/lib/menus.ts`, a file-name rule in `scripts/menus.mjs` and its labels.
+Any other file is an adapted menu, named by its file name without the school or the month: “SENSE GLUTEN BASAL LA MAR BELLA SETEMBRE” is `sense-gluten`, and “S/ BOLETS” is `sense-bolets`. Typos are fixed on the way (“SENSE ANOUS” is `sense-nous`, “VEGETERIÀ” is `vegetaria`), so a menu that comes back keeps its names from the month before. A new one is listed with empty names: write them in the month’s list, as the menu’s sheet says, in Catalan, Spanish and English. The build refuses a list with a menu left unnamed.
+
+```yaml
+adapted:
+  - id: sense-bolets
+    ca: "Sense bolets"
+    es: "Sin setas"
+    en: "No mushrooms"
+```
 
 ## Language and appearance preferences
 
