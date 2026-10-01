@@ -607,3 +607,113 @@ for (const width of [320,390]) {
   });
  }
 }
+
+for (const reducedMotion of ['reduce','no-preference'] as const) {
+ test(`shared notice links open their details on arrival with ${reducedMotion} motion`,async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.emulateMedia({reducedMotion});
+  await page.goto('http://127.0.0.1:4323/en/#avis-class');
+  const card=page.locator('#avis-class');
+  await expect(card).toBeInViewport();
+  await expect(card.locator('details').first()).toHaveAttribute('open','');
+  await expect(card).toHaveClass(/highlight/);
+  await page.reload();
+  await expect(card).toBeInViewport();
+  await expect(card.locator('details').first()).toHaveAttribute('open','');
+  await page.locator('.language-picker summary').click();
+  await page.getByRole('link',{name:'Castellano',exact:true}).click();
+  await expect(page).toHaveURL(/\/es\/#avis-class$/);
+  await expect(card).toBeInViewport();
+  await expect(card.locator('details').first()).toHaveAttribute('open','');
+ });
+}
+
+test('hash navigation reveals a filtered notice and browser back returns to the previous notice',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('http://127.0.0.1:4323/?lang=ca#avis-school');
+ await page.getByRole('button',{name:'Escola',exact:true}).click();
+ await expect(page.locator('#avis-class')).toBeHidden();
+ await page.evaluate(()=>{location.hash='avis-class';});
+ await expect(page.locator('#avis-class')).toBeInViewport();
+ await expect(page.locator('#avis-class details').first()).toHaveAttribute('open','');
+ await expect(page.locator('.filter[data-filter="tot"]')).toHaveAttribute('aria-pressed','true');
+ await page.goBack();
+ await expect(page.locator('#avis-school')).toBeInViewport();
+ await page.evaluate(()=>{location.hash='%invalid';});
+ await expect(page.locator('.notice')).toHaveCount(2);
+});
+
+for (const [path,label,confirmation] of [['/?lang=ca','Copia l’enllaç','Enllaç copiat'],['/es/','Copiar enlace','Enlace copiado'],['/en/','Copy link','Link copied']]) {
+ for (const colorScheme of ['light','dark'] as const) {
+  test(`copy a notice link in ${path} with ${colorScheme} theme`,async({page})=>{
+   await page.setViewportSize({width:320,height:844});
+   await page.emulateMedia({colorScheme});
+   await page.addInitScript(()=>{
+    Object.defineProperty(navigator,'clipboard',{value:{writeText:async(text:string)=>{(window as any).copiedNotice=text;}}});
+   });
+   await page.goto(`http://127.0.0.1:4323${path}`);
+   const share=page.locator('#avis-class').getByRole('button',{name:label,exact:true});
+   await expect(share).toHaveText(label);
+   await share.focus();
+   await page.keyboard.press(colorScheme==='dark'?'Space':'Enter');
+   await expect(page.locator('#avis-class .copy-status')).toHaveText(confirmation);
+   const copied=await page.evaluate(()=>(window as any).copiedNotice);
+   expect(copied).toBe(`http://127.0.0.1:4323${path}#avis-class`);
+   expect((await share.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+   // A reader's saved English preference must not change an explicitly shared Catalan notice.
+   await page.evaluate(()=>localStorage.setItem('llibres-language','en'));
+   await page.goto(copied);
+   await expect(page.locator('html')).toHaveAttribute('lang',path.startsWith('/es')?'es':path.startsWith('/en')?'en':'ca');
+   await expect(page.locator('#avis-class')).toBeInViewport();
+  });
+ }
+}
+
+for (const clipboard of ['unavailable','denied'] as const) {
+ test(`one click copies to the real clipboard when the Clipboard API is ${clipboard}`,async({page,context})=>{
+  await context.grantPermissions(['clipboard-read','clipboard-write']);
+  await page.setViewportSize({width:320,height:844});
+  await page.goto('http://127.0.0.1:4323/en/');
+  await page.evaluate(mode=>{
+   const readText=navigator.clipboard.readText.bind(navigator.clipboard);
+   (window as any).readCopiedNotice=readText;
+   Object.defineProperty(navigator,'clipboard',{value:mode==='unavailable'?undefined:{writeText:async()=>{throw new Error('Clipboard denied');}}});
+  },clipboard);
+  const button=page.locator('#avis-class').getByRole('button',{name:'Copy link',exact:true});
+  await button.click();
+  await expect(page.locator('#avis-class .copy-status')).toHaveText('Link copied');
+  expect(await page.evaluate(()=>(window as any).readCopiedNotice())).toBe('http://127.0.0.1:4323/en/#avis-class');
+  await expect(page.locator('#avis-class .copy-link-fallback')).toBeHidden();
+  await expect(button).toBeFocused();
+  await expect(page).toHaveURL('http://127.0.0.1:4323/en/');
+  await expect(page.locator('.clipboard-buffer')).toHaveCount(0);
+ });
+}
+
+test('if both copy methods are blocked a selected link is available for manual copying',async({page})=>{
+ await page.setViewportSize({width:320,height:844});
+ await page.addInitScript(()=>{
+  Object.defineProperty(navigator,'clipboard',{value:{writeText:async()=>{throw new Error('Clipboard denied');}}});
+  document.execCommand=()=>false;
+ });
+ await page.goto('http://127.0.0.1:4323/en/');
+ await page.locator('#avis-class .copy-notice-link').click();
+ const input=page.locator('#avis-class .copy-link-fallback');
+ await expect(input).toBeFocused();
+ await expect(input).toHaveValue('http://127.0.0.1:4323/en/#avis-class');
+ await expect(page.locator('#avis-class .copy-status')).toHaveText('Select and copy this link.');
+ expect(await input.evaluate((element:HTMLInputElement)=>element.selectionEnd!-element.selectionStart!)).toBe((await input.inputValue()).length);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('direct notice links still navigate without JavaScript',async({browser})=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:320,height:844}});
+ const page=await context.newPage();
+ await page.goto('http://127.0.0.1:4323/en/#avis-class');
+ await expect(page.locator('#avis-class')).toBeInViewport();
+ await page.locator('#avis-school').getByRole('link',{name:'Link to this notice'}).click();
+ await expect(page).toHaveURL(/#avis-school$/);
+ await expect(page.locator('#avis-school')).toBeInViewport();
+ await context.close();
+});

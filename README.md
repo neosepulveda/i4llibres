@@ -67,6 +67,8 @@ Browser tests build isolated temporary copies with empty or fictional content. T
 
 ## Add or edit a notice
 
+Each notice has a direct link ending in `#avis-<id>`, using its content filename. Use “Copy link” below the notice to copy its URL in the current language with one click, including on the HTTP preview. The shared link scrolls to the notice and opens its details. If the browser blocks both copy methods, a selected URL appears for manual copying. Keep the filename unchanged when editing a published notice to preserve its links; removing the notice removes the destination.
+
 Create `src/content/notices/<id>.md` with Catalan content:
 
 ```markdown

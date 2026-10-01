@@ -54,6 +54,7 @@ const events = notices.filter(notice => notice.data.event).sort((a,b) => a.data.
   const riffle = document.querySelector<HTMLElement>('.riffle');
   const leaves = Array.from(riffle?.children ?? []) as HTMLElement[];
   function arrive(card: HTMLElement) {
+    if (card.hidden) document.dispatchEvent(new Event('llibres:show-all'));
     card.scrollIntoView({ block:'start' });
     const details = card.querySelector<HTMLDetailsElement>('details');
     if (details) details.open = true;
@@ -62,10 +63,25 @@ const events = notices.filter(notice => notice.data.event).sort((a,b) => a.data.
     card.dispatchEvent(new Event('llibres:arrive', { bubbles:true }));
     card.querySelector<HTMLElement>('summary')?.focus({ preventScroll:true });
   }
+  function arriveFromHash() {
+    let id: string;
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+    const card = document.getElementById(id);
+    if (card?.classList.contains('notice')) arrive(card);
+  }
+  addEventListener('hashchange', arriveFromHash);
+  // Wait for the cover and font measurements before positioning a shared notice.
+  async function initialArrival() {
+    await document.fonts.ready;
+    requestAnimationFrame(() => requestAnimationFrame(arriveFromHash));
+  }
+  if (document.readyState === 'complete') initialArrival();
+  else addEventListener('load', initialArrival, { once:true });
   rows.forEach(row => row.addEventListener('click', event => {
     const card = document.querySelector<HTMLElement>(row.getAttribute('href')!);
     if (!card) return;
     event.preventDefault();
+    history.pushState(null, '', row.getAttribute('href')!);
     if (card.hidden) document.dispatchEvent(new Event('llibres:show-all'));
     row.blur();
     if (!motion || !riffle) { arrive(card); return; }

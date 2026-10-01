@@ -17,6 +17,7 @@ const ca = {
   countSuffix:{classe:'d’I4B',escola:'de l’escola',menjador:'del menjador',afa:'de l’AFA'},
   empty:'Encara no hi ha cap avís', emptyBody:'Quan hi hagi novetats de la classe o de l’escola, les trobaràs aquí.', noCategory:'No hi ha avisos d’aquesta categoria', reset:'Mostra tots els avisos',
   more:'Més informació', images:'Imatges per consultar i descarregar', openImage:'Obre la imatge en una pestanya nova', tapImage:'Toca la imatge per veure-la sencera.', download:'Descarrega',
+  noticeLink:'Enllaç a aquest avís', copyLink:'Copia l’enllaç', linkCopied:'Enllaç copiat', copyManually:'Selecciona i copia aquest enllaç.',
   add:'Afegeix al calendari', others:'Apple Calendar, Outlook i altres', ics:'Descarrega el fitxer .ics', barcelona:'hora de Barcelona', allDay:'Tot el dia', upcoming:'Properes dates',
   filterAll:'Tots', categories:{classe:'I4B',escola:'Escola',menjador:'Menjador',afa:'AFA'},
 };
@@ -37,6 +38,7 @@ export const messages: Record<Language, Messages> = {
     countSuffix:{classe:'de I4B',escola:'del colegio',menjador:'del comedor',afa:'de la AFA'},
     empty:'Todavía no hay avisos', emptyBody:'Cuando haya novedades de la clase o del colegio, las encontrarás aquí.', noCategory:'No hay avisos de esta categoría', reset:'Mostrar todos los avisos',
     more:'Más información', images:'Imágenes para consultar y descargar', openImage:'Abrir la imagen en una pestaña nueva', tapImage:'Toca la imagen para verla entera.', download:'Descargar',
+    noticeLink:'Enlace a este aviso', copyLink:'Copiar enlace', linkCopied:'Enlace copiado', copyManually:'Selecciona y copia este enlace.',
     add:'Añadir al calendario', others:'Apple Calendar, Outlook y otros', ics:'Descargar el archivo .ics', barcelona:'hora de Barcelona', allDay:'Todo el día', upcoming:'Próximas fechas',
     filterAll:'Todos', categories:{classe:'I4B',escola:'Colegio',menjador:'Comedor',afa:'AFA'},
   },
@@ -54,6 +56,7 @@ export const messages: Record<Language, Messages> = {
     countSuffix:{classe:'from I4B',escola:'from the school',menjador:'about school meals',afa:'from the AFA'},
     empty:'No notices yet', emptyBody:'When there is news from the class or school, you’ll find it here.', noCategory:'No notices in this category', reset:'Show all notices',
     more:'More information', images:'Pictures to view and download', openImage:'Open image in a new tab', tapImage:'Tap the image to see it in full.', download:'Download',
+    noticeLink:'Link to this notice', copyLink:'Copy link', linkCopied:'Link copied', copyManually:'Select and copy this link.',
     add:'Add to calendar', others:'Apple Calendar, Outlook and others', ics:'Download the .ics file', barcelona:'Barcelona time', allDay:'All day', upcoming:'Upcoming dates',
     filterAll:'All', categories:{classe:'I4B',escola:'School',menjador:'Meals',afa:'AFA'},
   },

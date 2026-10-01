@@ -25,5 +25,72 @@ const stamp = event ? { datetime:event.start, label:stampLabel(event, language) 
       : <details class="tab"><summary><span>{note || t.more}</span><span class="tab-mark" aria-hidden="true"></span></summary><div class="notice-body"><Content /><NoticeImages images={images} language={language} /></div></details>}
     <NoticeFiles files={files} language={language} />
     {event && <details class="tab calendar-actions"><summary><span>{t.add}</span><span class="tab-mark" aria-hidden="true"></span></summary><CalendarLinks id={notice.id} title={title} event={event} language={language} /></details>}
+    <div class="notice-share">
+      <a class="copy-notice-link" href={`#avis-${notice.id}`} data-copy={t.copyLink} data-copied={t.linkCopied} data-manual={t.copyManually}>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="m8 12 4-4M7 13l-1 1a3 3 0 0 1-4-4l4-4a3 3 0 0 1 4 0m0 1 1-1a3 3 0 0 1 4 4l-4 4a3 3 0 0 1-4 0"/></svg>
+        <span>{t.noticeLink}</span>
+      </a>
+      <span class="copy-status" role="status"></span>
+      <input class="copy-link-fallback" type="text" readonly aria-label={t.noticeLink} hidden />
+    </div>
   </div>
 </article>
+<script>
+  async function copyNoticeLink(url: string) {
+    if (navigator.clipboard?.writeText) {
+      try { await navigator.clipboard.writeText(url); return true; } catch {}
+    }
+    // HTTP previews do not expose the Clipboard API. Copy during the click using a
+    // temporary selection instead, then return focus without moving the page.
+    const active = document.activeElement as HTMLElement | null;
+    const buffer = document.createElement('textarea');
+    buffer.className = 'clipboard-buffer';
+    buffer.value = url;
+    buffer.readOnly = true;
+    buffer.setAttribute('aria-label', 'Copy link');
+    document.body.append(buffer);
+    try {
+      buffer.focus({ preventScroll:true });
+      buffer.select();
+      buffer.setSelectionRange(0, url.length);
+      return document.execCommand('copy');
+    } catch {
+      return false;
+    } finally {
+      buffer.remove();
+      active?.focus({ preventScroll:true });
+    }
+  }
+  document.querySelectorAll<HTMLAnchorElement>('.copy-notice-link').forEach(link => {
+    link.querySelector('span')!.textContent = link.dataset.copy!;
+    link.setAttribute('role', 'button');
+    link.addEventListener('keydown', event => {
+      if (event.key === ' ') { event.preventDefault(); link.click(); }
+    });
+    const share = link.closest('.notice-share')!;
+    const status = share.querySelector<HTMLElement>('.copy-status')!;
+    const fallback = share.querySelector<HTMLInputElement>('input')!;
+    let reset: ReturnType<typeof setTimeout>;
+    link.addEventListener('click', async event => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      const url = new URL(location.href);
+      url.hash = link.hash;
+      // A Catalan link must stay Catalan even for a reader with a saved language preference.
+      if (document.documentElement.lang === 'ca') url.searchParams.set('lang', 'ca');
+      clearTimeout(reset);
+      status.textContent = '';
+      fallback.hidden = true;
+      if (await copyNoticeLink(url.href)) {
+        status.textContent = link.dataset.copied!;
+        reset = setTimeout(() => { status.textContent = ''; }, 3000);
+      } else {
+        status.textContent = link.dataset.manual!;
+        fallback.value = url.href;
+        fallback.hidden = false;
+        fallback.focus();
+        fallback.select();
+      }
+    });
+  });
+</script>

@@ -66,8 +66,18 @@ const paths = {ca:languagePath(import.meta.env.BASE_URL,'ca'),es:languagePath(im
     </div>
     <slot name="overlays" />
     <script>
+      function updateLanguageLinks() {
+        document.querySelectorAll<HTMLAnchorElement>('[data-language]').forEach(link => {
+          const url = new URL(link.href);
+          url.hash = location.hash;
+          link.href = url.href;
+        });
+      }
+      updateLanguageLinks();
+      addEventListener('hashchange', updateLanguageLinks);
       document.querySelectorAll<HTMLAnchorElement>('[data-language]').forEach(link => {
         link.addEventListener('click', () => {
+          updateLanguageLinks();
           try { localStorage.setItem('llibres-language', link.dataset.language!); } catch {}
         });
       });

@@ -333,13 +333,19 @@ html.motion .reader{animation-name:reader}
   font-variant-numeric:tabular-nums;transform:rotate(-2.5deg)}
 .notice h3{margin:0 0 8px;font-size:clamp(23px,6vw,27px);overflow-wrap:anywhere}
 .notice-summary{margin:0 0 12px;font-size:17px}
+.notice-share{clear:both;display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;margin-top:14px;font-size:14px}
+.copy-notice-link{display:inline-flex;align-items:center;gap:7px;min-height:44px;color:var(--ink);font-weight:600;text-underline-offset:3px}
+.copy-notice-link svg{width:20px;height:20px;flex-shrink:0}
+.copy-status{color:var(--ink)}
+.clipboard-buffer{position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;font-size:16px}
+.copy-link-fallback{width:100%;min-width:0;min-height:44px;padding:8px;border:1px solid var(--muted);border-radius:4px;background:var(--paper);color:var(--ink);font:inherit}
 .notice.highlight{outline:3px solid var(--c);outline-offset:4px;border-radius:6px}
 @media (prefers-reduced-motion:no-preference){.notice{transition:outline-color .6s}}
 
 /* details, files and calendar exports: full-width rows between perforated lines, with a plus that turns into a minus, or an arrow for a file */
 .tab{border-top:1.5px dashed color-mix(in srgb,var(--ink) 26%,transparent)}
 .notice-summary+.tab,.notice-body.open+.tab{margin-top:14px}
-.tab:last-child{border-bottom:1.5px dashed color-mix(in srgb,var(--ink) 26%,transparent)}
+.tab:last-child,.tab:has(+ .notice-share){border-bottom:1.5px dashed color-mix(in srgb,var(--ink) 26%,transparent)}
 .tab summary,.file-row{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:6px 0;font-weight:600;font-size:16px;line-height:1.3}
 .tab summary::-webkit-details-marker{display:none}
 .tab summary:focus-visible,.file-row:focus-visible{outline-offset:2px}
