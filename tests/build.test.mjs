@@ -28,16 +28,14 @@ test('category filters and notice cards use identical labels in every language',
 });
 
 test('all published languages include translated notices and calendar exports',()=>{
- for(const [language,title,summary] of [['es','El tablón de I4B','Reunión del comedor'],['en','The I4B noticeboard','School meals meeting']]){
+ for(const [language,title,summary] of [['es','El tablón de I4B','Cancelada la reunión del comedor'],['en','The I4B noticeboard','School meals meeting on 5 October cancelled']]){
   const html=readFileSync(`dist/${language}/index.html`,'utf8');
   assert.ok(html.includes(`<html lang="${language}"`));
   assert.ok(html.includes(title));
   assert.ok(html.includes(summary));
   assert.doesNotMatch(html,/La presentació de la reunió|Materials per als espais|Què fem cada dia/);
   assert.match(html,/<meta name="robots" content="noindex, nofollow"/);
-  const ics=readFileSync(`dist/${language}/calendar/reunio-menjador.ics`,'utf8');
-  assert.ok(ics.includes('SUMMARY:'+summary));
-  assert.ok(ics.includes('DTSTART:20261005T150000Z'));
+  assert.ok(existsSync(`dist/${language}/calendar/extraescolars-afa.ics`));
  }
 });
 
@@ -146,7 +144,7 @@ test('every published notice opens with its own pop-up scene',()=>{
  for(const card of cards) assert.match(card,/<div class="notice-scene paper"><div class="popup" aria-hidden="true">/);
 });
 
-test('the school meals meeting offers the lunchtime plan as a PDF between its details and calendar rows',()=>{
+test('the cancelled school meals meeting keeps its shared link and documents without signup or calendar actions',()=>{
  for(const [path,title,meta] of [
   ['','Pla de funcionament del temps de migdia 2026–27','PDF · 15,2 MB'],
   ['es/','Plan de funcionamiento del mediodía 2026–27 (en catalán)','PDF · 15,2 MB'],
@@ -154,12 +152,18 @@ test('the school meals meeting offers the lunchtime plan as a PDF between its de
  ]){
   const card=readFileSync(`dist/${path}index.html`,'utf8').match(/<article class="notice menjador" id="avis-reunio-menjador"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card);
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  assert.doesNotMatch(html,/<a class="upcoming-event[^>]*href="#avis-reunio-menjador"/);
+  assert.equal(existsSync(`dist/${path}calendar/reunio-menjador.ics`),false,path);
+  assert.doesNotMatch(card,/calendar-actions|forms\.gle|formulario de acogida|formulari d’acollida|childcare form/);
+  assert.ok(card.includes({ '': 'Cancel·lada la reunió', 'es/': 'Cancelada la reunión', 'en/': 'meeting on 5 October cancelled' }[path]),path);
+  assert.ok(card.includes({ '': 'La reunió es tornarà a convocar', 'es/': 'La reunión se volverá a convocar', 'en/': 'The meeting will be rescheduled' }[path]),path);
+  assert.ok(card.includes('/downloads/menjador-informacions-espai-migdia-2026-2027.jpg'),path);
   const row=card.match(/<a class="tab file-row" href="\/downloads\/menjador-pla-funcionament-2026-2027\.pdf" download>[\s\S]*?<\/a>/)?.[0];
   assert.ok(row,path);
   assert.ok(row.includes(title),path);
   assert.ok(row.includes(meta),path);
   assert.ok(card.indexOf('<details class="tab">')<card.indexOf(row));
-  assert.ok(card.indexOf(row)<card.indexOf('calendar-actions'));
  }
 });
 
