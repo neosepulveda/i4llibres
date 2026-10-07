@@ -28,7 +28,7 @@ test('category filters and notice cards use identical labels in every language',
 });
 
 test('all published languages include translated notices and calendar exports',()=>{
- for(const [language,title,summary] of [['es','El tablón de I4B','Cancelada la reunión del comedor'],['en','The I4B noticeboard','School meals meeting on 5 October cancelled']]){
+ for(const [language,title,summary] of [['es','El tablón de I4B','Reunión del comedor: miércoles 14 de octubre'],['en','The I4B noticeboard','School meals meeting: Wednesday 14 October']]){
   const html=readFileSync(`dist/${language}/index.html`,'utf8');
   assert.ok(html.includes(`<html lang="${language}"`));
   assert.ok(html.includes(title));
@@ -130,7 +130,7 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
 // The board runs from what families have to do, nearest first, to reference and voluntary notices.
 // This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
 test('the notices run from what to do next to what is voluntary',()=>{
- const order=['reunio-menjador','reunio-families-inscripcions','proxim-dia-sense-escola','extraescolars-afa','activitats-migdia-octubre','horari-llibres','materials-infantil'];
+ const order=['psicomotricitat-comenca','proxim-dia-sense-escola','reunio-menjador','reunio-families-inscripcions','extraescolars-afa','club-catala-voluntaris','activitats-migdia-octubre','horari-llibres','materials-infantil'];
  for(const path of ['','es/','en/']){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
@@ -144,26 +144,73 @@ test('every published notice opens with its own pop-up scene',()=>{
  for(const card of cards) assert.match(card,/<div class="notice-scene paper"><div class="popup" aria-hidden="true">/);
 });
 
-test('the cancelled school meals meeting keeps its shared link and documents without signup or calendar actions',()=>{
- for(const [path,title,meta] of [
-  ['','Pla de funcionament del temps de migdia 2026–27','PDF · 15,2 MB'],
-  ['es/','Plan de funcionamiento del mediodía 2026–27 (en catalán)','PDF · 15,2 MB'],
-  ['en/','Lunchtime service plan 2026–27 (in Catalan)','PDF · 15.2 MB'],
+test('the rescheduled school meals meeting keeps its shared link, dates the 14 October, and offers the plan between its details and calendar rows',()=>{
+ for(const [path,title,meta,summary] of [
+  ['','Pla de funcionament del temps de migdia 2026–27','PDF · 15,2 MB','Reunió del menjador'],
+  ['es/','Plan de funcionamiento del mediodía 2026–27 (en catalán)','PDF · 15,2 MB','Reunión del comedor'],
+  ['en/','Lunchtime service plan 2026–27 (in Catalan)','PDF · 15.2 MB','School meals meeting'],
  ]){
-  const card=readFileSync(`dist/${path}index.html`,'utf8').match(/<article class="notice menjador" id="avis-reunio-menjador"[\s\S]*?<\/article>/)?.[0];
-  assert.ok(card);
   const html=readFileSync(`dist/${path}index.html`,'utf8');
-  assert.doesNotMatch(html,/<a class="upcoming-event[^>]*href="#avis-reunio-menjador"/);
-  assert.equal(existsSync(`dist/${path}calendar/reunio-menjador.ics`),false,path);
-  assert.doesNotMatch(card,/calendar-actions|forms\.gle|formulario de acogida|formulari d’acollida|childcare form/);
-  assert.ok(card.includes({ '': 'Cancel·lada la reunió', 'es/': 'Cancelada la reunión', 'en/': 'meeting on 5 October cancelled' }[path]),path);
-  assert.ok(card.includes({ '': 'La reunió es tornarà a convocar', 'es/': 'La reunión se volverá a convocar', 'en/': 'The meeting will be rescheduled' }[path]),path);
+  const card=html.match(/<article class="notice menjador" id="avis-reunio-menjador"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card);
+  assert.match(html,/<a class="upcoming-event menjador" href="#avis-reunio-menjador" data-end="2026-10-14T18:00:00\+02:00"/);
+  assert.ok(card.includes({ '': 'dimecres 14 d’octubre', 'es/': 'miércoles 14 de octubre', 'en/': 'Wednesday 14 October' }[path]),path);
+  assert.ok(card.includes({ '': '5 d’octubre', 'es/': '5 de octubre', 'en/': '5 October' }[path]),path);
+  assert.ok(card.includes('https://forms.gle/rdxGsYhpomXyddHy9'),path);
+  const ics=readFileSync(`dist/${path}calendar/reunio-menjador.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART:20261014T150000Z/);
+  assert.match(ics,/DTEND:20261014T160000Z/);
+  assert.ok(ics.includes('SUMMARY:'+summary),path);
+  assert.ok(ics.includes('forms.gle/rdxGsYhpomXyddHy9'),path);
   assert.ok(card.includes('/downloads/menjador-informacions-espai-migdia-2026-2027.jpg'),path);
   const row=card.match(/<a class="tab file-row" href="\/downloads\/menjador-pla-funcionament-2026-2027\.pdf" download>[\s\S]*?<\/a>/)?.[0];
   assert.ok(row,path);
   assert.ok(row.includes(title),path);
   assert.ok(row.includes(meta),path);
   assert.ok(card.indexOf('<details class="tab">')<card.indexOf(row));
+  assert.ok(card.indexOf(row)<card.indexOf('calendar-actions'));
+ }
+});
+
+test('the first psychomotricity day is a class notice, on the dates page for the day, pointing at the timetable',()=>{
+ for(const [path,where,socks] of [
+  ['','al poliesportiu','posar-los els mitjons'],
+  ['es/','en el polideportivo','ponerles los calcetines'],
+  ['en/','at the sports hall','put their socks on'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice classe" id="avis-psicomotricitat-comenca"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card,path);
+  assert.match(html,/<a class="upcoming-event classe" href="#avis-psicomotricitat-comenca" data-end="2026-10-09"/);
+  assert.ok(card.includes(where),path);
+  assert.ok(card.includes(socks),path);
+  assert.ok(card.includes('href="#avis-horari-llibres"'),path);
+  // Its pop-up is the sports hall: wall bars, a beam, and the socks waiting on the bench.
+  assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
+  assert.match(card,/<rect x="6" y="29" width="17.6" height="1.1"/,path);
+  const ics=readFileSync(`dist/${path}calendar/psicomotricitat-comenca.ics`,'utf8');
+  assert.match(ics,/DTSTART;VALUE=DATE:20261008/);
+  assert.match(ics,/DTEND;VALUE=DATE:20261009/);
+ }
+});
+
+// The volunteers' WhatsApp invite and its QR code stay off this public page: anyone could join.
+test('the Club de Català notice sends families to the class group for the invite and publishes no WhatsApp link',()=>{
+ for(const [path,hint] of [
+  ['','Club de Català» o «chat.whatsapp'],
+  ['es/','Club de Català» o «chat.whatsapp'],
+  ['en/','Club de Català” or “chat.whatsapp'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice afa" id="avis-club-catala-voluntaris"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card,path);
+  assert.ok(card.includes(hint),path);
+  // Its pop-up is the café, with the club's name on the chalkboard.
+  assert.ok(card.includes('>Un cafè i català</text>'),path);
+  assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
+  assert.doesNotMatch(card,/<a [^>]*href="[^"]*whatsapp/i,path);
+  assert.doesNotMatch(html,/chat\.whatsapp\.com|KW2dxqKTmYf5CqpuadBdzE|<img[^>]*whatsapp/i,path);
+  assert.doesNotMatch(html,/<a class="upcoming-event[^>]*href="#avis-club-catala-voluntaris"/);
  }
 });
 
