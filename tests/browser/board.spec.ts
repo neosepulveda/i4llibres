@@ -65,6 +65,7 @@ test('empty state works without JavaScript',async({browser})=>{
 for (const width of [390,1280]) {
  test(`the closed book fills the first screen and opens as you scroll at ${width}px`,async({page})=>{
   await page.setViewportSize({width,height:844});
+  await page.clock.install({time:new Date('2026-09-26T10:00:00Z')});
   await page.goto('http://127.0.0.1:4323');
   const turn=()=>page.locator('.book').evaluate(book=>parseFloat((book as HTMLElement).style.getPropertyValue('--turn')));
   // Nothing but the book, the pencil and the button above the fold.
