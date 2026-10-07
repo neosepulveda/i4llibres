@@ -92,7 +92,7 @@ The example date is illustrative, not a current announcement.
 | `order` | Lower values appear first; defaults to 100. Put family actions before optional information. |
 | `date` | Optional date displayed on the card. Does not create an event or expire the notice. |
 | `note` | Optional label for the row that opens the details. |
-| `scene` | Optional pop-up illustration: `letter`, `activities`, `dining`, `holiday`, `timetable` or `playground`. Without one, the card shows the school from the cover. |
+| `scene` | Optional pop-up illustration: `letter`, `activities`, `dining`, `holiday`, `timetable`, `playground`, `lunchtime`, `castanyada`, `gym` or `cafe`. Without one, the card shows the school from the cover. |
 | `expanded` | Optional. `true` shows the body and images on the page instead of behind a details row. In an expanded notice, a list whose items start with bold text reads as a timetable. |
 
 Each scene was drawn for a particular notice, and some carry words (the email subject, “every month”, the weekday initials), so pick one only when its picture fits. A new kind of notice needs a new component in `src/components/scenes/` and its name in `src/lib/scenes.ts`.
