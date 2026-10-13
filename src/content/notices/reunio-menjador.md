@@ -1,7 +1,7 @@
 ---
 title: "Reunió del menjador: dimecres 14 d’octubre a les 17 h"
 description: "Nova data de la reunió amb Menjadors Biosca, cancel·lada el 5 d’octubre per la pluja: dimecres 14 d’octubre a les 17 h. Presentaran el servei, el projecte nutricional i la proposta educativa de l’espai migdia. Si necessiteu acollida per als infants durant la reunió, empleneu el formulari als detalls."
-order: 30
+order: 10
 category: menjador
 scene: dining
 date: "2026-10-14"

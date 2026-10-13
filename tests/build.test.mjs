@@ -130,7 +130,7 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
 // The board runs from what families have to do, nearest first, to reference and voluntary notices.
 // This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
 test('the notices run from what to do next to what is voluntary',()=>{
- const order=['psicomotricitat-comenca','proxim-dia-sense-escola','reunio-menjador','reunio-families-inscripcions','extraescolars-afa','club-catala-voluntaris','activitats-migdia-octubre','horari-llibres','materials-infantil'];
+ const order=['reunio-menjador','extraescolars-afa','creacions-tardor','proxim-dia-sense-escola','reunio-families-inscripcions','activitats-migdia-octubre','psicomotricitat-comenca','horari-llibres','club-catala-voluntaris','materials-infantil'];
  for(const path of ['','es/','en/']){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
@@ -172,25 +172,24 @@ test('the rescheduled school meals meeting keeps its shared link, dates the 14 O
  }
 });
 
-test('the first psychomotricity day is a class notice, on the dates page for the day, pointing at the timetable',()=>{
+test('psychomotricity keeps its shared link and Thursday instructions without the expired first-day event',()=>{
  for(const [path,where,socks] of [
-  ['','al poliesportiu','posar-los els mitjons'],
-  ['es/','en el polideportivo','ponerles los calcetines'],
+  ['','al pavelló','posar-los els mitjons'],
+  ['es/','en el pabellón','ponerles los calcetines'],
   ['en/','at the sports hall','put their socks on'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   const card=html.match(/<article class="notice classe" id="avis-psicomotricitat-comenca"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card,path);
-  assert.match(html,/<a class="upcoming-event classe" href="#avis-psicomotricitat-comenca" data-end="2026-10-09"/);
+  assert.doesNotMatch(html,/<a class="upcoming-event[^>]*href="#avis-psicomotricitat-comenca"/);
+  assert.doesNotMatch(card,/class="stamp"|class="calendar-actions"|8 d’octubre|8 de octubre|8 October/);
   assert.ok(card.includes(where),path);
   assert.ok(card.includes(socks),path);
   assert.ok(card.includes('href="#avis-horari-llibres"'),path);
   // Its pop-up is the sports hall: wall bars, a beam, and the socks waiting on the bench.
   assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
   assert.match(card,/<rect x="6" y="29" width="17.6" height="1.1"/,path);
-  const ics=readFileSync(`dist/${path}calendar/psicomotricitat-comenca.ics`,'utf8');
-  assert.match(ics,/DTSTART;VALUE=DATE:20261008/);
-  assert.match(ics,/DTEND;VALUE=DATE:20261009/);
+  assert.equal(existsSync(`dist/${path}calendar/psicomotricitat-comenca.ics`),false,path);
  }
 });
 
@@ -262,8 +261,8 @@ test('the timetable’s train carries each day’s activities in open wagons, as
  for(const [path,days] of [['',['dl','dt','dc','dj','dv']],['es/',['L','M','X','J','V']],['en/',['Mo','Tu','We','Th','Fr']]]){
   const train=readFileSync(`dist/${path}index.html`,'utf8').match(/<div class="piece train"[\s\S]*?<\/svg><\/div>/)?.[0];
   assert.ok(train,path);
-  const loads=train.split('<g class="cargo">').slice(1).map(load=>Array.from(load.matchAll(/<g class="(library|english|workshop|families|movement|music)"/g),([,activity])=>activity));
-  assert.deepEqual(loads,[['library'],['workshop','english'],['english','families'],['movement','music'],['workshop']],path);
+  const loads=train.split('<g class="cargo">').slice(1).map(load=>Array.from(load.matchAll(/<g class="(library|english|workshop|families|movement|music|phonology)"/g),([,activity])=>activity));
+  assert.deepEqual(loads,[['library'],['english'],['english','families'],['movement','music'],['phonology']],path);
   assert.deepEqual(Array.from(train.matchAll(/<text[^>]*>([^<]+)<\/text>/g),([,day])=>day),days,path);
  }
 });
@@ -312,5 +311,78 @@ test('the dates page links to the menus, kept in a pocket inside the back cover'
   assert.doesNotMatch(pocket,/<img/);
   // Without JavaScript the menus lie open and the pocket button stays out of the way.
   assert.match(pocket,/<button class="pocket" type="button" aria-expanded="true" aria-controls="menu-cards"[^>]* hidden>/);
+ }
+});
+
+test('the next day without school is 2 November, a school closure rather than a public holiday',()=>{
+ for(const [path,title,closure] of [
+  ['','Dia sense escola: lliure disposició','dia de lliure disposició'],
+  ['es/','Día sin colegio: libre disposición','día de libre disposición'],
+  ['en/','School closure day','school closure day'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice escola" id="avis-proxim-dia-sense-escola"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(closure),path);
+  assert.doesNotMatch(card,/12 d’octubre|12 de octubre|12 October|festiu estatal|festivo nacional|national public holiday/);
+  assert.match(html,/<a class="upcoming-event escola" href="#avis-proxim-dia-sense-escola" data-end="2026-11-03"/);
+  const ics=readFileSync(`dist/${path}calendar/proxim-dia-sense-escola.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART;VALUE=DATE:20261102/);
+  assert.match(ics,/DTEND;VALUE=DATE:20261103/);
+  assert.ok(ics.includes('SUMMARY:'+title),path);
+ }
+});
+
+test('autumn creations are voluntary, with a translated 27 October deadline and calendar exports',()=>{
+ for(const [path,voluntary,deadline,title] of [
+  ['','totalment voluntària','dimarts 27 d’octubre','Últim dia per portar les creacions de tardor'],
+  ['es/','totalmente voluntaria','martes 27 de octubre','Último día para llevar las creaciones de otoño'],
+  ['en/','entirely voluntary','Tuesday 27 October','Last day to bring in autumn creations'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice escola" id="avis-creacions-tardor"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(voluntary),path);
+  assert.ok(card.includes(deadline),path);
+  assert.match(card,/class="piece autumn-hedgehog"/);
+  assert.match(card,/class="piece autumn-owl"/);
+  assert.match(card,/class="piece autumn-collage"/);
+  assert.match(html,/<a class="upcoming-event escola" href="#avis-creacions-tardor" data-end="2026-10-28"/);
+  const ics=readFileSync(`dist/${path}calendar/creacions-tardor.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART;VALUE=DATE:20261027/);
+  assert.match(ics,/DTEND;VALUE=DATE:20261028/);
+  assert.ok(ics.includes('SUMMARY:'+title),path);
+  const google=card.match(/href="(https:\/\/calendar\.google\.com[^\"]+)"/)[1];
+  assert.equal(new URL(google.replaceAll('&amp;','&')).searchParams.get('dates'),'20261027/20261028',path);
+ }
+});
+
+test('the updated timetable postpones workshops, changes Friday, and labels the preserved original image',()=>{
+ for(const [path,friday,november,caption,warning] of [
+  ['','consciència fonològica','tallers començaran al novembre','Horari original per dies','anterior al recordatori del 6 d’octubre'],
+  ['es/','conciencia fonológica','talleres empezarán en noviembre','Horario original por días','anterior al recordatorio del 6 de octubre'],
+  ['en/','phonological awareness','Workshops will start in November','Original timetable by day','from before the 6 October reminder'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice classe" id="avis-horari-llibres"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card,path);
+  const days=card.match(/<ul>[\s\S]*?<\/ul>/)?.[0];
+  assert.ok(days?.includes(friday),path);
+  assert.doesNotMatch(days,/tallers|talleres|workshops/);
+  assert.ok(card.includes(november),path);
+  assert.ok(card.includes(caption),path);
+  assert.ok(card.includes(warning),path);
+  assert.ok(card.includes('RECORDATORI HORARIS I4B'),path);
+  assert.ok(existsSync('dist/downloads/activitats-i4b-per-dies.jpg'));
+ }
+});
+
+test('September menus are retired while October and the yearly service sheet stay available',()=>{
+ assert.equal(existsSync('src/content/menus/2026-09.yaml'),false);
+ assert.equal(readdirSync('dist/downloads').some(name=>/menjador-.*-2026-09\./.test(name)),false);
+ for(const [path,label] of [['','Menús d’octubre'],['es/','Menús de octubre'],['en/','October menus']]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  assert.ok(html.includes(label),path);
+  assert.doesNotMatch(html,/\/downloads\/menjador-[^"<>]*-2026-09\./);
+  assert.ok(html.includes('/downloads/menjador-basal-2026-10.jpg'),path);
+  assert.ok(html.includes('/downloads/menjador-informacions-espai-migdia-2026-2027.jpg'),path);
  }
 });

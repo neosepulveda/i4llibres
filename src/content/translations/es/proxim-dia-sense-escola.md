@@ -1,12 +1,12 @@
 ---
-title: "Lunes 12 de octubre, día festivo"
-description: "El próximo festivo del calendario escolar es el lunes 12 de octubre. Tenedlo presente para organizaros en familia."
-note: "Detalles del día festivo"
+title: "El lunes 2 de noviembre no hay colegio"
+description: "El lunes 2 de noviembre es un día de libre disposición del colegio. Tenedlo presente para organizaros en familia."
+note: "Detalles del día sin colegio"
 event:
-  title: "Día festivo"
+  title: "Día sin colegio: libre disposición"
   location: "Escola La Mar Bella"
-  description: "Día festivo del calendario escolar. No hay clase."
+  description: "Día de libre disposición de la Escola La Mar Bella. No hay clase."
 ---
-El **lunes 12 de octubre de 2026** es festivo nacional y **no habrá clase**, según el calendario del curso 2026–2027 de la Escola La Mar Bella.
+El **lunes 2 de noviembre de 2026 no habrá clase**: es un día de libre disposición de la Escola La Mar Bella.
 
 Podéis consultar todos los festivos, los días de libre disposición, las vacaciones y las jornadas intensivas en el [calendario oficial del colegio](https://lamarbella.cat/calendari-escolar/).

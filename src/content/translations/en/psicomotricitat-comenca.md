@@ -1,15 +1,11 @@
 ---
-title: "Psychomotricity starts on Thursday 8 October"
-description: "From this Thursday, drop the children off at the sports hall at 9:00 and remember to put their socks on."
-note: "Details and calendar reminder"
-event:
-  title: "Psychomotricity starts"
-  location: "Sports hall, Escola La Mar Bella"
-  description: "First psychomotricity session for the Llibres. Drop the children off at the sports hall at 9:00 and remember to put their socks on."
+title: "Thursday psychomotricity at the sports hall"
+description: "Every Thursday, meet directly at the sports hall at 9:00. Remember to put the children’s socks on."
+note: "Where to meet and what to bring"
 ---
-This **Thursday 8 October** the Llibres start psychomotricity.
+The Llibres have **psychomotricity every Thursday, from 9:00 to 10:30**.
 
 - At **9:00**, drop the children off directly **at the sports hall**, not in the classroom.
 - Remember to **put their socks on**.
 
-From now on psychomotricity is every Thursday from 9:00 to 10:30, as the [Llibres timetable](#avis-horari-llibres) shows.
+You can find the other activities in the [Llibres timetable](#avis-horari-llibres).

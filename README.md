@@ -92,7 +92,7 @@ The example date is illustrative, not a current announcement.
 | `order` | Lower values appear first; defaults to 100. Put family actions before optional information. |
 | `date` | Optional date displayed on the card. Does not create an event or expire the notice. |
 | `note` | Optional label for the row that opens the details. |
-| `scene` | Optional pop-up illustration: `letter`, `activities`, `dining`, `holiday`, `timetable`, `playground`, `lunchtime`, `castanyada`, `gym` or `cafe`. Without one, the card shows the school from the cover. |
+| `scene` | Optional pop-up illustration: `letter`, `activities`, `dining`, `holiday`, `timetable`, `playground`, `lunchtime`, `castanyada`, `gym`, `cafe` or `autumn-creations`. Without one, the card shows the school from the cover. |
 | `expanded` | Optional. `true` shows the body and images on the page instead of behind a details row. In an expanded notice, a list whose items start with bold text reads as a timetable. |
 
 Each scene was drawn for a particular notice, and some carry words (the email subject, “every month”, the weekday initials), so pick one only when its picture fits. A new kind of notice needs a new component in `src/components/scenes/` and its name in `src/lib/scenes.ts`.
@@ -165,7 +165,7 @@ images:
     alt: "A meaningful description in Catalan."
 ```
 
-Add corresponding translated image text to both translation files. Images appear after the notice text, like snapshots pinned to the page, behind the details row or directly on the page for an `expanded` notice. Tapping one opens it in a new tab, and each has a download link. Original timetable images remain in Catalan; the translated notice body provides their contents in Spanish and English.
+Add corresponding translated image text to both translation files. Images appear after the notice text, like snapshots pinned to the page, behind the details row or directly on the page for an `expanded` notice. Tapping one opens it in a new tab, and each has a download link. Original timetable images remain in Catalan; the notice body gives the current activities in all three languages. If a later message changes the timetable, preserve the original picture, label it as the original, and explain the changes in visible text and alt text.
 
 ## Add files
 
