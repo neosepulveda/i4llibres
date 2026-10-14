@@ -1,5 +1,5 @@
 ---
-title: "Extraescolares del AFA: altas y bajas a partir del día 1"
+title: "Extraescolares del AFA: bajas de noviembre hasta el 20 de octubre"
 description: "Las solicitudes de alta y baja de las extraescolares del AFA se pueden hacer del 1 al 20 de cada mes, hasta las 23:55 h, en Ampasoft."
 note: "Cómo solicitar un alta o una baja"
 event:

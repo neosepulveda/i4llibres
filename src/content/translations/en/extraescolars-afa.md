@@ -1,5 +1,5 @@
 ---
-title: "AFA extracurricular activities: enrolment and cancellation open on the 1st"
+title: "AFA activities: cancel for November by 20 October"
 description: "Request enrolment or cancellation for AFA extracurricular activities through Ampasoft from the 1st of each month until 23:55 on the 20th."
 note: "How to request enrolment or cancellation"
 event:

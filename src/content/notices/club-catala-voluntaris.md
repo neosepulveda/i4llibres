@@ -1,7 +1,7 @@
 ---
 title: "L’AFA busca voluntaris per al Club de Català"
 description: "El Club de Català de l’AFA està a punt de tornar, però necessita voluntaris per conversar en català dues tardes al mes. Amb dues hores al mes ja ajudes."
-order: 90
+order: 100
 category: afa
 scene: cafe
 note: "Com apuntar-t’hi"

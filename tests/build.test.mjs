@@ -28,7 +28,7 @@ test('category filters and notice cards use identical labels in every language',
 });
 
 test('all published languages include translated notices and calendar exports',()=>{
- for(const [language,title,summary] of [['es','El tablón de I4B','Reunión del comedor: miércoles 14 de octubre'],['en','The I4B noticeboard','School meals meeting: Wednesday 14 October']]){
+ for(const [language,title,summary] of [['es','El tablón de I4B','Comedor: plan de funcionamiento, contacto y precios'],['en','The I4B noticeboard','School meals: service plan, contacts and prices']]){
   const html=readFileSync(`dist/${language}/index.html`,'utf8');
   assert.ok(html.includes(`<html lang="${language}"`));
   assert.ok(html.includes(title));
@@ -39,11 +39,11 @@ test('all published languages include translated notices and calendar exports',(
  }
 });
 
-test('AFA notice and filter explain the monthly enrolment and cancellation window in every language',()=>{
+test('AFA notice highlights the next cancellation deadline and retains the monthly application window in every language',()=>{
  for(const [path,opening,window] of [
-  ['','altes i baixes a partir del dia 1','de l’1 al 20 de cada mes'],
-  ['es/','altas y bajas a partir del día 1','del 1 al 20 de cada mes'],
-  ['en/','enrolment and cancellation open on the 1st','from the 1st to the 20th of every month'],
+  ['','baixes de novembre fins al 20 d’octubre','de l’1 al 20 de cada mes'],
+  ['es/','bajas de noviembre hasta el 20 de octubre','del 1 al 20 de cada mes'],
+  ['en/','cancel for November by 20 October','from the 1st to the 20th of every month'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.match(html,/data-filter="afa"[^>]*>.*?AFA<span class="filter-count"/);
@@ -130,7 +130,7 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
 // The board runs from what families have to do, nearest first, to reference and voluntary notices.
 // This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
 test('the notices run from what to do next to what is voluntary',()=>{
- const order=['reunio-menjador','extraescolars-afa','creacions-tardor','proxim-dia-sense-escola','reunio-families-inscripcions','activitats-migdia-octubre','psicomotricitat-comenca','horari-llibres','club-catala-voluntaris','materials-infantil'];
+ const order=['extraescolars-afa','creacions-tardor','proxim-dia-sense-escola','reunio-families-inscripcions','activitats-migdia-octubre','psicomotricitat-comenca','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
  for(const path of ['','es/','en/']){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
@@ -144,31 +144,25 @@ test('every published notice opens with its own pop-up scene',()=>{
  for(const card of cards) assert.match(card,/<div class="notice-scene paper"><div class="popup" aria-hidden="true">/);
 });
 
-test('the rescheduled school meals meeting keeps its shared link, dates the 14 October, and offers the plan between its details and calendar rows',()=>{
+test('the expired school meals meeting becomes a service reference, preserving its shared link and both downloads without obsolete calendar or childcare actions',()=>{
  for(const [path,title,meta,summary] of [
-  ['','Pla de funcionament del temps de migdia 2026–27','PDF · 15,2 MB','Reunió del menjador'],
-  ['es/','Plan de funcionamiento del mediodía 2026–27 (en catalán)','PDF · 15,2 MB','Reunión del comedor'],
-  ['en/','Lunchtime service plan 2026–27 (in Catalan)','PDF · 15.2 MB','School meals meeting'],
+  ['','Pla de funcionament del temps de migdia 2026–27','PDF · 15,2 MB','Menjador: pla de funcionament, contacte i preus'],
+  ['es/','Plan de funcionamiento del mediodía 2026–27 (en catalán)','PDF · 15,2 MB','Comedor: plan de funcionamiento, contacto y precios'],
+  ['en/','Lunchtime service plan 2026–27 (in Catalan)','PDF · 15.2 MB','School meals: service plan, contacts and prices'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   const card=html.match(/<article class="notice menjador" id="avis-reunio-menjador"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card);
-  assert.match(html,/<a class="upcoming-event menjador" href="#avis-reunio-menjador" data-end="2026-10-14T18:00:00\+02:00"/);
-  assert.ok(card.includes({ '': 'dimecres 14 d’octubre', 'es/': 'miércoles 14 de octubre', 'en/': 'Wednesday 14 October' }[path]),path);
-  assert.ok(card.includes({ '': '5 d’octubre', 'es/': '5 de octubre', 'en/': '5 October' }[path]),path);
-  assert.ok(card.includes('https://forms.gle/rdxGsYhpomXyddHy9'),path);
-  const ics=readFileSync(`dist/${path}calendar/reunio-menjador.ics`,'utf8').replace(/\r\n /g,'');
-  assert.match(ics,/DTSTART:20261014T150000Z/);
-  assert.match(ics,/DTEND:20261014T160000Z/);
-  assert.ok(ics.includes('SUMMARY:'+summary),path);
-  assert.ok(ics.includes('forms.gle/rdxGsYhpomXyddHy9'),path);
+  assert.ok(card.includes(summary),path);
+  assert.doesNotMatch(html,/<a class="upcoming-event[^>]*href="#avis-reunio-menjador"/);
+  assert.doesNotMatch(card,/class="stamp"|calendar-actions|forms\.gle|2026-10-14/);
+  assert.equal(existsSync(`dist/${path}calendar/reunio-menjador.ics`),false,path);
   assert.ok(card.includes('/downloads/menjador-informacions-espai-migdia-2026-2027.jpg'),path);
   const row=card.match(/<a class="tab file-row" href="\/downloads\/menjador-pla-funcionament-2026-2027\.pdf" download>[\s\S]*?<\/a>/)?.[0];
   assert.ok(row,path);
   assert.ok(row.includes(title),path);
   assert.ok(row.includes(meta),path);
   assert.ok(card.indexOf('<details class="tab">')<card.indexOf(row));
-  assert.ok(card.indexOf(row)<card.indexOf('calendar-actions'));
  }
 });
 
