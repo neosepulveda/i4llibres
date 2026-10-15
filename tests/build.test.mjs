@@ -130,7 +130,7 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
 // The board runs from what families have to do, nearest first, to reference and voluntary notices.
 // This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
 test('the notices run from what to do next to what is voluntary',()=>{
- const order=['extraescolars-afa','creacions-tardor','proxim-dia-sense-escola','reunio-families-inscripcions','activitats-migdia-octubre','psicomotricitat-comenca','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
+ const order=['extraescolars-afa','creacions-tardor','proxim-dia-sense-escola','acollida-desembre','reunio-families-inscripcions','activitats-migdia-octubre','psicomotricitat-comenca','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
  for(const path of ['','es/','en/']){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
@@ -142,6 +142,26 @@ test('every published notice opens with its own pop-up scene',()=>{
  const cards=Array.from(html.matchAll(/<article class="notice[\s\S]*?<\/article>/g),([card])=>card);
  assert.ok(cards.length>0);
  for(const card of cards) assert.match(card,/<div class="notice-scene paper"><div class="popup" aria-hidden="true">/);
+});
+
+test('December childcare names Biosca and the announced hours without inventing prices, booking links or calendar exports',()=>{
+ for(const [path,title,hours,unknown] of [
+  ['','Acollida del 21 de desembre: la gestionarà Biosca','15.30 a 16.30 h','no indica preus ni com reservar plaça'],
+  ['es/','Acogida del 21 de diciembre: la gestionará Biosca','15:30 a 16:30 h','no indica precios ni cómo reservar plaza'],
+  ['en/','Childcare on 21 December: Biosca will manage the service','15:30 to 16:30','does not give prices or booking instructions'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice afa" id="avis-acollida-desembre"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(title),path);
+  assert.match(card,/<time datetime="2026-12-21">/);
+  assert.ok(card.includes(hours),path);
+  assert.ok(card.includes(unknown),path);
+  assert.ok(card.includes('JORNADA INTENSIVA 21/12/26'),path);
+  assert.match(card,/<div class="popup" aria-hidden="true">/);
+  assert.doesNotMatch(card,/calendar-actions|forms\.gle|mailto:|mail\.google/);
+  assert.doesNotMatch(html,/<a class="upcoming-event[^>]*href="#avis-acollida-desembre"/);
+  assert.equal(existsSync(`dist/${path}calendar/acollida-desembre.ics`),false,path);
+ }
 });
 
 test('the expired school meals meeting becomes a service reference, preserving its shared link and both downloads without obsolete calendar or childcare actions',()=>{
