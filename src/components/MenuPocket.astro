@@ -3,6 +3,7 @@ import { fileMeta } from '../lib/file-meta';
 import { menusLabel, monthName } from '../lib/date-labels';
 import { messages, type Language } from '../lib/i18n';
 import { lunchtimeInfo, type MenuMonth } from '../lib/menus';
+import { season } from '../lib/season';
 interface Props { months: MenuMonth[]; language: Language }
 const { months, language } = Astro.props;
 const t = messages[language];
@@ -31,7 +32,7 @@ const peeking = [...groups[0].main.slice(0, 3 - adapted.length).map(({ label }) 
 const printed = months.map(({ month }) => monthName(month, language)).reverse().join(' · ');
 ---
 <section class="back-endpaper" id="menus" aria-labelledby="menus-heading">
-  <svg class="endpapers" aria-hidden="true"><rect width="100%" height="100%" fill="url(#endpaper-back)"/></svg>
+  <svg class="endpapers" aria-hidden="true"><rect width="100%" height="100%" fill={season === 'autumn' ? 'url(#endpaper-autumn-back)' : 'url(#endpaper-back)'}/></svg>
   <div class="menus-label"><h2 id="menus-heading">{menusLabel(months.map(({ month }) => month), language)}</h2><p class="menus-hint">{t.menusHint}</p></div>
   <div class="menu-cards" id="menu-cards">
     {groups.map(({ month, heading, main, adaptedHeading, adapted }) => <>

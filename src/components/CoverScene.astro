@@ -4,6 +4,10 @@
 // as the page loads, peeking out from behind the school and hopping in through the front door.
 // The children's teacher leads their line, holding a book up high like a guide's flag, and waves it
 // back when the monster waves. She is only on the cover; notices keep the children on their own.
+// In autumn two plane trees turn behind the school and their leaves lie on the sand. With motion a few
+// more fall during the story and settle there as it ends, so nothing keeps moving afterwards.
+import { season } from '../lib/season';
+const autumn = season === 'autumn';
 ---
 <svg class="cover-scene" viewBox="0 0 100 82" preserveAspectRatio="xMidYMax slice">
   <g class="cover-zoom">
@@ -11,6 +15,7 @@
     <g transform="translate(0 -6)">
       <use href="#school-back" width="100" height="90"/>
       <g filter="url(#piece-shadow)">
+        {autumn && <g class="plane-trees"><use href="#plane-tree" x="9" y="27" width="25" height="28.3"/><use href="#plane-tree" x="67" y="25.5" width="26" height="29.5"/></g>}
         <g transform="translate(70 55.5)"><g class="monster peeking"><use href="#monster" x="-5" y="-13" width="10" height="14"/><path d="M2.7-6q1.3.9 1.5 2.4" style="fill:none;stroke:var(--lilac);stroke-width:1;stroke-linecap:round"/></g></g>
         <use href="#school-building" width="100" height="90"/>
         <svg x="26" y="26" width="48" height="30" viewBox="0 0 48 30" overflow="visible">
@@ -32,6 +37,10 @@
         </svg>
         <g transform="translate(79 57)"><g class="monster walking"><use href="#monster" x="-5" y="-13" width="10" height="14"/><g transform="translate(2.7 -6)"><path class="waving" d="M0 0q1.3.9 1.5 2.4" style="fill:none;stroke:var(--lilac);stroke-width:1;stroke-linecap:round"/></g></g></g>
         <use href="#school-front" width="100" height="90"/>
+        {autumn && <g class="fallen-leaves"><use href="#plane-leaf" x="0.5" y="69" width="3" height="3" transform="rotate(20 2 70.5)" style="--pl:var(--leaf-1)"/><use href="#plane-leaf" x="14.5" y="71.9" width="3" height="3" transform="rotate(-40 16 73.4)" style="--pl:var(--leaf-3)"/><use href="#plane-leaf" x="26" y="70.1" width="3" height="3" transform="rotate(80 27.5 71.6)" style="--pl:var(--leaf-2)"/><use href="#plane-leaf" x="38.5" y="72.3" width="3" height="3" transform="rotate(-10 40 73.8)" style="--pl:var(--leaf-1)"/><use href="#plane-leaf" x="49.5" y="70.7" width="3" height="3" transform="rotate(140 51 72.2)" style="--pl:var(--leaf-3)"/><use href="#plane-leaf" x="62" y="72.1" width="3" height="3" transform="rotate(60 63.5 73.6)" style="--pl:var(--leaf-4)"/><use href="#plane-leaf" x="75.5" y="70.9" width="3" height="3" transform="rotate(-70 77 72.4)" style="--pl:var(--leaf-2)"/><use href="#plane-leaf" x="86.5" y="72.3" width="3" height="3" transform="rotate(15 88 73.8)" style="--pl:var(--leaf-3)"/><use href="#plane-leaf" x="95.5" y="69.9" width="3" height="3" transform="rotate(100 97 71.4)" style="--pl:var(--leaf-1)"/>
+          {/* Each falling leaf rests where it lands; --drop and --drift say how far above and to the side it starts in a tree. */}
+          <g transform="translate(12 71)"><g class="falling-leaf" style="--drop:34;--drift:-2;animation-delay:.2s;animation-duration:3.2s"><use href="#plane-leaf" x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(35)" style="--pl:var(--leaf-1)"/></g></g><g transform="translate(31 74.6)"><g class="falling-leaf" style="--drop:39.6;--drift:4;animation-delay:.9s;animation-duration:3.6s"><use href="#plane-leaf" x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(-50)" style="--pl:var(--leaf-2)"/></g></g><g transform="translate(38 72.8)"><g class="falling-leaf" style="--drop:34.8;--drift:8;animation-delay:1.6s;animation-duration:3s"><use href="#plane-leaf" x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(110)" style="--pl:var(--leaf-3)"/></g></g><g transform="translate(60 73.9)"><g class="falling-leaf" style="--drop:39.9;--drift:-12;animation-delay:.5s;animation-duration:3.4s"><use href="#plane-leaf" x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(-20)" style="--pl:var(--leaf-1)"/></g></g><g transform="translate(74 71.3)"><g class="falling-leaf" style="--drop:33.3;--drift:-6;animation-delay:1.3s;animation-duration:3.2s"><use href="#plane-leaf" x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(70)" style="--pl:var(--leaf-2)"/></g></g><g transform="translate(93 74.2)"><g class="falling-leaf" style="--drop:43.2;--drift:5;animation-delay:2s;animation-duration:3.3s"><use href="#plane-leaf" x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(-95)" style="--pl:var(--leaf-4)"/></g></g>
+        </g>}
         <path class="reaching" d="M24.4 62.6Q22.6 62.8 21.1 61.8" style="fill:none;stroke:var(--skin-1);stroke-width:1.2;stroke-linecap:round"/>
         <use href="#school-children" x="5" width="100" height="90" style="--first-arm-free:none"/>
         <g class="teacher" transform="translate(6 45)">

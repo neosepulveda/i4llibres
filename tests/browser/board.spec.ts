@@ -136,6 +136,71 @@ test('near the end of the story the view closes in on the window where the monst
  expect(await page.locator('.cover .reader').evaluate(reader=>getComputedStyle(reader).opacity)).toBe('1');
 });
 
+test('in autumn plane trees turn behind the school, and leaves fall during the story and settle on the sand',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ await expect(page.locator('html')).toHaveAttribute('data-season','autumn');
+ await expect(page.locator('.cover .plane-trees use')).toHaveCount(2);
+ const scene=page.locator('.cover-scene'), leaves=page.locator('.cover .falling-leaf');
+ await expect(leaves).toHaveCount(6);
+ expect(await scene.evaluate(svg=>svg.getAnimations({subtree:true}).filter(animation=>(animation as CSSAnimation).animationName==='leaf-fall').length)).toBe(6);
+ // They hurry along with the story, and once it ends they lie where they landed, with nothing left moving.
+ await page.evaluate(()=>window.scrollTo(0,40));
+ await expect.poll(()=>scene.evaluate(svg=>svg.getAnimations({subtree:true}).length),{timeout:2500}).toBe(0);
+ expect(await leaves.evaluateAll(elements=>elements.map(leaf=>[getComputedStyle(leaf).getPropertyValue('--fall-y').trim(),getComputedStyle(leaf).opacity].join(' ')))).toEqual(Array(6).fill('0 1'));
+});
+
+for (const colorScheme of ['light','dark'] as const) {
+ test(`in autumn the book, in russet cloth, lies on an oak table among pressed leaves, and one tucked in slips out as the cover lifts ${colorScheme}`,async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.emulateMedia({colorScheme});
+  await page.goto('http://127.0.0.1:4323');
+  const [table,grain]=await page.evaluate(()=>[getComputedStyle(document.body).backgroundColor,getComputedStyle(document.body).backgroundImage]);
+  expect(table).toBe(colorScheme==='light'?'rgb(213, 184, 139)':'rgb(29, 21, 15)');
+  expect(grain).toContain('feTurbulence');
+  expect(await page.locator('.cover .front').evaluate(front=>getComputedStyle(front).backgroundColor)).toBe(colorScheme==='light'?'rgb(138, 58, 31)':'rgb(106, 44, 23)');
+  // What is written on the table stays readable on the wood.
+  const luminance=(rgb:string)=>rgb.match(/[\d.]+/g)!.slice(0,3).map(Number).map(value=>value/255).map(channel=>channel<=0.04045?channel/12.92:((channel+0.055)/1.055)**2.4).reduce((sum,channel,index)=>sum+channel*[0.2126,0.7152,0.0722][index],0);
+  const inks=await page.evaluate(()=>['--on-table','--on-table-muted'].map(token=>{
+   const probe=document.createElement('span');
+   probe.style.color=`var(${token})`;
+   document.body.append(probe);
+   const color=getComputedStyle(probe).color;
+   probe.remove();
+   return color;
+  }));
+  for(const ink of inks){
+   const [light,dark]=[luminance(ink),luminance(table)].sort((a,b)=>b-a);
+   expect((light+0.05)/(dark+0.05)).toBeGreaterThanOrEqual(4.5);
+  }
+  const leaves=page.locator('.table-leaf');
+  await expect(leaves).toHaveCount(4);
+  for(const leaf of await leaves.all()) await expect(leaf).toBeVisible();
+  // Only the tip of the tucked leaf shows above the closed book; the rest is under it.
+  const tucked=page.locator('.table-leaf.tucked');
+  const book=(await page.locator('.book').boundingBox())!, before=(await tucked.boundingBox())!;
+  expect(before.y).toBeLessThan(book.y);
+  expect(before.y+before.height).toBeGreaterThan(book.y);
+  expect(await tucked.evaluate(leaf=>getComputedStyle(leaf).zIndex)).toBe('0');
+  await openBook(page);
+  await expect(page.locator('.opening')).toHaveClass(/lifted/);
+  await expect.poll(()=>tucked.evaluate(leaf=>leaf.getAnimations().length),{timeout:4000}).toBe(0);
+  // It comes to rest on the table below the dates, never over them.
+  const landed=(await tucked.boundingBox())!, last=(await page.locator('#dates a:visible').last().boundingBox())!;
+  expect(landed.y).toBeGreaterThan(last.y+last.height);
+ });
+}
+
+test('the autumn look belongs to the season: without it the table, the cloth and the cover window are as before',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4323');
+ await page.evaluate(()=>document.documentElement.removeAttribute('data-season'));
+ await expect.poll(()=>page.evaluate(()=>getComputedStyle(document.body).backgroundColor)).toBe('rgb(214, 223, 226)');
+ expect(await page.locator('.cover-window').evaluate(window=>getComputedStyle(window).backgroundColor)).toBe('rgb(191, 226, 240)');
+ expect(await page.locator('.cover .front').evaluate(front=>getComputedStyle(front).backgroundColor)).toBe('rgb(31, 75, 103)');
+ await expect(page.locator('.table-leaf').first()).toBeHidden();
+});
+
 for (const width of [390,1180]) {
  test(`an arrow on the table points to the notices once the cover is halfway open at ${width}px`,async({page})=>{
   await page.setViewportSize({width,height:820});
@@ -156,8 +221,9 @@ for (const width of [390,1180]) {
   await arrow.click();
   await expect.poll(async()=>(await page.locator('#avisos').boundingBox())!.y).toBeLessThan(40);
   await expect(arrow).toBeHidden();
-  // The pencil leaves the table as the notices slide over it.
+  // The pencil and the pressed leaves leave the table as the notices slide over it.
   await expect.poll(()=>page.locator('.pencil').evaluate(pencil=>getComputedStyle(pencil).opacity)).toBe('0');
+  await expect.poll(()=>page.locator('.table-leaf').evaluateAll(leaves=>leaves.map(leaf=>getComputedStyle(leaf).opacity))).toEqual(['0','0','0','0']);
  });
 }
 
@@ -185,6 +251,7 @@ test('dates that do not fit wait behind a link, and the open book grows to show 
  await expect(more).toHaveAttribute('aria-expanded','true');
  await expect(more).toHaveText('Mostra’n menys');
  await expect(page.locator('.opening')).toHaveClass(/released/);
+ await expect(page.locator('.table-leaf').first()).toBeHidden();
  expect(Math.abs((await page.locator('.book').boundingBox())!.y-before)).toBeLessThan(2);
  expect((await page.locator('#dates').boundingBox())!.height).toBeGreaterThan(cover+100);
  await more.click();
@@ -202,6 +269,9 @@ test('with reduced motion the cover and every date simply sit on the page',async
  // Last year's monster is already in its window, reading.
  expect(await page.locator('.cover-scene').evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);
  expect(await page.locator('.cover .reader').evaluate(reader=>getComputedStyle(reader).opacity)).toBe('1');
+ // Autumn leaves already lie on the sand, and none are laid on the table.
+ expect(await page.locator('.cover .falling-leaf').evaluateAll(leaves=>leaves.map(leaf=>getComputedStyle(leaf).opacity))).toEqual(Array(6).fill('1'));
+ await expect(page.locator('.table-leaf').first()).toBeHidden();
  await expect(page.locator('.upcoming-event:visible')).toHaveCount(2);
  const cover=(await page.locator('.cover').boundingBox())!, dates=(await page.locator('#dates').boundingBox())!;
  expect(dates.y).toBeGreaterThan(cover.y+cover.height);

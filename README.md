@@ -216,6 +216,10 @@ adapted:
     en: "No mushrooms"
 ```
 
+## Change the season
+
+The board dresses for the season named in `src/lib/season.ts`: in autumn, a russet cloth on an oak table, plane trees through the cover window, leaves on the table and in the endpapers. Set it to `undefined` for the board without a season. Each season keeps its look in its own stylesheet, such as `src/styles/autumn.css`, under `[data-season=…]`.
+
 ## Language and appearance preferences
 
 - `/` defaults to Catalan; `/es/` is Spanish; `/en/` is English.

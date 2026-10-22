@@ -1,0 +1,58 @@
+/* Autumn, while src/lib/season.ts says so: a russet cloth on an oak table (walnut under the lamp),
+   late-afternoon light and plane trees through the cover window, and pressed leaves on the table.
+   Every rule hangs on [data-season=autumn], and each day rule that :root[data-theme=fosc] also sets
+   has a night rule of its own. The endpapers' leaves and chestnuts are chosen in the markup. */
+
+/* leaves and bark, for the plane trees and their leaves */
+:root{--leaf-1:#e5a12a;--leaf-2:#d8692a;--leaf-3:#b4402a;--leaf-4:#a3702e;--leaf-vein:#7a3d18;--bark:#d9cfb2;--bark-patch:#9f9677}
+:root[data-theme=fosc]{--leaf-1:#b88324;--leaf-2:#a65424;--leaf-3:#86331f;--leaf-4:#7d5622;--leaf-vein:#4a2410;--bark:#9a8f72;--bark-patch:#6a624c}
+
+/* the table: light oak with a long grain, walnut at night; the cloth turns russet */
+:root[data-season=autumn]{--cloth:#8a3a1f;--cloth-dark:#69290f;--table:#d5b88b;--on-table-muted:#45362a;--shadow:rgba(72,42,14,.24);--shadow-strong:rgba(72,42,14,.36)}
+:root[data-season=autumn][data-theme=fosc]{--cloth:#6a2c17;--cloth-dark:#4f1e0c;--table:#1d150f;--on-table-muted:#bcab90;--shadow:rgba(0,0,0,.5);--shadow-strong:rgba(0,0,0,.62)}
+[data-season=autumn] body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='720'%3E%3Cfilter id='g' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0032 .12' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.2 0 0 0 0 0.07 1.3 0 0 0 -0.57'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23g)'/%3E%3C/svg%3E");background-size:720px 720px}
+[data-season=autumn][data-theme=fosc] body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='720'%3E%3Cfilter id='g' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0032 .12' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.84 0 0 0 0 0.62 0.36 0 0 0 -0.15'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23g)'/%3E%3C/svg%3E")}
+
+/* the cover window: a warm sky over the sea, with the moon gone amber at night */
+[data-season=autumn] .cover-window{--sky:#f6d8ab;--sky-light:#fdeeda;--skyline:#e2ae8f;--sun:#ee873a;--sea:#2c6c9a;--sea-light:#5e98c0;--sand:#ecc98b;--sand-dark:#dcab66;--pl-vein:var(--leaf-vein)}
+[data-season=autumn][data-theme=fosc] .cover-window{--sky:#2d2846;--sky-light:#3c3658;--skyline:#201c36;--sun:#f0b45e;--sea:#1a3d6a;--sea-light:#2b5b8f;--sand:#a78d5c;--sand-dark:#8b7349}
+/* Leaves fall during the story and rest on the sand. Like the monster, they move by registered numbers,
+   so Chrome keeps the tilted cover sharp, and they don't fill forwards: where they land is where they rest. */
+@property --fall-x{syntax:"<number>";inherits:false;initial-value:0}
+@property --fall-y{syntax:"<number>";inherits:false;initial-value:0}
+@property --fall-turn{syntax:"<number>";inherits:false;initial-value:0}
+@property --fall-flip{syntax:"<number>";inherits:false;initial-value:1}
+@property --fall-opacity{syntax:"<number>";inherits:false;initial-value:1}
+.falling-leaf{opacity:var(--fall-opacity);
+  transform:translate(calc((var(--fall-x) + var(--fall-y) * var(--drift,0)) * 1px),calc(var(--fall-y) * var(--drop,0) * 1px)) rotate(calc(var(--fall-turn) * 1deg)) scale(var(--fall-flip),1)}
+html.motion .falling-leaf{animation-name:leaf-fall;animation-timing-function:ease-in-out;animation-fill-mode:backwards}
+@keyframes leaf-fall{
+  0%{--fall-x:0;--fall-y:-1;--fall-turn:-280;--fall-flip:1;--fall-opacity:0}
+  8%{--fall-opacity:1}
+  25%{--fall-x:2;--fall-flip:.4}
+  50%{--fall-x:-1.5;--fall-flip:1}
+  75%{--fall-x:1.5;--fall-flip:.4}
+  100%{--fall-x:0;--fall-y:0;--fall-turn:0;--fall-flip:1;--fall-opacity:1}
+}
+
+/* pressed leaves on the table, partly under the book, cleared away with the pencil */
+.table-leaf{display:none;position:absolute;z-index:0;pointer-events:none;filter:drop-shadow(0 1px 1.2px rgba(60,30,8,.3));transition:opacity .4s}
+html.motion[data-season=autumn] .table-leaf{display:block}
+html.motion[data-season=autumn][data-theme=fosc] .table-leaf{filter:brightness(.7) drop-shadow(0 1px 1.5px rgba(0,0,0,.5))}
+html.motion .opening.reading .table-leaf{opacity:0}
+html.motion .opening.released .table-leaf{display:none}
+.table-leaf.one{--pl:#b4472b;--pl-vein:#7c2c16;width:104px;left:calc(50% - var(--pw) / 2 - 58px);top:calc(50% - var(--pw) * .62 - 20px);transform:rotate(-32deg)}
+.table-leaf.two{--pl:#dc9a2c;--pl-vein:#94621c;width:84px;left:calc(50% + var(--pw) / 2 - 30px);top:calc(50% + var(--pw) * .5);transform:rotate(148deg)}
+.table-leaf.three{--pl:#a06a33;--pl-vein:#6a4420;width:60px;left:calc(50% - var(--pw) / 2 - 18px);top:calc(50% + var(--pw) * .56);transform:rotate(-104deg)}
+/* tucked in at the top of the book, so only its tip shows; once the cover lifts it slips out and falls to the table */
+.table-leaf.tucked{--pl:#a3322a;--pl-vein:#661b15;width:76px;left:calc(50% - var(--pw) * .22);top:calc(50% - var(--pw) * .56 - 30px);transform:rotate(-12deg)}
+html.motion[data-season=autumn] .opening.lifted .table-leaf.tucked{z-index:4;transform:translate(calc(var(--pw) * -.2),calc(var(--pw) * 1.2 + 40px)) rotate(-58deg);
+  animation:slip-out 2.6s cubic-bezier(.45,.05,.55,.95) backwards}
+@keyframes slip-out{
+  0%{transform:rotate(-12deg);z-index:0}
+  12%{transform:translate(4px,-30px) rotate(-2deg);z-index:0}
+  13%{z-index:4}
+  35%{transform:translate(calc(var(--pw) * -.16),calc(var(--pw) * .3)) rotate(-38deg)}
+  58%{transform:translate(calc(var(--pw) * .04),calc(var(--pw) * .62)) rotate(18deg)}
+  80%{transform:translate(calc(var(--pw) * -.12),calc(var(--pw) * .92)) rotate(-24deg)}
+}

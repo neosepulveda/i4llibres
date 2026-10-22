@@ -1,14 +1,16 @@
 ---
 import Illustrations from '../components/Illustrations.astro';
 import '../styles/site.css';
+import '../styles/autumn.css';
 import { messages, languagePath, type Language } from '../lib/i18n';
+import { season } from '../lib/season';
 interface Props { language: Language }
 const { language } = Astro.props;
 const t = messages[language];
 const paths = {ca:languagePath(import.meta.env.BASE_URL,'ca'),es:languagePath(import.meta.env.BASE_URL,'es'),en:languagePath(import.meta.env.BASE_URL,'en')};
 ---
 <!doctype html>
-<html lang={language}>
+<html lang={language} data-season={season}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

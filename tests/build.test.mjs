@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync,existsSync} from 'node:fs';
 import {menusLabel,monthName} from '../src/lib/date-labels.ts';
 import {messages} from '../src/lib/i18n.ts';
+import {season} from '../src/lib/season.ts';
 test('production HTML excludes fixtures and renders the empty state when there are no notices',()=>{
   const html=readFileSync('dist/index.html','utf8');
   if (readdirSync('src/content/notices',{recursive:true}).filter(p=>p.endsWith('.md')).length===0) assert.match(html,/Encara no hi ha cap avís/);
@@ -477,5 +478,21 @@ test('September menus are retired while October and the yearly service sheet sta
   assert.doesNotMatch(html,/\/downloads\/menjador-[^"<>]*-2026-09\./);
   assert.ok(html.includes('/downloads/menjador-basal-2026-10.jpg'),path);
   assert.ok(html.includes('/downloads/menjador-informacions-espai-migdia-2026-2027.jpg'),path);
+ }
+});
+
+test('the board wears the season set in src/lib/season.ts, and nothing of autumn outside it',()=>{
+ const autumn=season==='autumn';
+ for(const path of ['','es/','en/']){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const count=pattern=>(html.match(pattern)||[]).length;
+  assert.equal(/<html lang="[a-z]+" data-season="autumn">/.test(html),autumn,path);
+  // two plane trees through the cover window, leaves that fall there, pressed leaves on the table,
+  // and endpapers of leaves and chestnuts inside the front cover and around the menus pocket
+  assert.equal(count(/<use href="#plane-tree"/g),autumn?2:0,path);
+  assert.equal(count(/class="falling-leaf"/g),autumn?6:0,path);
+  assert.equal(count(/class="table-leaf /g),autumn?4:0,path);
+  assert.equal(count(/fill="url\(#endpaper-autumn\)"/g),autumn?1:0,path);
+  assert.equal(count(/fill="url\(#endpaper-autumn-back\)"/g),autumn?1:0,path);
  }
 });
