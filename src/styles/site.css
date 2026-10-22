@@ -270,6 +270,8 @@ html.motion .reader{animation-name:reader}
   .playing .ball{animation:bounce .9s cubic-bezier(.4,0,.6,1) infinite alternate}
   .playing .bunting{animation:bunting 3s ease-in-out infinite alternate}
   .playing .glow{animation:glow 1.4s ease-in-out infinite alternate}
+  .playing .rain{animation:rain .9s linear infinite}
+  .playing .rain.b{animation-delay:-.45s}
 }
 @keyframes wave{to{transform:translateX(-2.5px)}}
 @keyframes gull{to{transform:translate(1.5px,-1.2px)}}
@@ -284,6 +286,7 @@ html.motion .reader{animation-name:reader}
 @keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 @keyframes bunting{from{transform:rotate(-1deg)}to{transform:rotate(1deg)}}
 @keyframes glow{from{opacity:.55}to{opacity:1}}
+@keyframes rain{0%{transform:translate(1px,-3px);opacity:0}20%,80%{opacity:1}100%{transform:translate(-1px,3px);opacity:0}}
 
 /* ---------- Notices ---------- */
 /* the notices lie on the table above the pencil and lamp */

@@ -1,7 +1,7 @@
 ---
 title: "Creacions de tardor: porteu-les fins al 27 d’octubre"
 description: "L’escola convida les famílies a fer una petita creació amb fruits i elements de tardor. La participació és voluntària."
-order: 20
+order: 40
 category: escola
 scene: autumn-creations
 date: "2026-10-27"

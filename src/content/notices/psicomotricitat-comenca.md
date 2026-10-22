@@ -1,7 +1,7 @@
 ---
 title: "Els dijous, psicomotricitat al pavelló"
 description: "Cada dijous, ens trobem directament al pavelló a les 9 h. Recordeu posar als infants els mitjons."
-order: 70
+order: 100
 category: classe
 scene: gym
 note: "On ens trobem i què cal portar"

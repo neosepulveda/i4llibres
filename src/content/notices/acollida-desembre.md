@@ -3,7 +3,7 @@ title: "Acollida del 21 de desembre: la gestionarà Biosca"
 description: "Durant la jornada intensiva del 21 de desembre de 2026, Biosca gestionarà l’acollida de 15.30 a 16.30 h. L’AFA deixarà d’oferir aquest servei."
 category: afa
 scene: childcare
-order: 40
+order: 70
 date: "2026-12-21"
 note: "Què canvia en l’acollida?"
 ---

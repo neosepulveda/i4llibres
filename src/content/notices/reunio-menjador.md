@@ -1,7 +1,7 @@
 ---
 title: "Menjador: pla de funcionament, contacte i preus"
 description: "Documents del servei de migdia de Menjadors Biosca per al curs 2026–27: el pla de funcionament i el full de contacte i preus."
-order: 90
+order: 120
 category: menjador
 scene: dining
 note: "Quins documents hi ha?"

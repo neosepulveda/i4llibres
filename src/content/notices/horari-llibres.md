@@ -1,7 +1,7 @@
 ---
 title: "Què fem cada dia? L’horari dels Llibres"
 description: "Biblioteca, anglès, psicomotricitat, música i consciència fonològica. Els tallers començaran al novembre."
-order: 80
+order: 110
 category: classe
 scene: timetable
 expanded: true

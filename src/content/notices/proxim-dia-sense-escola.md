@@ -4,7 +4,7 @@ description: "Dilluns 2 de novembre és dia de lliure disposició de l’escola.
 category: escola
 scene: holiday
 date: "2026-11-02"
-order: 30
+order: 50
 note: "Detalls del dia sense escola"
 event:
   title: "Dia sense escola: lliure disposició"

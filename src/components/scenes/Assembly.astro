@@ -1,0 +1,72 @@
+---
+// The AFA's general assembly in the school dining hall: the agenda on a board and the AFA's
+// pennant, two members of the board at a long table with their papers, families on rows of chairs
+// seen from behind, a hand or two up for a vote, and a child building with blocks on a rug in the
+// childcare corner.
+import type { Language } from '../../lib/i18n';
+interface Props { language: Language }
+const sign = { ca:'Ordre del dia', es:'Orden del día', en:'Agenda' }[Astro.props.language];
+// The agenda's lines, the first two ticked off.
+const agenda = [[0, 16, true], [1, 22, true], [2, 13, false], [3, 19, false]] as const;
+// Rows of chairs: where each stands, when it rises, and its seats, 18 wide: middle, clothes, skin,
+// hair, long hair, and a hand up. The back-right row leaves room for the childcare corner.
+type Seat = readonly [number, string, string, string, boolean, boolean];
+const rows: { x:number, y:number, d:number, seats:Seat[] }[] = [
+  { x:6, y:24, d:.14, seats:[[9, 'classe', 'skin-1', 'hair-2', false, true], [27, 'red', 'skin-3', 'hair-3', false, false]] },
+  { x:50, y:25, d:.22, seats:[[9, 'lilac', 'skin-4', 'hair-4', true, false]] },
+  { x:16, y:34, d:.3, seats:[[9, 'menjador', 'skin-6', 'hair-5', true, false], [27, 'cloth', 'skin-2', 'hair-1', false, true]] },
+];
+---
+<div class="backdrop"><svg viewBox="0 0 100 50" preserveAspectRatio="none">
+  <rect width="100" height="50" style="fill:var(--wall)"/>
+  <rect y="36" width="100" height="14" style="fill:var(--wood);opacity:.4"/><rect y="35.6" width="100" height=".8" style="fill:var(--wood-dark)"/>
+  <rect x="5" y="8" width="16" height="20" rx=".8" style="fill:var(--wood-dark)"/><rect x="6.2" y="9.2" width="13.6" height="17.6" style="fill:var(--sky)"/>
+  <circle class="day" cx="16" cy="21" r="2.4" style="fill:var(--orange)"/><g class="night"><circle cx="16" cy="14" r="2.2" style="fill:var(--sun)"/><circle cx="17.2" cy="13.2" r="2" style="fill:var(--sky)"/></g>
+  <path d="M13 9.2v17.6M6.2 18h13.6" style="stroke:var(--wood-dark);stroke-width:.6"/>
+  <rect x="30" y="5" width="40" height="26" rx="1" style="fill:var(--wood-dark)"/><rect x="31.4" y="6.4" width="37.2" height="23.2" style="fill:var(--white)"/>
+  <text x="50" y="12.4" text-anchor="middle" style="font-family:'Young Serif',Georgia,serif;font-size:4.6px;fill:var(--black)">{sign}</text>
+  {agenda.map(([i, length, done]) => <g>
+    <text x="35" y={17.6 + i * 3.2} style="font-family:Georgia,serif;font-size:2.6px;fill:var(--afa)">{i + 1}.</text>
+    <path d={`M38.4 ${16.8 + i * 3.2}h${length}`} style="stroke:var(--black);stroke-width:.5;stroke-linecap:round;opacity:.5"/>
+    {done && <path d={`M${40 + length} ${16.6 + i * 3.2}l.8.9 1.8-2`} style="fill:none;stroke:var(--grass-dark);stroke-width:.5;stroke-linecap:round"/>}
+  </g>)}
+  <path d="M79 5 86 1l7 4" style="fill:none;stroke:var(--black);stroke-width:.4"/><path d="M78 5h16v18l-8-3-8 3z" style="fill:var(--afa)"/><path d="M77 5h18" style="stroke:var(--wood-dark);stroke-width:.9;stroke-linecap:round"/>
+  <text x="86" y="14" text-anchor="middle" style="font-family:'Young Serif',Georgia,serif;font-size:5px;fill:var(--white)">AFA</text>
+</svg></div>
+<div class="floor"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+  <rect width="100" height="40" style="fill:var(--sand)"/>
+  <path d="M0 10h100M0 20h100M0 30h100M10 0v40M20 0v40M30 0v40M40 0v40M50 0v40M60 0v40M70 0v40M80 0v40M90 0v40" style="stroke:var(--sand-dark);stroke-width:.4;opacity:.7"/>
+  <ellipse cx="80" cy="27" rx="11" ry="4" style="fill:var(--lilac)"/><ellipse cx="80" cy="27" rx="9" ry="3" style="fill:none;stroke:var(--white);stroke-width:.5;opacity:.6"/>
+</svg>
+  <div class="piece" style="--x:26;--y:12;--w:48;--ar:48/26;--d:0"><svg viewBox="0 0 48 26">
+    {/* Two members of the board behind the table, one reading from a sheet. */}
+    <g transform="translate(4 0)">
+      <path d="M10 30c-3.6 0-6-3.4-5.4-11.2C3.4 12.4 5.6 8.4 10 8.4s6.6 4 5.4 10.4c.6 7.8-1.8 11.2-5.4 11.2z" style="fill:var(--escola)"/>
+      <circle cx="10" cy="5.4" r="3.4" style="fill:var(--skin-5)"/><path d="M6.8 5.2c-.2-2.6 1.4-4.2 3.2-4.2s3.4 1.6 3.2 4.2c-.8-1.2-2-1.8-3.2-1.8s-2.4.6-3.2 1.8z" style="fill:var(--hair-5)"/>
+    </g>
+    <g transform="translate(24 0)">
+      <path d="M10 30c-3.6 0-6-3.4-5.4-11.2C3.4 12.4 5.6 8.4 10 8.4s6.6 4 5.4 10.4c.6 7.8-1.8 11.2-5.4 11.2z" style="fill:var(--afa)"/>
+      <circle cx="10" cy="5.4" r="3.4" style="fill:var(--skin-1)"/><path d="M6.6 5.6c-.4-2.8 1.2-4.6 3.4-4.6s3.8 1.8 3.4 4.6c-.4 3.2-1.2 4.8-.6 6.6-1.6-1-4-1-5.6 0 .6-1.8-.2-3.4-.6-6.6z" style="fill:var(--hair-2)"/>
+      <path d="M14.6 12.6 17.6 9" style="stroke:var(--skin-1);stroke-width:1.4;stroke-linecap:round"/>
+      <g transform="rotate(10 19 6)"><rect x="16.4" y="2.4" width="5" height="6.6" rx=".3" style="fill:var(--white)"/><path d="M17.4 4h3M17.4 5.4h3M17.4 6.8h2" style="stroke:var(--black);stroke-width:.3;opacity:.5"/></g>
+    </g>
+    <rect x="0" y="15.6" width="48" height="2.2" rx=".5" style="fill:var(--wood)"/>
+    <rect x="1" y="17.8" width="46" height="8.2" style="fill:var(--cream)"/><rect x="1" y="17.8" width="46" height="1.4" style="fill:var(--afa)"/>
+    <g transform="rotate(-6 12 15)"><rect x="9" y="14" width="6" height="1.6" rx=".2" style="fill:var(--white)"/></g>
+    <path d="M22.4 10.4h3.4l.4 5.2h-4.2z" style="fill:var(--sky-light);opacity:.9"/><path d="M25.8 11.2h1a1 1 0 0 1 0 2.4h-.8" style="fill:none;stroke:var(--sky-light);stroke-width:.5"/>
+    <g style="fill:var(--sky-light);opacity:.9"><rect x="28" y="13" width="1.6" height="2.6" rx=".2"/><rect x="18.6" y="13" width="1.6" height="2.6" rx=".2"/></g>
+  </svg></div>
+  {rows.map(({ x, y, d, seats }) => <div class="piece" style={`--x:${x};--y:${y};--w:${seats.length * 18};--ar:${seats.length * 18}/20;--d:${d}`}><svg viewBox={`0 0 ${seats.length * 18} 20`}>
+    {seats.map(([cx, clothes, skin, hair, long, hand]) => <g>
+      {hand && <g class="hop"><path d={`M${cx + 4.4} 9.4 ${cx + 7} 2.6`} style={`stroke:var(--${clothes});stroke-width:1.8;stroke-linecap:round`}/><circle cx={cx + 7.2} cy="1.8" r="1.1" style={`fill:var(--${skin})`}/></g>}
+      <path d={`M${cx} 20c-4.4 0-6.4-2.6-6-8 .4-3.6 2.6-5 6-5s5.6 1.4 6 5c.4 5.4-1.6 8-6 8z`} style={`fill:var(--${clothes})`}/>
+      <circle cx={cx} cy="4.4" r="3.2" style={`fill:var(--${skin})`}/>
+      <path d={long ? `M${cx - 3.4} 4.6c-.3-2.8 1.4-4.2 3.4-4.2s3.7 1.4 3.4 4.2l.4 4.6c-1.2.6-2.4.8-3.8.8s-2.6-.2-3.8-.8z` : `M${cx - 3.3} 4.8c-.3-2.8 1.4-4.4 3.3-4.4s3.6 1.6 3.3 4.4c-.6 1-1.8 1.6-3.3 1.6s-2.7-.6-3.3-1.6z`} style={`fill:var(--${hair})`}/>
+      <rect x={cx - 5.6} y="12.6" width="11.2" height="2" rx=".6" style="fill:var(--wood-dark)"/><path d={`M${cx - 4.8} 12.6V20M${cx + 4.8} 12.6V20`} style="stroke:var(--wood-dark);stroke-width:1"/>
+    </g>)}
+  </svg></div>)}
+  <div class="piece" style="--x:71;--y:28;--w:18;--ar:20/16;--d:.38"><svg viewBox="0 0 20 16">
+    <use href="#child" x="1" y="1" width="10" height="15" style="--clothes:var(--yellow);--skin:var(--skin-2);--hair:var(--hair-2)"/>
+    <g><rect x="11.6" y="11" width="3.8" height="5" rx=".4" style="fill:var(--escola)"/><rect x="15.8" y="11" width="3.8" height="5" rx=".4" style="fill:var(--afa)"/><rect x="13.6" y="7.2" width="3.8" height="3.8" rx=".4" style="fill:var(--classe)"/><path d="M13.2 7.2 15.5 4l2.3 3.2z" style="fill:var(--red)"/></g>
+  </svg></div>
+</div>

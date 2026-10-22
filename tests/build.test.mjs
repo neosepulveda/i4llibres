@@ -41,9 +41,9 @@ test('all published languages include translated notices and calendar exports',(
 
 test('AFA notice highlights the next cancellation deadline and retains the monthly application window in every language',()=>{
  for(const [path,opening,window] of [
-  ['','baixes de novembre fins al 20 d’octubre','de l’1 al 20 de cada mes'],
-  ['es/','bajas de noviembre hasta el 20 de octubre','del 1 al 20 de cada mes'],
-  ['en/','cancel for November by 20 October','from the 1st to the 20th of every month'],
+  ['','baixes de desembre fins al 20 de novembre','de l’1 al 20 de cada mes'],
+  ['es/','bajas de diciembre hasta el 20 de noviembre','del 1 al 20 de cada mes'],
+  ['en/','cancel for December by 20 November','from the 1st to the 20th of every month'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.match(html,/data-filter="afa"[^>]*>.*?AFA<span class="filter-count"/);
@@ -56,20 +56,20 @@ test('AFA notice highlights the next cancellation deadline and retains the month
 
 test('AFA calendar exports mark only the final day to cancel activities for the following month',()=>{
  for(const [path,title] of [
-  ['', 'Últim dia per donar de baixa extraescolars de novembre'],
-  ['es/', 'Último día para dar de baja extraescolares de noviembre'],
-  ['en/', 'Last day to cancel November extracurricular activities'],
+  ['', 'Últim dia per donar de baixa extraescolars de desembre'],
+  ['es/', 'Último día para dar de baja extraescolares de diciembre'],
+  ['en/', 'Last day to cancel December extracurricular activities'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
-  assert.match(html,/<a class="upcoming-event afa" href="#avis-extraescolars-afa" data-end="2026-10-21"/);
+  assert.match(html,/<a class="upcoming-event afa" href="#avis-extraescolars-afa" data-end="2026-11-21"/);
   const ics=readFileSync(`dist/${path}calendar/extraescolars-afa.ics`,'utf8');
-  assert.match(ics,/DTSTART;VALUE=DATE:20261020/);
-  assert.match(ics,/DTEND;VALUE=DATE:20261021/);
+  assert.match(ics,/DTSTART;VALUE=DATE:20261120/);
+  assert.match(ics,/DTEND;VALUE=DATE:20261121/);
   assert.ok(ics.replace(/\r\n /g,'').includes('SUMMARY:'+title));
-  const card=html.match(/<article class="notice afa"[\s\S]*?<\/article>/)?.[0];
+  const card=html.match(/<article class="notice afa" id="avis-extraescolars-afa"[\s\S]*?<\/article>/)?.[0];
   const google=card.match(/href="(https:\/\/calendar\.google\.com[^\"]+)"/)[1];
   const params=new URL(google.replaceAll('&amp;','&')).searchParams;
-  assert.equal(params.get('dates'),'20261020/20261021');
+  assert.equal(params.get('dates'),'20261120/20261121');
   assert.equal(params.get('text'),title);
   assert.ok(params.get('details').includes('23:55'));
  }
@@ -78,7 +78,7 @@ test('AFA calendar exports mark only the final day to cancel activities for the 
 test('AFA instructions include the exact deadline, payment requirement and application link',()=>{
  for(const [path,payment] of [['','cal estar al corrent de pagament dels rebuts'],['es/','hay que estar al corriente del pago de los recibos'],['en/','all payments must be up to date']]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
-  const card=html.match(/<article class="notice afa"[\s\S]*?<\/article>/)?.[0];
+  const card=html.match(/<article class="notice afa" id="avis-extraescolars-afa"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card?.includes('23:55'));
   assert.ok(card.includes(payment));
   assert.match(card,/<a href="https:\/\/ampalamarbella\.ampasoft\.net\/" target="_blank" rel="noopener noreferrer">/);
@@ -130,7 +130,7 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
 // The board runs from what families have to do, nearest first, to reference and voluntary notices.
 // This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
 test('the notices run from what to do next to what is voluntary',()=>{
- const order=['extraescolars-afa','creacions-tardor','proxim-dia-sense-escola','acollida-desembre','reunio-families-inscripcions','activitats-migdia-octubre','psicomotricitat-comenca','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
+ const order=['roba-recanvi','assemblea-afa','festa-castanyada','creacions-tardor','proxim-dia-sense-escola','extraescolars-afa','acollida-desembre','reunio-families-inscripcions','activitats-migdia-octubre','psicomotricitat-comenca','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
  for(const path of ['','es/','en/']){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
@@ -142,6 +142,85 @@ test('every published notice opens with its own pop-up scene',()=>{
  const cards=Array.from(html.matchAll(/<article class="notice[\s\S]*?<\/article>/g),([card])=>card);
  assert.ok(cards.length>0);
  for(const card of cards) assert.match(card,/<div class="notice-scene paper"><div class="popup" aria-hidden="true">/);
+});
+
+test('spare clothes lists the full change the class asks for, with no date or calendar export',()=>{
+ for(const [path,title,items] of [
+  ['','Roba de recanvi: reviseu que la muda sigui completa',['pantalons','samarreta','roba interior','mitjons']],
+  ['es/','Ropa de recambio: revisad que la muda esté completa',['pantalones','camiseta','ropa interior','calcetines']],
+  ['en/','Spare clothes: check the change of clothes is complete',['trousers','T-shirt','underwear','socks']],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice classe" id="avis-roba-recanvi"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(title),path);
+  assert.deepEqual(Array.from(card.match(/<ul>[\s\S]*?<\/ul>/)[0].matchAll(/<li>([^<]+)<\/li>/g),([,item])=>item),items,path);
+  assert.ok(card.includes('Roba de recanvi»')||card.includes('Roba de recanvi”'),path);
+  assert.doesNotMatch(card,/class="stamp"|calendar-actions/);
+  assert.equal(existsSync(`dist/${path}calendar/roba-recanvi.ics`),false,path);
+  // Its pop-up is the classroom on a rainy day: the bags on their pegs, rain in the window,
+  // the change laid out on a bench, and a child back in from the rain.
+  assert.match(card,/<clipPath id="spare-clothes-window">/);
+  assert.equal((card.match(/<g class="rain/g)||[]).length,2,path);
+  assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
+ }
+});
+
+test('the AFA assembly is a timed event on 28 October, after the clocks go back, with its agenda and the childcare form',()=>{
+ for(const [path,title,deadline,price,agenda] of [
+  ['','Assemblea general de l’AFA','fins al diumenge 25 d’octubre a les 22 h','2,5 € l’hora per infant','Ordre del dia'],
+  ['es/','Asamblea general del AFA','hasta el domingo 25 de octubre a las 22 h','2,5 € la hora por niño','Orden del día'],
+  ['en/','AFA general assembly','by 22:00 on Sunday 25 October','€2.50 per hour per child','Agenda'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice afa" id="avis-assemblea-afa"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card,path);
+  assert.match(card,/<p class="stamp"><time datetime="2026-10-28T17:30:00\+01:00">/);
+  assert.ok(card.includes(deadline),path);
+  assert.ok(card.includes(price),path);
+  assert.match(card,/<a href="https:\/\/forms\.gle\/KCcGDmMLKsBDcvwy5" target="_blank" rel="noopener noreferrer">/);
+  assert.equal(card.match(/<details class="tab">[\s\S]*?<\/details>/)[0].match(/<ul>[\s\S]*?<\/ul>/)[0].match(/<li>/g).length,12,path);
+  assert.ok(card.includes('Convocatòria de primera assemblea AFA La Mar Bella Curs 26-27'),path);
+  // The minutes and the AFFAC proposal stay in the email.
+  assert.doesNotMatch(card,/\/downloads\/|mail\.google/);
+  assert.match(html,/<a class="upcoming-event afa" href="#avis-assemblea-afa" data-end="2026-10-28T18:30:00\+01:00"/);
+  const ics=readFileSync(`dist/${path}calendar/assemblea-afa.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART:20261028T163000Z/);
+  assert.match(ics,/DTEND:20261028T173000Z/);
+  assert.ok(ics.includes('SUMMARY:'+title),path);
+  assert.ok(ics.includes('forms.gle/KCcGDmMLKsBDcvwy5'),path);
+  // Its pop-up is the dining hall: the agenda on a board, the AFA's pennant, rows of families.
+  assert.ok(card.includes(`>${agenda}</text>`),path);
+  assert.ok(card.includes('>AFA</text>'),path);
+  assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
+ }
+});
+
+test('the Castanyada party opens on the chestnut stall, with its presale, prices, poster and calendar exports',()=>{
+ for(const [path,title,sign,cash,prices] of [
+  ['','Festa de la Castanyada','Castanyes','Porteu diners en efectiu',['Aigua o suc: 1 €','Refresc: 1,5 €','Menjar (frankfurt, pizza o entrepà): 2,5 €','Patates o crispetes: 1 €','Túnel del Terror: 1 €']],
+  ['es/','Fiesta de la Castanyada','Castañas','Llevad dinero en efectivo',['Agua o zumo: 1 €','Refresco: 1,5 €','Comida (frankfurt, pizza o bocadillo): 2,5 €','Patatas o palomitas: 1 €','Túnel del Terror: 1 €']],
+  ['en/','Castanyada party','Chestnuts','Bring cash',['Water or juice: €1','Soft drink: €1.50','Food (hot dog, pizza or sandwich): €2.50','Crisps or popcorn: €1','Tunnel of Terror: €1']],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice afa" id="avis-festa-castanyada"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(title),path);
+  assert.match(card,/<p class="stamp"><time datetime="2026-10-30T17:30:00\+01:00">/);
+  assert.ok(card.includes(`>${sign}</text>`),path);
+  assert.ok(card.includes('20, 21, 22, 23'),path);
+  assert.ok(card.includes(cash),path);
+  const lists=card.match(/<ul>[\s\S]*?<\/ul>/g);
+  assert.deepEqual(Array.from(lists.at(-1).matchAll(/<li>([^<]+)<\/li>/g),([,price])=>price),prices,path);
+  for(const image of ['castanyada-cartell-2026','castanyada-preus-bar-2026']){
+   assert.match(card,new RegExp(`<a class="image-preview" href="/downloads/${image}\\.jpg" target="_blank" rel="noopener noreferrer"`));
+   assert.match(card,new RegExp(`<a class="image-download" href="/downloads/${image}\\.jpg" download>`));
+   assert.ok(existsSync(`dist/downloads/${image}.jpg`),image);
+  }
+  assert.match(html,/<a class="upcoming-event afa" href="#avis-festa-castanyada" data-end="2026-10-30T19:00:00\+01:00"/);
+  const ics=readFileSync(`dist/${path}calendar/festa-castanyada.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART:20261030T163000Z/);
+  assert.match(ics,/DTEND:20261030T180000Z/);
+  assert.ok(ics.includes('SUMMARY:'+title),path);
+ }
 });
 
 test('December childcare names Biosca and the announced hours without inventing prices, booking links or calendar exports',()=>{

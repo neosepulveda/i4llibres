@@ -1,7 +1,7 @@
 ---
 title: "Materials per als espais de joc d’Infantil"
 description: "L’equip d’Infantil busca materials per millorar els espais de joc. Si en teniu a casa i ja no els feu servir, els podeu donar a l’escola."
-order: 110
+order: 140
 category: classe
 scene: playground
 note: "Veure els materials que es demanen"

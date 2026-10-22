@@ -1,21 +1,21 @@
 ---
-title: "Extraescolars de l’AFA: baixes de novembre fins al 20 d’octubre"
+title: "Extraescolars de l’AFA: baixes de desembre fins al 20 de novembre"
 description: "Les sol·licituds d’alta i baixa de les extraescolars de l’AFA es poden fer de l’1 al 20 de cada mes, fins a les 23:55 h, a Ampasoft."
 category: afa
 scene: activities
-order: 10
+order: 60
 note: "Com sol·licitar una alta o una baixa"
 event:
   allDay: true
-  start: "2026-10-20"
-  end: "2026-10-21"
-  title: "Últim dia per donar de baixa extraescolars de novembre"
+  start: "2026-11-20"
+  end: "2026-11-21"
+  title: "Últim dia per donar de baixa extraescolars de desembre"
   location: "AFA"
-  description: "Data límit per donar de baixa les extraescolars de l’AFA del mes de novembre: 20 d’octubre a les 23:55 h. A Ampasoft, ves a «Preinscripció», obre la pestanya d’activitats, tria l’activitat i clica «Demanar baixa». https://ampalamarbella.ampasoft.net/"
+  description: "Data límit per donar de baixa les extraescolars de l’AFA del mes de desembre: 20 de novembre a les 23:55 h. A Ampasoft, ves a «Preinscripció», obre la pestanya d’activitats, tria l’activitat i clica «Demanar baixa». https://ampalamarbella.ampasoft.net/"
 ---
 Les famílies poden sol·licitar altes i baixes de les activitats extraescolars organitzades per l’AFA, l’associació de famílies, **de l’1 al 20 de cada mes**. El termini acaba **el dia 20 a les 23:55 h**.
 
-Per donar de baixa una activitat de cara al novembre, feu la sol·licitud **abans del 20 d’octubre a les 23:55 h**. El recordatori del calendari marca aquest últim dia.
+Per donar de baixa una activitat de cara al desembre, feu la sol·licitud **abans del 20 de novembre a les 23:55 h**. El recordatori del calendari marca aquest últim dia.
 
 Per poder participar en les activitats, **cal estar al corrent de pagament dels rebuts**.
 
