@@ -18,7 +18,7 @@ bin/dev
 
 Open http://127.0.0.1:4321/. `bin/dev` accepts Astro arguments, such as `bin/dev --port 4325`.
 
-`bin/setup` installs mise through Homebrew if necessary, trusts `.mise.toml`, installs the pinned Node version, runs `npm ci`, and installs Chromium for browser tests. Without Homebrew, install [mise](https://mise.jdx.dev/) first. Node is pinned to **24.15.0**.
+`bin/setup` installs mise through Homebrew if necessary, trusts `.mise.toml`, installs the pinned Node version, runs `npm ci`, and installs Chromium for browser tests. Without Homebrew, install [mise](https://mise.jdx.dev/) first. Node is pinned to **24.22.1**.
 
 ## Work from a phone through Norman
 

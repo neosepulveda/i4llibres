@@ -44,7 +44,7 @@ Daily/weekly recaps, a CMS approval queue, authentication, and automatic transla
 
 ## Architecture
 
-The app is a static Astro site with TypeScript and Markdown content collections. Node 24.15.0 is pinned by mise; dependency versions are in `package.json` and `package-lock.json`. There is no runtime server, database, API key, or runtime LLM call.
+The app is a static Astro site with TypeScript and Markdown content collections. Node 24.22.1 is pinned by mise; dependency versions are in `package.json` and `package-lock.json`. There is no runtime server, database, API key, or runtime LLM call.
 
 ```text
 Catalan notices + Spanish/English translations

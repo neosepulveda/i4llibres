@@ -11,7 +11,7 @@ function sandbox(run) {
     const fake=join(root,'fake');mkdirSync(fake);
     const log=join(root,'calls');
     for(const name of ['mise','npm','gum'])writeFileSync(join(fake,name),`#!/bin/bash\nprintf '%s\\n' "${name} $*" >> "$CALL_LOG"\n`,{mode:0o755});
-    writeFileSync(join(fake,'node'),'#!/bin/bash\nif [ "$1" = --version ]; then printf "%s\\n" "${FAKE_NODE_VERSION:-v24.15.0}"; else printf "node %s\\n" "$*" >> "$CALL_LOG"; fi\n',{mode:0o755});
+    writeFileSync(join(fake,'node'),'#!/bin/bash\nif [ "$1" = --version ]; then printf "%s\\n" "${FAKE_NODE_VERSION:-v24.22.1}"; else printf "node %s\\n" "$*" >> "$CALL_LOG"; fi\n',{mode:0o755});
     writeFileSync(join(fake,'tailscale'),'#!/bin/bash\nprintf "%s\\n" "${FAKE_TAILSCALE_IP:-100.113.216.23}"\nexit "${FAKE_TAILSCALE_STATUS:-0}"\n',{mode:0o755});
     const invoke=(script,args=[],extra={},cwd=root)=>spawnSync('/bin/bash',[join(root,'bin',script),...args],{cwd,encoding:'utf8',env:{...process.env,PATH:fake+':/usr/bin:/bin',CALL_LOG:log,...extra}});
     run(invoke,()=>readFileSync(log,'utf8'),root);
