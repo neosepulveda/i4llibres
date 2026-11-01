@@ -131,7 +131,7 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
 // The board runs from what families have to do, nearest first, to reference and voluntary notices.
 // This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
 test('the notices run from what to do next to what is voluntary',()=>{
- const order=['roba-recanvi','assemblea-afa','festa-castanyada','creacions-tardor','proxim-dia-sense-escola','extraescolars-afa','acollida-desembre','reunio-families-inscripcions','activitats-migdia-octubre','psicomotricitat-comenca','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
+ const order=['proxim-dia-sense-escola','cros-sant-marti','punt-verd-mobil','extraescolars-afa','acollida-desembre','reunio-families-inscripcions','psicomotricitat-comenca','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
  for(const path of ['','es/','en/']){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
@@ -145,82 +145,66 @@ test('every published notice opens with its own pop-up scene',()=>{
  for(const card of cards) assert.match(card,/<div class="notice-scene paper"><div class="popup" aria-hidden="true">/);
 });
 
-test('spare clothes lists the full change the class asks for, with no date or calendar export',()=>{
- for(const [path,title,items] of [
-  ['','Roba de recanvi: reviseu que la muda sigui completa',['pantalons','samarreta','roba interior','mitjons']],
-  ['es/','Ropa de recambio: revisad que la muda esté completa',['pantalones','camiseta','ropa interior','calcetines']],
-  ['en/','Spare clothes: check the change of clothes is complete',['trousers','T-shirt','underwear','socks']],
+test('the notices that ended in October leave the board with their dates, calendar files and pictures',()=>{
+ for(const path of ['','es/','en/']){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  for(const id of ['assemblea-afa','festa-castanyada','creacions-tardor','activitats-migdia-octubre','roba-recanvi']){
+   assert.doesNotMatch(html,new RegExp(`id="avis-${id}"|href="#avis-${id}"`),`${path}${id}`);
+   assert.equal(existsSync(`dist/${path}calendar/${id}.ics`),false,`${path}${id}`);
+  }
+  // October's lunchtime programme still goes with October's menus, in the pocket.
+  assert.match(html.match(/<section class="back-endpaper" id="menus"[\s\S]*?<\/section>/)[0],/<a class="menu-card" href="\/downloads\/menjador-activitats-2026-10\.jpg"/,path);
+ }
+ for(const image of ['castanyada-cartell-2026','castanyada-preus-bar-2026']) assert.equal(existsSync(`dist/downloads/${image}.jpg`),false,image);
+});
+
+test('the Cros de Sant Martí asks for sign-up by 3 November and gives the Llibres’ family race on Sunday 8 November',()=>{
+ for(const [path,title,deadline,times,finish] of [
+  ['','Cros de Sant Martí, diumenge 8 de novembre: inscripcions fins dimarts 3','dimarts 3 de novembre a les 23.59 h',['10.55 h','11.10 h'],'Arribada'],
+  ['es/','Cros de Sant Martí, domingo 8 de noviembre: inscripciones hasta el martes 3','martes 3 de noviembre a las 23:59 h',['10:55 h','11:10 h'],'Llegada'],
+  ['en/','Sant Martí cross-country race, Sunday 8 November: sign up by Tuesday 3','23:59 on Tuesday 3 November',['10:55','11:10'],'Finish'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
-  const card=html.match(/<article class="notice classe" id="avis-roba-recanvi"[\s\S]*?<\/article>/)?.[0];
+  const card=html.match(/<article class="notice escola" id="avis-cros-sant-marti"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(title),path);
+  assert.ok(card.includes(deadline),path);
+  for(const time of times) assert.ok(card.includes(time),`${path}${time}`);
+  assert.match(card,/<p class="stamp"><time datetime="2026-11-08T10:55:00\+01:00">/);
+  assert.match(card,/<a href="https:\/\/forms\.cloud\.microsoft\/e\/5qQavBawbi" target="_blank" rel="noopener noreferrer">/);
+  // The other years' times stay on the sheet in the school's email.
+  assert.ok(card.includes('ACTIVITAT EDUCACIÓ FÍSICA DIUMENGE 8 DE NOVEMBRE. ESCOLA LA MAR BELLA'),path);
+  assert.doesNotMatch(card,/\/downloads\//);
+  assert.match(html,/<a class="upcoming-event escola" href="#avis-cros-sant-marti" data-end="2026-11-08T11:55:00\+01:00"/);
+  const ics=readFileSync(`dist/${path}calendar/cros-sant-marti.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART:20261108T095500Z/);
+  assert.match(ics,/DTEND:20261108T105500Z/);
+  assert.ok(ics.includes('forms.cloud.microsoft/e/5qQavBawbi'),path);
+  // Its pop-up is the race by the sea: the finish arch, the CEEB's tent, the family race, the green
+  // circuit's flags and its sign.
+  assert.ok(card.includes(`>${finish}</text>`),path);
+  assert.ok(card.includes('>400 m</text>'),path);
+  assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
+ }
+});
+
+test('the Punt Verd Mòbil comes on Monday 9 November, with what children can bring, as an all-day event',()=>{
+ for(const [path,title,items] of [
+  ['','Dilluns 9 de novembre, el Punt Verd Mòbil ve a l’escola',['roba i calçat','llibres','piles i bateries','bombetes','aparells elèctrics i cables','cartutxos','olis, pintures, aerosols i cosmètics','pneumàtics']],
+  ['es/','El lunes 9 de noviembre, el Punt Verd Mòbil viene al colegio',['ropa y calzado','libros','pilas y baterías','bombillas','aparatos eléctricos y cables','cartuchos','aceites, pinturas, aerosoles y cosméticos','neumáticos']],
+  ['en/','Monday 9 November: the mobile recycling point comes to school',['clothes and shoes','books','batteries','light bulbs','electrical appliances and cables','cartridges','oils, paint, aerosols and cosmetics','tyres']],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice escola" id="avis-punt-verd-mobil"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card?.includes(title),path);
   assert.deepEqual(Array.from(card.match(/<ul>[\s\S]*?<\/ul>/)[0].matchAll(/<li>([^<]+)<\/li>/g),([,item])=>item),items,path);
-  assert.ok(card.includes('Roba de recanvi»')||card.includes('Roba de recanvi”'),path);
-  assert.doesNotMatch(card,/class="stamp"|calendar-actions/);
-  assert.equal(existsSync(`dist/${path}calendar/roba-recanvi.ics`),false,path);
-  // Its pop-up is the classroom on a rainy day: the bags on their pegs, rain in the window,
-  // the change laid out on a bench, and a child back in from the rain.
-  assert.match(card,/<clipPath id="spare-clothes-window">/);
-  assert.equal((card.match(/<g class="rain/g)||[]).length,2,path);
+  assert.ok(card.includes('Punt Verd Mòbil Escola la Mar Bella'),path);
+  assert.match(html,/<a class="upcoming-event escola" href="#avis-punt-verd-mobil" data-end="2026-11-10"/);
+  const ics=readFileSync(`dist/${path}calendar/punt-verd-mobil.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART;VALUE=DATE:20261109/);
+  assert.match(ics,/DTEND;VALUE=DATE:20261110/);
+  // Its pop-up is the lorry in the playground, its side open on the bays.
+  assert.ok(card.includes('>Punt Verd</text>'),path);
   assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
- }
-});
-
-test('the AFA assembly is a timed event on 28 October, after the clocks go back, with its agenda and the childcare form',()=>{
- for(const [path,title,deadline,price,agenda] of [
-  ['','Assemblea general de l’AFA','fins al diumenge 25 d’octubre a les 22 h','2,5 € l’hora per infant','Ordre del dia'],
-  ['es/','Asamblea general del AFA','hasta el domingo 25 de octubre a las 22 h','2,5 € la hora por niño','Orden del día'],
-  ['en/','AFA general assembly','by 22:00 on Sunday 25 October','€2.50 per hour per child','Agenda'],
- ]){
-  const html=readFileSync(`dist/${path}index.html`,'utf8');
-  const card=html.match(/<article class="notice afa" id="avis-assemblea-afa"[\s\S]*?<\/article>/)?.[0];
-  assert.ok(card,path);
-  assert.match(card,/<p class="stamp"><time datetime="2026-10-28T17:30:00\+01:00">/);
-  assert.ok(card.includes(deadline),path);
-  assert.ok(card.includes(price),path);
-  assert.match(card,/<a href="https:\/\/forms\.gle\/KCcGDmMLKsBDcvwy5" target="_blank" rel="noopener noreferrer">/);
-  assert.equal(card.match(/<details class="tab">[\s\S]*?<\/details>/)[0].match(/<ul>[\s\S]*?<\/ul>/)[0].match(/<li>/g).length,12,path);
-  assert.ok(card.includes('Convocatòria de primera assemblea AFA La Mar Bella Curs 26-27'),path);
-  // The minutes and the AFFAC proposal stay in the email.
-  assert.doesNotMatch(card,/\/downloads\/|mail\.google/);
-  assert.match(html,/<a class="upcoming-event afa" href="#avis-assemblea-afa" data-end="2026-10-28T18:30:00\+01:00"/);
-  const ics=readFileSync(`dist/${path}calendar/assemblea-afa.ics`,'utf8').replace(/\r\n /g,'');
-  assert.match(ics,/DTSTART:20261028T163000Z/);
-  assert.match(ics,/DTEND:20261028T173000Z/);
-  assert.ok(ics.includes('SUMMARY:'+title),path);
-  assert.ok(ics.includes('forms.gle/KCcGDmMLKsBDcvwy5'),path);
-  // Its pop-up is the dining hall: the agenda on a board, the AFA's pennant, rows of families.
-  assert.ok(card.includes(`>${agenda}</text>`),path);
-  assert.ok(card.includes('>AFA</text>'),path);
-  assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
- }
-});
-
-test('the Castanyada party opens on the chestnut stall, with its presale, prices, poster and calendar exports',()=>{
- for(const [path,title,sign,cash,prices] of [
-  ['','Festa de la Castanyada','Castanyes','Porteu diners en efectiu',['Aigua o suc: 1 €','Refresc: 1,5 €','Menjar (frankfurt, pizza o entrepà): 2,5 €','Patates o crispetes: 1 €','Túnel del Terror: 1 €']],
-  ['es/','Fiesta de la Castanyada','Castañas','Llevad dinero en efectivo',['Agua o zumo: 1 €','Refresco: 1,5 €','Comida (frankfurt, pizza o bocadillo): 2,5 €','Patatas o palomitas: 1 €','Túnel del Terror: 1 €']],
-  ['en/','Castanyada party','Chestnuts','Bring cash',['Water or juice: €1','Soft drink: €1.50','Food (hot dog, pizza or sandwich): €2.50','Crisps or popcorn: €1','Tunnel of Terror: €1']],
- ]){
-  const html=readFileSync(`dist/${path}index.html`,'utf8');
-  const card=html.match(/<article class="notice afa" id="avis-festa-castanyada"[\s\S]*?<\/article>/)?.[0];
-  assert.ok(card?.includes(title),path);
-  assert.match(card,/<p class="stamp"><time datetime="2026-10-30T17:30:00\+01:00">/);
-  assert.ok(card.includes(`>${sign}</text>`),path);
-  assert.ok(card.includes('20, 21, 22, 23'),path);
-  assert.ok(card.includes(cash),path);
-  const lists=card.match(/<ul>[\s\S]*?<\/ul>/g);
-  assert.deepEqual(Array.from(lists.at(-1).matchAll(/<li>([^<]+)<\/li>/g),([,price])=>price),prices,path);
-  for(const image of ['castanyada-cartell-2026','castanyada-preus-bar-2026']){
-   assert.match(card,new RegExp(`<a class="image-preview" href="/downloads/${image}\\.jpg" target="_blank" rel="noopener noreferrer"`));
-   assert.match(card,new RegExp(`<a class="image-download" href="/downloads/${image}\\.jpg" download>`));
-   assert.ok(existsSync(`dist/downloads/${image}.jpg`),image);
-  }
-  assert.match(html,/<a class="upcoming-event afa" href="#avis-festa-castanyada" data-end="2026-10-30T19:00:00\+01:00"/);
-  const ics=readFileSync(`dist/${path}calendar/festa-castanyada.ics`,'utf8').replace(/\r\n /g,'');
-  assert.match(ics,/DTSTART:20261030T163000Z/);
-  assert.match(ics,/DTEND:20261030T180000Z/);
-  assert.ok(ics.includes('SUMMARY:'+title),path);
  }
 });
 
@@ -319,38 +303,6 @@ test('the timetable shows its week on the page, then the picture by day to open 
  }
 });
 
-test('the lunchtime activities read week by week behind the tab, then Biosca’s four play boxes, then the programme itself, the same picture the pocket holds',()=>{
- for(const [path,weeks,boxes] of [
-  ['',['1 i 2 d’octubre','Del 5 al 9 d’octubre','Del 12 al 16 d’octubre','Del 19 al 23 d’octubre','Del 26 al 30 d’octubre'],['Emocions','Esports i moviment','Creativitat','Consciència ecològica']],
-  ['es/',['1 y 2 de octubre','Del 5 al 9 de octubre','Del 12 al 16 de octubre','Del 19 al 23 de octubre','Del 26 al 30 de octubre'],['Emociones','Deporte y movimiento','Creatividad','Conciencia ecológica']],
-  ['en/',['1 and 2 October','5 to 9 October','12 to 16 October','19 to 23 October','26 to 30 October'],['Emotions','Sport and movement','Creativity','Ecology']],
- ]){
-  const html=readFileSync(`dist/${path}index.html`,'utf8');
-  const card=html.match(/<article class="notice menjador" id="avis-activitats-migdia-octubre"[\s\S]*?<\/article>/)?.[0];
-  assert.ok(card,path);
-  const body=card.match(/<details class="tab">[\s\S]*?<\/details>/)?.[0];
-  assert.ok(body,path);
-  assert.deepEqual(Array.from(body.matchAll(/<p><strong>([^:<]+):/g),([,week])=>week),weeks,path);
-  // A list of days for each week, then the boxes the programme marks activities with.
-  const lists=body.match(/<ul>[\s\S]*?<\/ul>/g);
-  assert.deepEqual(lists.map(list=>list.match(/<li>/g).length),[2,5,5,5,5,4],path);
-  assert.deepEqual(Array.from(lists.at(-1).matchAll(/<li>([^:<]+):/g),([,box])=>box),boxes,path);
-  assert.ok(body.lastIndexOf('</ul>')<body.indexOf('class="notice-images"'),path);
-  assert.match(body,/href="\/downloads\/menjador-activitats-2026-10\.jpg" download/);
-  assert.match(html.match(/<section class="back-endpaper" id="menus"[\s\S]*?<\/section>/)[0],/<a class="menu-card" href="\/downloads\/menjador-activitats-2026-10\.jpg"/,path);
- }
-});
-
-test('the lunchtime activities open on the dining hall, with a card pegged up for each week’s theme in the programme’s order',()=>{
- for(const path of ['','es/','en/']){
-  const card=readFileSync(`dist/${path}index.html`,'utf8').match(/<article class="notice menjador" id="avis-activitats-migdia-octubre"[\s\S]*?<\/article>/)?.[0];
-  const weeks=card?.match(/<div class="piece weeks"[\s\S]*?<\/svg><\/div>/)?.[0];
-  assert.ok(weeks,path);
-  assert.deepEqual(Array.from(weeks.matchAll(/<g class="week ([a-z]+)"/g),([,theme])=>theme),['smile','garland','bread','cook','chestnuts'],path);
-  assert.deepEqual(Array.from(weeks.matchAll(/<text[^>]*>([^<]+)<\/text>/g),([,dates])=>dates),['1–2','5–9','12–16','19–23','26–30'],path);
- }
-});
-
 test('the timetable’s train carries each day’s activities in open wagons, as the timetable lists them',()=>{
  for(const [path,days] of [['',['dl','dt','dc','dj','dv']],['es/',['L','M','X','J','V']],['en/',['Mo','Tu','We','Th','Fr']]]){
   const train=readFileSync(`dist/${path}index.html`,'utf8').match(/<div class="piece train"[\s\S]*?<\/svg><\/div>/)?.[0];
@@ -423,29 +375,6 @@ test('the next day without school is 2 November, a school closure rather than a 
   assert.match(ics,/DTSTART;VALUE=DATE:20261102/);
   assert.match(ics,/DTEND;VALUE=DATE:20261103/);
   assert.ok(ics.includes('SUMMARY:'+title),path);
- }
-});
-
-test('autumn creations are voluntary, with a translated 27 October deadline and calendar exports',()=>{
- for(const [path,voluntary,deadline,title] of [
-  ['','totalment voluntària','dimarts 27 d’octubre','Últim dia per portar les creacions de tardor'],
-  ['es/','totalmente voluntaria','martes 27 de octubre','Último día para llevar las creaciones de otoño'],
-  ['en/','entirely voluntary','Tuesday 27 October','Last day to bring in autumn creations'],
- ]){
-  const html=readFileSync(`dist/${path}index.html`,'utf8');
-  const card=html.match(/<article class="notice escola" id="avis-creacions-tardor"[\s\S]*?<\/article>/)?.[0];
-  assert.ok(card?.includes(voluntary),path);
-  assert.ok(card.includes(deadline),path);
-  assert.match(card,/class="piece autumn-hedgehog"/);
-  assert.match(card,/class="piece autumn-owl"/);
-  assert.match(card,/class="piece autumn-collage"/);
-  assert.match(html,/<a class="upcoming-event escola" href="#avis-creacions-tardor" data-end="2026-10-28"/);
-  const ics=readFileSync(`dist/${path}calendar/creacions-tardor.ics`,'utf8').replace(/\r\n /g,'');
-  assert.match(ics,/DTSTART;VALUE=DATE:20261027/);
-  assert.match(ics,/DTEND;VALUE=DATE:20261028/);
-  assert.ok(ics.includes('SUMMARY:'+title),path);
-  const google=card.match(/href="(https:\/\/calendar\.google\.com[^\"]+)"/)[1];
-  assert.equal(new URL(google.replaceAll('&amp;','&')).searchParams.get('dates'),'20261027/20261028',path);
  }
 });
 
