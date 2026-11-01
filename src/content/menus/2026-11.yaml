@@ -1,0 +1,60 @@
+# Written by bin/menus from Menjadors Biosca's menus. Name each adapted menu as its sheet does.
+month: "2026-11"
+menus:
+  - basal
+  - fitxa
+  - sopars
+  - activitats
+adapted:
+  - id: allergia-marisc-peix-llegums-fruits-secs-fruita-pelada-no-porc
+    ca: "Al·lèrgia al marisc, peix, llegums i fruits secs. Fruita pelada, sense porc"
+    es: "Alergia al marisco, pescado, legumbres y frutos secos. Fruta pelada, sin cerdo"
+    en: "Allergic to shellfish, fish, pulses and nuts. Peeled fruit, no pork"
+  - id: halal
+    ca: "Halal"
+    es: "Halal"
+    en: "Halal"
+  - id: ovolactovegetaria
+    ca: "Ovolactovegetarià"
+    es: "Ovolactovegetariano"
+    en: "Lacto-ovo vegetarian"
+  - id: sense-bolets
+    ca: "Sense bolets"
+    es: "Sin setas"
+    en: "No mushrooms"
+  - id: sense-carn
+    ca: "Sense carn"
+    es: "Sin carne"
+    en: "No meat"
+  - id: sense-fruits-secs
+    ca: "Sense fruits secs"
+    es: "Sin frutos secos"
+    en: "No nuts"
+  - id: sense-gluten
+    ca: "Sense gluten"
+    es: "Sin gluten"
+    en: "No gluten"
+  - id: sense-lactosa
+    ca: "Sense lactosa"
+    es: "Sin lactosa"
+    en: "No lactose"
+  - id: sense-p-vegetal
+    ca: "Sense proteïna vegetal"
+    es: "Sin proteína vegetal"
+    en: "No plant protein"
+  - id: sense-peix-ni-marisc
+    ca: "Sense peix ni marisc"
+    es: "Sin pescado ni marisco"
+    en: "No fish or shellfish"
+  - id: vega
+    ca: "Vegà"
+    es: "Vegano"
+    en: "Vegan"
+  - id: sense-lactosa-sense-llegums
+    ca: "Sense lactosa ni llegums"
+    es: "Sin lactosa ni legumbres"
+    en: "No lactose or pulses"
+  - id: sense-lactosa-sense-proteina-de-vaca
+    ca: "Sense lactosa ni proteïna de vaca"
+    es: "Sin lactosa ni proteína de vaca"
+    en: "No lactose, cow’s milk or beef"

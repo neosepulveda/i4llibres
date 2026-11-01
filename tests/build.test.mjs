@@ -152,8 +152,8 @@ test('the notices that ended in October leave the board with their dates, calend
    assert.doesNotMatch(html,new RegExp(`id="avis-${id}"|href="#avis-${id}"`),`${path}${id}`);
    assert.equal(existsSync(`dist/${path}calendar/${id}.ics`),false,`${path}${id}`);
   }
-  // October's lunchtime programme still goes with October's menus, in the pocket.
-  assert.match(html.match(/<section class="back-endpaper" id="menus"[\s\S]*?<\/section>/)[0],/<a class="menu-card" href="\/downloads\/menjador-activitats-2026-10\.jpg"/,path);
+  // The month's lunchtime programme is a card in the pocket only, with the month's menus.
+  assert.match(html.match(/<section class="back-endpaper" id="menus"[\s\S]*?<\/section>/)[0],/<a class="menu-card" href="\/downloads\/menjador-activitats-2026-11\.jpg"/,path);
  }
  for(const image of ['castanyada-cartell-2026','castanyada-preus-bar-2026']) assert.equal(existsSync(`dist/downloads/${image}.jpg`),false,image);
 });
@@ -398,14 +398,16 @@ test('the updated timetable postpones workshops, changes Friday, and labels the 
  }
 });
 
-test('September menus are retired while October and the yearly service sheet stay available',()=>{
- assert.equal(existsSync('src/content/menus/2026-09.yaml'),false);
- assert.equal(readdirSync('dist/downloads').some(name=>/menjador-.*-2026-09\./.test(name)),false);
- for(const [path,label] of [['','Menús d’octubre'],['es/','Menús de octubre'],['en/','October menus']]){
+test('September and October menus are retired while November and the yearly service sheet stay available',()=>{
+ for(const month of ['2026-09','2026-10']){
+  assert.equal(existsSync(`src/content/menus/${month}.yaml`),false,month);
+  assert.equal(readdirSync('dist/downloads').some(name=>name.startsWith('menjador-')&&name.includes(`-${month}.`)),false,month);
+ }
+ for(const [path,label] of [['','Menús de novembre'],['es/','Menús de noviembre'],['en/','November menus']]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.ok(html.includes(label),path);
-  assert.doesNotMatch(html,/\/downloads\/menjador-[^"<>]*-2026-09\./);
-  assert.ok(html.includes('/downloads/menjador-basal-2026-10.jpg'),path);
+  assert.doesNotMatch(html,/\/downloads\/menjador-[^"<>]*-2026-(09|10)\./);
+  assert.ok(html.includes('/downloads/menjador-basal-2026-11.jpg'),path);
   assert.ok(html.includes('/downloads/menjador-informacions-espai-migdia-2026-2027.jpg'),path);
  }
 });
