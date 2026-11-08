@@ -3,7 +3,7 @@ title: "Dilluns 9 de novembre, el Punt Verd Mòbil ve a l’escola"
 description: "Aquell dia els infants poden portar de casa coses per reciclar: roba i calçat, piles, bombetes, aparells elèctrics, llibres i més."
 category: escola
 scene: recycling
-order: 30
+order: 10
 date: "2026-11-09"
 note: "Què es pot portar?"
 event:

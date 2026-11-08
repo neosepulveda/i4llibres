@@ -15,7 +15,7 @@ const { title, description, category, date, note, event, images, files, scene, e
 const stamp = event ? { datetime:event.start, label:stampLabel(event, language) } : date && { datetime:date, label:shortDate(date, language) };
 ---
 <article class={`notice ${category}`} id={`avis-${notice.id}`} data-category={category}>
-  <div class="notice-scene paper"><Scene name={scene} language={language} /></div>
+  <div class="notice-scene paper"><Scene name={scene} language={language} event={event} /></div>
   <div class="notice-text paper">
     <span class="tag">{t.categories[category]}</span>
     {stamp && <p class="stamp"><time datetime={stamp.datetime}>{stamp.label}</time></p>}

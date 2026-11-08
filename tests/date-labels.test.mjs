@@ -29,6 +29,25 @@ test('card stamps and calendar notes read naturally in each language',()=>{
  assert.equal(ticketLabel(holiday,'en'),'All day, Monday 12 October');
 });
 
+// The end of an all-day event is the day after its last, so 7 and 8 December end on the 9th.
+test('an all-day event over several days names its first and last day',()=>{
+ const closure={allDay:true,start:'2026-12-07',end:'2026-12-09',location:'Escola',description:'Sense escola'};
+ assert.equal(dayAndTime(closure,'ca'),'dilluns i dimarts, tot el dia');
+ assert.equal(dayAndTime(closure,'es'),'lunes y martes, todo el día');
+ assert.equal(dayAndTime(closure,'en'),'Monday and Tuesday, all day');
+ assert.equal(stampLabel(closure,'ca'),'dl 7 – dt 8 des, tot el dia');
+ assert.equal(stampLabel(closure,'es'),'lun 7 – mar 8 dic, todo el día');
+ assert.equal(stampLabel(closure,'en'),'Mon 7 – Tue 8 Dec, all day');
+ assert.equal(ticketLabel(closure,'ca'),'Tot el dia, dilluns 7 – dimarts 8 de desembre');
+ assert.equal(ticketLabel(closure,'es'),'Todo el día, lunes 7 – martes 8 de diciembre');
+ assert.equal(ticketLabel(closure,'en'),'All day, Monday 7 – Tuesday 8 December');
+ // A longer run is a span, and across the end of a month each day keeps its month.
+ const bridge={...closure,start:'2026-10-30',end:'2026-11-03'};
+ assert.equal(dayAndTime(bridge,'ca'),'divendres – dilluns, tot el dia');
+ assert.equal(stampLabel(bridge,'en'),'Fri 30 Oct – Mon 2 Nov, all day');
+ assert.equal(ticketLabel(bridge,'es'),'Todo el día, viernes 30 de octubre – lunes 2 de noviembre');
+});
+
 test('the menus link names its months with the right preposition, and the pocket prints the month',()=>{
  assert.equal(menusLabel(['2026-09'],'ca'),'Menús de setembre');
  assert.equal(menusLabel(['2026-10'],'ca'),'Menús d’octubre');
