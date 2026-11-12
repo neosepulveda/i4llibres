@@ -1,18 +1,17 @@
 ---
-title: "Jueves 12 de noviembre, psicomotricidad de 11:00 a 12:30"
-description: "Ese día dejad a los niños en el aula, no en el pabellón. Los demás jueves, nos encontramos directamente en el pabellón a las 9 h. Recordad ponerles los calcetines a los niños."
-note: "Dónde nos encontramos y qué hay que llevar"
+title: "Jueves 26 de noviembre, huelga en la educación: no habrá puertas abiertas de psicomotricidad"
+description: "Ese día hay convocada una huelga del sector de la educación, y se anulan las puertas abiertas de psicomotricidad. Cada jueves, nos encontramos directamente en el pabellón a las 9 h. Recordad ponerles los calcetines a los niños."
+note: "Qué ha dicho Sandra y dónde nos encontramos"
 event:
-  title: "Psicomotricidad de 11:00 a 12:30"
+  title: "Huelga del sector de la educación"
   location: "Escola La Mar Bella"
-  description: "Por las puertas abiertas de I5, este jueves dejad a los niños directamente en el aula, no en el pabellón. La sesión de psicomotricidad será de 11:00 a 12:30."
+  description: "Jornada de huelga del sector de la educación. Se anulan las puertas abiertas de psicomotricidad de I4B. Posiblemente pasarán al jueves 3 de diciembre, pero la dirección aún tiene que confirmarlo."
 ---
-**El jueves 12 de noviembre cambia el horario**, porque los grupos de I5 hacen las puertas abiertas con sus familias a primera hora:
+**El jueves 26 de noviembre hay convocada una huelga del sector de la educación**, y por eso se anulan las puertas abiertas de psicomotricidad de ese día. Posiblemente pasarán al **jueves 3 de diciembre**, pero la dirección aún tiene que confirmarlo, y Sandra avisará a las familias.
 
-- Dejad a los niños **directamente en el aula**, no en el pabellón.
-- La sesión de psicomotricidad será **de 11:00 a 12:30**.
+El correo de Sandra, del 12 de noviembre, es «Cancel·lació de les portes obertes de psicomotricitat».
 
-Los demás jueves, Els Llibres hacen **psicomotricidad de 9:00 a 10:30**:
+Els Llibres hacen **psicomotricidad cada jueves, de 9:00 a 10:30**.
 
 - A las **9 h**, dejad a los niños directamente **en el pabellón**, no en el aula.
 - Recordad **ponerles los calcetines**.

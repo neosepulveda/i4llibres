@@ -4,7 +4,7 @@ description: "Dilluns 7 de desembre és dia de lliure disposició de l’escola 
 category: escola
 scene: holiday
 date: "2026-12-07"
-order: 50
+order: 30
 note: "Detalls dels dies sense escola"
 event:
   title: "Dies sense escola: lliure disposició i dia festiu"

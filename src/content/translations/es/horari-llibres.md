@@ -1,6 +1,6 @@
 ---
 title: "¿Qué hacemos cada día? El horario de Els Llibres"
-description: "Biblioteca, inglés, psicomotricidad, música y conciencia fonológica. Los talleres empezarán en noviembre."
+description: "Biblioteca, inglés, psicomotricidad, música y conciencia fonológica. Los talleres, los martes por la tarde y los viernes por la mañana, empezarán en noviembre."
 note: "Ver y descargar los horarios"
 images:
   - title: "Horario original por días"
@@ -14,6 +14,6 @@ Estas son las actividades de Els Llibres, con las novedades del correo de Sandra
 - **Jueves:** psicomotricidad, de 9:00 a 10:30. Nos encontramos directamente en el pabellón a las 9 h. Música por la tarde.
 - **Viernes:** conciencia fonológica.
 
-Los **talleres empezarán en noviembre**, cuando los niños de I3 estén preparados para la libre circulación.
+Los **talleres empezarán en noviembre**, cuando los niños de I3 estén preparados para la libre circulación. Serán los **martes de 15:00 a 16:10** y los **viernes de 9:00 a 10:30**, aproximadamente, y participarán juntos niños de distintos cursos. Lo dice la presentación de la reunión de familias, que encontraréis en el correo de Sandra «Informacions reunions famílies», del 25 de septiembre.
 
 La imagen de abajo es el horario original en catalán, anterior al recordatorio del 6 de octubre. Consultad las novedades en el texto de este aviso.

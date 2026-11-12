@@ -1,6 +1,6 @@
 ---
 title: "What do we do each day? The Els Llibres timetable"
-description: "Library, English, movement activities, music and phonological awareness. Workshops will start in November."
+description: "Library, English, movement activities, music and phonological awareness. Workshops, on Tuesday afternoons and Friday mornings, will start in November."
 note: "View and download the timetables"
 images:
   - title: "Original timetable by day"
@@ -14,6 +14,6 @@ These are the Llibres’ activities, with the updates from Sandra’s email **�
 - **Thursday:** movement activities, 9:00–10:30. Meet directly at the sports hall at 9:00. Music in the afternoon.
 - **Friday:** phonological awareness.
 
-**Workshops will start in November**, once the I3 children are ready to move freely between activity spaces.
+**Workshops will start in November**, once the I3 children are ready to move freely between activity spaces. They will be on **Tuesdays from 15:00 to 16:10** and **Fridays from 9:00 to 10:30**, roughly, with children from different years taking part together. This comes from the presentation at the families’ meeting, which you can find in Sandra’s email “Informacions reunions famílies” of 25 September.
 
 The image below is the original timetable in Catalan, from before the 6 October reminder. See the text of this notice for the updates.

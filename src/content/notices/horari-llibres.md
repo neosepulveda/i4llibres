@@ -1,6 +1,6 @@
 ---
 title: "Què fem cada dia? L’horari dels Llibres"
-description: "Biblioteca, anglès, psicomotricitat, música i consciència fonològica. Els tallers començaran al novembre."
+description: "Biblioteca, anglès, psicomotricitat, música i consciència fonològica. Els tallers, els dimarts a la tarda i els divendres al matí, començaran al novembre."
 order: 80
 category: classe
 scene: timetable
@@ -19,6 +19,6 @@ Aquestes són les activitats dels Llibres, amb les novetats del correu de la San
 - **Dijous:** psicomotricitat, de 9 a 10.30 h. Ens trobem directament al pavelló a les 9 h. Música a la tarda.
 - **Divendres:** consciència fonològica.
 
-Els **tallers començaran al novembre**, quan els infants d’I3 estiguin preparats per fer circulació lliure.
+Els **tallers començaran al novembre**, quan els infants d’I3 estiguin preparats per fer circulació lliure. Seran els **dimarts de 15 a 16.10 h** i els **divendres de 9 a 10.30 h**, aproximadament, i hi participaran junts infants de diferents cursos. Ho diu la presentació de la reunió de famílies, que trobareu al correu de la Sandra «Informacions reunions famílies», del 25 de setembre.
 
 La imatge de sota és l’horari original, anterior al recordatori del 6 d’octubre. Consulteu les novetats al text d’aquest avís.
