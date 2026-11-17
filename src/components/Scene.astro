@@ -18,10 +18,13 @@ import SpareClothes from './scenes/SpareClothes.astro';
 import CrossCountry from './scenes/CrossCountry.astro';
 import Recycling from './scenes/Recycling.astro';
 import Strike from './scenes/Strike.astro';
+import EducationStrike from './scenes/EducationStrike.astro';
+import HotChocolate from './scenes/HotChocolate.astro';
+import SantJordi from './scenes/SantJordi.astro';
 import type { CalendarEvent } from '../lib/calendar';
 interface Props { name?: SceneName; language: Language; event?: CalendarEvent }
 const { name, language, event } = Astro.props;
-const Pieces = name && { letter:Letter, activities:Activities, dining:Dining, holiday:Holiday, timetable:Timetable, playground:Playground, lunchtime:Lunchtime, castanyada:Castanyada, gym:Gym, cafe:Cafe, 'autumn-creations':AutumnCreations, childcare:Childcare, assembly:Assembly, 'spare-clothes':SpareClothes, 'cross-country':CrossCountry, recycling:Recycling, strike:Strike }[name];
+const Pieces = name && { letter:Letter, activities:Activities, dining:Dining, holiday:Holiday, timetable:Timetable, playground:Playground, lunchtime:Lunchtime, castanyada:Castanyada, gym:Gym, cafe:Cafe, 'autumn-creations':AutumnCreations, childcare:Childcare, assembly:Assembly, 'spare-clothes':SpareClothes, 'cross-country':CrossCountry, recycling:Recycling, strike:Strike, 'education-strike':EducationStrike, 'hot-chocolate':HotChocolate, 'sant-jordi':SantJordi }[name];
 ---
 {/* The holiday's calendar leaves show the notice's own days. */}
 {Pieces ? <div class="popup" aria-hidden="true"><div class="popup-inner">{name === 'holiday' ? <Holiday language={language} event={event} /> : <Pieces language={language} />}</div></div>

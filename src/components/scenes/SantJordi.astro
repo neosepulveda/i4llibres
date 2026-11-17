@@ -1,0 +1,136 @@
+---
+// Sant Jordi in the playground, which the I4 families organise with I3: a puppet theatre built like
+// a little castle, where the princess holds a rose, Sant Jordi waves a book and the dragon smiles
+// with a rose in its mouth; a table of books and roses with a child behind it; children sitting on
+// the ground to watch, seen from behind; and trees in blossom under red and yellow bunting. Only
+// the theatre's name has words, and it needs no translation.
+import type { Language } from '../../lib/i18n';
+interface Props { language: Language }
+// The bunting's flags along its string, red and yellow in turn.
+const flags = Array.from({ length:10 }, (_, i) => { const t = .05 + i * .1; return { x:100 * t, y:3 + 18 * t * (1 - t), colour:i % 2 ? 'yellow' : 'red' }; });
+// A tree in blossom, drawn around its trunk's foot: its crown's puffs, across, up, size and colour.
+const crown = [[0, -13, 4.6, 'pink'], [-4, -10.6, 3.4, 'pink'], [4, -10.8, 3.6, 'pink'], [-1.8, -16, 3, 'white'], [2.4, -15.6, 2.8, 'pink'], [-.4, -9.2, 2.6, 'white'], [5.2, -13.8, 1.6, 'white'], [-5, -13.4, 1.6, 'white']] as const;
+const leaves = [[-2.6, -12.6], [1.8, -11.2], [3.6, -14.4], [-3.8, -9.4], [.6, -16.8]] as const;
+// The trees: where each trunk stands, and its size.
+const backTrees = [[18, 47, .9], [6, 46, .7]] as const;
+const sideTrees = [[10, 18, 1], [95, 17, .78]] as const;
+// The castle's battlements along the top of the theatre.
+const merlons = Array.from({ length:8 }, (_, i) => 3 + i * 37 / 7);
+// Petals blown across the playground: left, top and turn.
+const petals = [[14, 18, 30], [30, 30, -40], [47, 25, 80], [63, 35, 10], [79, 16, -60], [88, 29, 40], [8, 33, 120], [55, 6, -20], [22, 9, 60]] as const;
+// The children watching, seen from behind: middle, clothes, skin, hair, long hair, and a hand up.
+type Watcher = readonly [number, string, string, string, boolean, boolean];
+const watchers: Watcher[] = [[6, 'escola', 'skin-4', 'hair-2', true, false], [17, 'classe', 'skin-3', 'hair-3', false, true], [28, 'lilac', 'skin-6', 'hair-4', false, false], [39, 'red', 'skin-2', 'hair-1', true, false]];
+// Roses in the jar on the table: where each head is.
+const roses = [[23.4, 2.8], [25.6, 1.6], [27.4, 3.4], [24.8, 4.6]] as const;
+---
+<div class="backdrop"><svg viewBox="0 0 100 50" preserveAspectRatio="none">
+  <rect width="100" height="50" style="fill:var(--sky)"/>
+  <use href="#stars" class="night" width="100" height="50"/>
+  <circle class="day" cx="88" cy="12" r="4.4" style="fill:var(--sun)"/><g class="night"><circle cx="88" cy="12" r="4.4" style="fill:var(--sun)"/><circle cx="90" cy="10.8" r="3.9" style="fill:var(--sky)"/></g>
+  <g class="clouds"><use href="#cloud" x="4" y="13" width="16" height="6.4"/><use href="#cloud" x="44" y="4" width="13" height="5.2"/></g>
+  <use href="#school-building" x="55.7" y="16.2" width="55" height="49.5"/>
+  {backTrees.map(([x, y, size]) => <g transform={`translate(${x} ${y}) scale(${size})`}>
+    <path d="M-.8 0V-9.6L-3.4-12M0-8.4l2.8-3" style="fill:none;stroke:var(--wood-dark);stroke-width:1.4;stroke-linecap:round"/>
+    {crown.map(([cx, cy, r, colour]) => <circle cx={cx} cy={cy} r={r} style={`fill:var(--${colour})`}/>)}
+    {leaves.map(([cx, cy]) => <ellipse cx={cx} cy={cy} rx=".9" ry=".5" style="fill:var(--grass-light)"/>)}
+  </g>)}
+  <rect y="48.4" width="100" height="1.6" style="fill:var(--sand-dark)"/>
+  <g class="bunting part" style="transform-origin:50% 0"><path d="M0 3Q50 12 100 3" style="fill:none;stroke:var(--black);stroke-width:.35;opacity:.6"/>
+    {flags.map(({ x, y, colour }) => <path d={`M${x - 2.2} ${y}h4.4l-2.2 4.4z`} style={`fill:var(--${colour})`}/>)}</g>
+</svg></div>
+<div class="floor"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><rect width="100" height="40" style="fill:var(--sand)"/><path d="M38 0h24l8 40H30z" style="fill:var(--sand-dark);opacity:.4"/>
+  {petals.map(([x, y, turn]) => <ellipse cx={x} cy={y} rx="1" ry=".55" transform={`rotate(${turn} ${x} ${y})`} style="fill:var(--pink)"/>)}</svg>
+  <div class="piece" style="--x:-2;--y:4;--w:104;--ar:104/18;--d:0"><svg viewBox="0 0 104 18">
+    {/* Trees in blossom either side, and a hedge with roses along the back. */}
+    {sideTrees.map(([x, y, size]) => <g transform={`translate(${x} ${y}) scale(${size})`}>
+      <path d="M-.8 0V-9.6L-3.4-12M0-8.4l2.8-3" style="fill:none;stroke:var(--wood-dark);stroke-width:1.4;stroke-linecap:round"/>
+      {crown.map(([cx, cy, r, colour]) => <circle cx={cx} cy={cy} r={r} style={`fill:var(--${colour})`}/>)}
+      {leaves.map(([cx, cy]) => <ellipse cx={cx} cy={cy} rx=".9" ry=".5" style="fill:var(--grass-light)"/>)}
+    </g>)}
+    <path d="M0 18v-4c6-2.4 12-2.4 18-.6s14-2 22-1 16 2 26 .4 22-2 38 .4V18z" style="fill:var(--grass)"/>
+    <g style="fill:var(--red)"><circle cx="24" cy="14.4" r=".7"/><circle cx="33" cy="13.4" r=".7"/><circle cx="47" cy="14.6" r=".7"/><circle cx="58" cy="13.2" r=".7"/><circle cx="71" cy="14" r=".7"/><circle cx="84" cy="13.6" r=".7"/></g>
+  </svg></div>
+  <div class="piece" style="--x:27;--y:14;--w:46;--ar:46/40;--d:.12"><svg viewBox="0 0 46 40">
+    {/* The puppet theatre, a little castle with its name over the stage. */}
+    <rect x="3" y="4.4" width="40" height="35.6" style="fill:var(--wall)"/>
+    <g style="fill:var(--wall)">{merlons.map(x => <rect x={x} y="2.2" width="3" height="2.6"/>)}<rect x="0" y="1.8" width="6.4" height="38.2"/><rect x="39.6" y="1.8" width="6.4" height="38.2"/><rect x="0" y="0" width="2.4" height="2.4"/><rect x="4" y="0" width="2.4" height="2.4"/><rect x="39.6" y="0" width="2.4" height="2.4"/><rect x="43.6" y="0" width="2.4" height="2.4"/></g>
+    <path d="M6.4 1.8V40M39.6 1.8V40" style="stroke:var(--wall-dark);stroke-width:.4"/>
+    <g style="fill:var(--black);opacity:.55"><rect x="2.6" y="6" width=".9" height="2.6" rx=".45"/><rect x="42.5" y="6" width=".9" height="2.6" rx=".45"/></g>
+    <path d="M0 30h46M0 35h46M3 26.4h3.4M39.6 26.4H43M10 30v5M36 30v5M16 35v5M30 35v5M3 20h3.4M39.6 20H43M3 14h3.4M39.6 14H43" style="stroke:var(--wall-dark);stroke-width:.4"/>
+    <rect x="10.6" y="5.2" width="24.8" height="5.2" rx=".5" style="fill:var(--red)"/>
+    <text x="23" y="9" text-anchor="middle" style="font-family:'Young Serif',Georgia,serif;font-size:3.3px;fill:var(--white)">Sant Jordi</text>
+    {/* The stage, its curtains drawn back. */}
+    <rect x="8.6" y="12" width="28.8" height="13" style="fill:var(--sky)"/>
+    <rect class="night glow" x="8.6" y="12" width="28.8" height="13" style="fill:#ffd66b;opacity:.18"/>
+    <g style="fill:var(--red)"><path d="M8.6 12.6h3.8c-.4 4-1.2 6.8-2 8.4.6 1.2 1 2.4 1.2 3.6h-3z"/><path d="M37.4 12.6h-3.8c.4 4 1.2 6.8 2 8.4-.6 1.2-1 2.4-1.2 3.6h3z"/></g>
+    <g style="fill:var(--gold)"><rect x="8.6" y="20.4" width="2.4" height=".8" rx=".3"/><rect x="35" y="20.4" width="2.4" height=".8" rx=".3"/></g>
+    {/* The princess holds a rose. */}
+    <g class="hop">
+      <path d="M12.4 17.2c0-1.6 1-2.6 2.1-2.6s2.1 1 2.1 2.6v3.4h-4.2z" style="fill:var(--hair-2)"/>
+      <path d="M11.8 24.6c.2-3.4 1-5.6 2.7-5.6s2.5 2.2 2.7 5.6z" style="fill:var(--pink)"/>
+      <circle cx="14.5" cy="17.1" r="1.8" style="fill:var(--skin-6)"/>
+      <path d="M12.7 17.1c-.1-1.3.8-2.2 1.8-2.2s1.9.9 1.8 2.2c-.4-.6-1-.9-1.8-.9s-1.4.3-1.8.9z" style="fill:var(--hair-2)"/>
+      <path d="M13.1 15.2l.2-1.6.7.8.5-1.1.5 1.1.7-.8.2 1.6z" style="fill:var(--gold)"/>
+      <path d="M16.2 20.8l1.2-.9" style="stroke:var(--skin-6);stroke-width:.8;stroke-linecap:round"/>
+      <path d="M17.6 19.6v2.4" style="stroke:var(--grass-dark);stroke-width:.35"/><circle cx="17.6" cy="19.4" r=".75" style="fill:var(--red)"/>
+    </g>
+    {/* Sant Jordi waves a book. */}
+    <g class="hop" style="animation-delay:-.5s">
+      <path d="M20 24.6c.2-3.6 1.2-5.8 3-5.8s2.8 2.2 3 5.8z" style="fill:var(--white)"/>
+      <path d="M23 19.8v4.4M21.4 21.4h3.2" style="stroke:var(--red);stroke-width:.7"/>
+      <circle cx="23" cy="17" r="1.9" style="fill:var(--skin-3)"/>
+      <path d="M21 16.9c0-1.6.9-2.7 2-2.7s2 1.1 2 2.7z" style="fill:var(--steel)"/><path d="M23 14.3c.4-1.4 1.6-2 2.6-1.6-.8.2-1.4.8-1.6 1.6z" style="fill:var(--red)"/>
+      <path d="M21.4 20.2l-1.6-2.8" style="stroke:var(--skin-3);stroke-width:.8;stroke-linecap:round"/>
+      <path d="M16.9 17.1l2.3.6 2.3-.6v-2.8l-2.3.6-2.3-.6z" style="fill:var(--escola)"/><path d="M17.2 16.6l2 .5 2-.5v-2.2l-2 .5-2-.5z" style="fill:var(--white)"/><path d="M19.2 14.9v2.2M17.7 15.2l1 .3M17.7 16l1 .3M19.7 15.5l1-.3M19.7 16.3l1-.3" style="stroke:var(--black);stroke-width:.15;opacity:.5"/>
+    </g>
+    {/* The dragon smiles, a rose in its mouth. */}
+    <g class="hop" style="animation-delay:-1s">
+      <path d="M32.2 21.2c.6-2 2-3 3.6-2.6-.6.6-.8 1.4-.6 2.2-.8-.2-1.6 0-2.2.6z" style="fill:var(--grass-dark)"/>
+      <path d="M28 24.6c0-3 1.4-4.8 3.6-4.8s3.4 1.8 3.4 4.8z" style="fill:var(--grass)"/>
+      <path d="M34.6 23.8c1.2-.2 1.6-1 1.4-1.8" style="fill:none;stroke:var(--grass);stroke-width:.9;stroke-linecap:round"/>
+      <g style="fill:var(--grass-dark)"><path d="M31.6 19.9l.6-1 .5 1.1zM33.2 20.4l.7-.9.4 1.2zM34.4 21.6l.8-.7.2 1.2zM30.6 14.9l.4-1 .5.9zM31.8 15.2l.6-.9.3 1z"/></g>
+      <path d="M30.4 21.4c-.6-1.6-.4-3.2.8-4.2" style="fill:none;stroke:var(--grass);stroke-width:1.8;stroke-linecap:round"/>
+      <ellipse cx="30.6" cy="16.3" rx="2.1" ry="1.6" style="fill:var(--grass)"/><ellipse cx="28.9" cy="16.8" rx="1.4" ry="1" style="fill:var(--grass-light)"/>
+      <circle cx="31" cy="15.7" r=".5" style="fill:var(--white)"/><circle cx="30.85" cy="15.75" r=".24" style="fill:var(--black)"/>
+      <path d="M28.2 17.2q.8.6 1.7 0" style="fill:none;stroke:var(--black);stroke-width:.25;stroke-linecap:round"/>
+      <path d="M28.4 17.3l-1.4.5" style="stroke:var(--grass-dark);stroke-width:.35"/><circle cx="26.7" cy="17.9" r=".75" style="fill:var(--red)"/>
+    </g>
+    <g style="fill:var(--red)"><rect x="8.2" y="11.2" width="29.6" height="1.6"/>{Array.from({ length:7 }, (_, i) => <path d={`M${8.2 + i * 29.6 / 7} 12.8a2.11 2.11 0 0 0 4.23 0z`}/>)}</g>
+    <rect x="7.6" y="24.4" width="30.8" height="1.8" rx=".4" style="fill:var(--wood-dark)"/>
+    {/* The castle gate below. */}
+    <path d="M19 40v-5.4a4 4 0 0 1 8 0V40z" style="fill:var(--wood-dark)"/><path d="M23 30.6V40M20.4 33v7M25.6 33v7" style="stroke:var(--wood);stroke-width:.4"/><circle cx="24.4" cy="36.4" r=".4" style="fill:var(--gold)"/>
+  </svg></div>
+  <div class="piece" style="--x:65;--y:26;--w:30;--ar:30/20;--d:.24"><svg viewBox="0 0 30 20">
+    {/* The table of books and roses, a child behind it with a rose held up. */}
+    <g class="hop" style="animation-delay:-.3s">
+      <use href="#child" x="10" y="0" width="10" height="15" style="--clothes:var(--escola);--skin:var(--skin-5);--hair:var(--hair-5)"/>
+      <path d="M18.4 6.2l1.6-2.6" style="stroke:var(--skin-5);stroke-width:1;stroke-linecap:round"/>
+      <path d="M20.3 3.6v-1.8" style="stroke:var(--grass-dark);stroke-width:.35"/><circle cx="20.3" cy="1.6" r=".9" style="fill:var(--red)"/>
+    </g>
+    <g style="stroke:var(--grass-dark);stroke-width:.35">{roses.map(([x, y]) => <path d={`M${x} ${y}L25.4 8`}/>)}</g>
+    <g style="fill:var(--grass)"><ellipse cx="24" cy="5.6" rx=".9" ry=".45" transform="rotate(-30 24 5.6)"/><ellipse cx="26.6" cy="5.2" rx=".9" ry=".45" transform="rotate(30 26.6 5.2)"/></g>
+    {roses.map(([x, y]) => <><circle cx={x} cy={y} r="1" style="fill:var(--red)"/><path d={`M${x - .4} ${y}a.4.4 0 1 1 .5.4`} style="fill:none;stroke:var(--menjador);stroke-width:.25"/></>)}
+    <path d="M23.6 6.4h3.6l-.4 2.8h-2.8z" style="fill:var(--sea-light);opacity:.85"/>
+    <g><rect x="1.6" y="7.4" width="7.4" height="1.6" rx=".2" style="fill:var(--classe)"/><rect x="2.4" y="5.8" width="6.4" height="1.6" rx=".2" style="fill:var(--afa)"/><rect x="1.8" y="4.2" width="6.8" height="1.6" rx=".2" style="fill:var(--escola)"/></g>
+    <path d="M3 8.2h4.6M3.6 6.6h3.8M3.2 5h4" style="stroke:var(--white);stroke-width:.3;opacity:.7"/>
+    <path d="M11 9.2l.4-1.6c1.2-.4 2.4-.4 3.1.2.7-.6 1.9-.6 3.1-.2l.4 1.6z" style="fill:var(--white)"/><path d="M14.5 7.8v1.4M12.2 8.3h1.6M15.4 8.3h1.6" style="stroke:var(--black);stroke-width:.2;opacity:.5"/>
+    <rect x="0" y="9" width="30" height="1.6" rx=".4" style="fill:var(--wood-dark)"/>
+    <rect x=".8" y="10.6" width="28.4" height="9.4" style="fill:var(--cream)"/><rect x=".8" y="10.6" width="28.4" height="1.4" style="fill:var(--red)"/>
+    <g style="fill:var(--yellow)">{[3, 9, 15, 21, 27].map(x => <rect x={x - 1} y="12" width="2" height="8"/>)}</g>
+  </svg></div>
+  <div class="piece" style="--x:8;--y:33;--w:46;--ar:46/14;--d:.32"><svg viewBox="0 0 46 14">
+    {/* Children sitting on the ground to watch, one waving at the puppets. */}
+    {watchers.map(([cx, clothes, skin, hair, long, hand]) => <g>
+      {hand && <g class="hop"><path d={`M${cx + 3.6} 7 ${cx + 5.4} 1.8`} style={`stroke:var(--${clothes});stroke-width:1.6;stroke-linecap:round`}/><circle cx={cx + 5.6} cy="1.2" r=".9" style={`fill:var(--${skin})`}/></g>}
+      <path d={`M${cx} 14c-4.2 0-5.6-1.6-5.2-5 .4-2.8 2.4-4 5.2-4s4.8 1.2 5.2 4c.4 3.4-1 5-5.2 5z`} style={`fill:var(--${clothes})`}/>
+      <circle cx={cx} cy="3.4" r="2.8" style={`fill:var(--${skin})`}/>
+      <path d={long ? `M${cx - 3} 3.6c-.2-2.4 1.2-3.4 3-3.4s3.2 1 3 3.4l.4 4.2c-1.2.5-2.2.7-3.4.7s-2.2-.2-3.4-.7z` : `M${cx - 2.9} 3.6c-.2-2.4 1.2-3.4 2.9-3.4s3.1 1 2.9 3.4c0 1.2-.5 2-1 2.4-.6-.3-1.2-.4-1.9-.4s-1.3.1-1.9.4c-.5-.4-1-1.2-1-2.4z`} style={`fill:var(--${hair})`}/>
+    </g>)}
+  </svg></div>
+  <div class="piece" style="--x:-1;--y:37;--w:102;--ar:102/4;--d:.42"><svg viewBox="0 0 102 4">
+    <path d="M2 4l1.6-3.4L5.2 4l1.4-2.6L8 4M44 4l1.4-3 1.4 3 1.6-3.6L50 4M94 4l1.6-3.4L97.2 4l1.4-2.8L100 4" style="fill:var(--grass-dark)"/>
+    {[[20, 2], [62, 2.2], [86, 1.8]].map(([x, y]) => <><g style="fill:var(--white)"><circle cx={x - .9} cy={y} r=".7"/><circle cx={x + .9} cy={y} r=".7"/><circle cx={x} cy={y - .9} r=".7"/><circle cx={x} cy={y + .9} r=".7"/></g><circle cx={x} cy={y} r=".5" style="fill:var(--yellow)"/></>)}
+    <path d="M73 3.2l-2.6.6" style="stroke:var(--grass-dark);stroke-width:.35"/><ellipse cx="71.6" cy="3.3" rx=".7" ry=".35" transform="rotate(-20 71.6 3.3)" style="fill:var(--grass)"/><circle cx="73.6" cy="3" r=".85" style="fill:var(--red)"/>
+  </svg></div>
+</div>

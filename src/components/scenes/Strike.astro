@@ -1,11 +1,18 @@
 ---
-// A general strike day at the school gate: the school behind its railings with the gate open and
-// the school's notice taped to them, a sandwich board for the lunch service with a question mark,
-// a grown-up checking a phone on the way in with a child, and a bus stop whose display has no
-// time to give. The notice is translated; nothing else has words.
+// A strike day at the school gate: the school behind its railings with the gate open and the
+// school's notice taped to them, a sandwich board for the lunch service with a question mark,
+// a grown-up checking a phone on the way in with a child, and a bus stop. In a general strike its
+// display has no time to give; in an education strike the buses run. The notice is translated;
+// nothing else has words.
 import type { Language } from '../../lib/i18n';
-interface Props { language: Language }
-const [strike, minimum] = { ca:['Vaga general', 'Serveis mínims'], es:['Huelga general', 'Servicios mínimos'], en:['General strike', 'Minimum services'] }[Astro.props.language];
+interface Props { language: Language; sector?: 'general' | 'education' }
+const { language, sector = 'general' } = Astro.props;
+const strike = {
+  general:{ ca:'Vaga general', es:'Huelga general', en:'General strike' },
+  education:{ ca:'Vaga a l’educació', es:'Huelga educativa', en:'Education strike' },
+}[sector][language];
+const minimum = { ca:'Serveis mínims', es:'Servicios mínimos', en:'Minimum services' }[language];
+const bus = sector === 'general' ? '-- min' : '4 min';
 // The railings either side of the gate, a bar every two units.
 const bars = Array.from({ length:14 }, (_, i) => 1 + i * 2);
 // The open gate's leaves, swung back against its posts.
@@ -65,12 +72,12 @@ const leaves = [30, 43.2] as const;
     </g>
   </svg></div>
   <div class="piece" style="--x:79;--y:26;--w:12;--ar:12/26;--d:.28"><svg viewBox="0 0 12 26">
-    {/* The bus stop, its display with no time to give. */}
+    {/* The bus stop: no time to give in a general strike. */}
     <rect x="2.6" y="3" width=".9" height="23" style="fill:var(--steel)"/><rect x="1.4" y="25.4" width="3.2" height=".6" style="fill:var(--steel)"/>
     <circle cx="3" cy="3.2" r="2.8" style="fill:var(--red)"/>
     <rect x="1.6" y="1.9" width="2.8" height="2.4" rx=".4" style="fill:var(--white)"/><rect x="1.9" y="2.2" width="2.2" height=".9" style="fill:var(--red)"/>
     <rect x="3.4" y="8" width="8.2" height="4.6" rx=".4" style="fill:var(--black)"/>
-    <text class="glow" x="7.5" y="11.2" text-anchor="middle" style="font-family:Georgia,serif;font-size:2.2px;fill:var(--orange)">-- min</text>
+    <text class="glow" x="7.5" y="11.2" text-anchor="middle" style="font-family:Georgia,serif;font-size:2.2px;fill:var(--orange)">{bus}</text>
   </svg></div>
   <div class="piece" style="--x:4;--y:31;--w:12;--ar:18/30;--d:.36"><svg viewBox="0 0 18 30"><use href="#tree" width="18" height="30"/></svg></div>
 </div>

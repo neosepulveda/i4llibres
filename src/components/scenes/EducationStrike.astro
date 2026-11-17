@@ -1,0 +1,8 @@
+---
+// An education strike: the general strike's school gate, with its own notice on the railings,
+// while the buses keep running.
+import type { Language } from '../../lib/i18n';
+import Strike from './Strike.astro';
+interface Props { language: Language }
+---
+<Strike language={Astro.props.language} sector="education" />

@@ -1,17 +1,19 @@
 ---
-title: "Jueves 26 de noviembre, huelga en la educación: no habrá puertas abiertas de psicomotricidad"
-description: "Ese día hay convocada una huelga del sector de la educación, y se anulan las puertas abiertas de psicomotricidad. Cada jueves, nos encontramos directamente en el pabellón a las 9 h. Recordad ponerles los calcetines a los niños."
+title: "Puertas abiertas de psicomotricidad: jueves 3 de diciembre"
+description: "Sandra ha confirmado la nueva fecha de las puertas abiertas, que la huelga del 26 de noviembre había hecho anular. Este jueves 19 de noviembre, en cambio, nos encontramos en el aula a las 9 h."
 note: "Qué ha dicho Sandra y dónde nos encontramos"
 event:
-  title: "Huelga del sector de la educación"
+  title: "Puertas abiertas de psicomotricidad de I4B"
   location: "Escola La Mar Bella"
-  description: "Jornada de huelga del sector de la educación. Se anulan las puertas abiertas de psicomotricidad de I4B. Posiblemente pasarán al jueves 3 de diciembre, pero la dirección aún tiene que confirmarlo."
+  description: "Sesión de psicomotricidad de Els Llibres abierta a las familias, aplazada del 26 de noviembre por la huelga del sector de la educación. El correo no indica la hora: es la de la sesión de cada jueves, de 9:00 a 10:30."
 ---
-**El jueves 26 de noviembre hay convocada una huelga del sector de la educación**, y por eso se anulan las puertas abiertas de psicomotricidad de ese día. Posiblemente pasarán al **jueves 3 de diciembre**, pero la dirección aún tiene que confirmarlo, y Sandra avisará a las familias.
+Sandra ha confirmado que las **puertas abiertas de psicomotricidad** serán el **jueves 3 de diciembre**. Eran el 26 de noviembre, pero se anularon por la [huelga del sector de la educación](#avis-vaga-educacio). El correo no indica la hora; la sesión de cada jueves es de 9:00 a 10:30.
 
-El correo de Sandra, del 12 de noviembre, es «Cancel·lació de les portes obertes de psicomotricitat».
+**Este jueves 19 de noviembre, nos encontramos en el aula a las 9 h**, no en el pabellón, porque esta semana hace psicomotricidad el otro grupo de I4.
 
-Els Llibres hacen **psicomotricidad cada jueves, de 9:00 a 10:30**.
+Los correos de Sandra son «PORTES OBERTES DE PSICOMOTRICITAT», del 16 de noviembre, y «Cancel·lació de les portes obertes de psicomotricitat», del 12 de noviembre.
+
+Els Llibres hacen **psicomotricidad cada jueves, de 9:00 a 10:30**. Si no hay ningún aviso:
 
 - A las **9 h**, dejad a los niños directamente **en el pabellón**, no en el aula.
 - Recordad **ponerles los calcetines**.

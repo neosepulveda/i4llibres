@@ -131,7 +131,7 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
 // The board runs from what families have to do, nearest first, to reference and voluntary notices.
 // This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
 test('the notices run from what to do next to what is voluntary',()=>{
- const order=['extraescolars-afa','psicomotricitat-comenca','proxim-dia-sense-escola','acollida-desembre','reunio-families-inscripcions','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
+ const order=['psicomotricitat-comenca','extraescolars-afa','vaga-educacio','proxim-dia-sense-escola','voluntaris-nadal-afa','acollida-desembre','festes-afa-sant-jordi','reunio-families-inscripcions','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
  for(const path of ['','es/','en/']){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
@@ -210,34 +210,122 @@ test('the expired school meals meeting becomes a service reference, preserving i
  }
 });
 
-// Sandra's email of 12 November: a strike in education on the 26th cancels the open session, whose new date isn't confirmed.
-test('psychomotricity leads with the education strike on Thursday 26 November and the cancelled open session, and keeps the Thursday instructions',()=>{
- for(const [path,title,strike,cancelled,maybe,where,socks,leaf] of [
-  ['','Dijous 26 de novembre, vaga a l’educació: no hi haurà portes obertes de psicomotricitat','Dijous 26 de novembre hi ha convocada una vaga del sector de l’educació','s’anul·len les portes obertes de psicomotricitat d’aquell dia','dijous 3 de desembre','al pavelló','posar-los els mitjons','Vaga del sector de l’educació'],
-  ['es/','Jueves 26 de noviembre, huelga en la educación: no habrá puertas abiertas de psicomotricidad','El jueves 26 de noviembre hay convocada una huelga del sector de la educación','se anulan las puertas abiertas de psicomotricidad de ese día','jueves 3 de diciembre','en el pabellón','ponerles los calcetines','Huelga del sector de la educación'],
-  ['en/','Thursday 26 November: education strike, no psychomotricity open session','A strike has been called in the education sector on Thursday 26 November','psychomotricity open session for families is cancelled','Thursday 3 December','at the sports hall','put their socks on','Education strike'],
+// Sandra's emails of 12 and 16 November: the strike on the 26th moved the open session to 3 December,
+// and on 19 November the Llibres meet in the classroom while the other I4 group has the sports hall.
+test('psychomotricity leads with the open session on Thursday 3 December, the classroom on the 19th, and keeps the Thursday instructions',()=>{
+ for(const [path,title,confirmed,classroom,noTime,where,socks,leaf,when] of [
+  ['','Portes obertes de psicomotricitat: dijous 3 de desembre','seran el <strong>dijous 3 de desembre</strong>','Aquest dijous 19 de novembre, ens trobem a l’aula a les 9 h','El correu no indica l’hora','al pavelló','posar-los els mitjons','Portes obertes de psicomotricitat d’I4B','dijous, 09:00–10:30 h'],
+  ['es/','Puertas abiertas de psicomotricidad: jueves 3 de diciembre','serán el <strong>jueves 3 de diciembre</strong>','Este jueves 19 de noviembre, nos encontramos en el aula a las 9 h','El correo no indica la hora','en el pabellón','ponerles los calcetines','Puertas abiertas de psicomotricidad de I4B','jueves, 09:00–10:30'],
+  ['en/','Psychomotricity open session: Thursday 3 December','on <strong>Thursday 3 December</strong>','This Thursday, 19 November, we meet in the classroom at 9:00','The email gives no time','at the sports hall','put their socks on','I4B psychomotricity open session','Thursday, 09:00–10:30'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   const card=html.match(/<article class="notice classe" id="avis-psicomotricitat-comenca"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card?.includes(title),path);
-  assert.ok(card.includes(strike),path);
-  assert.ok(card.includes(cancelled),path);
-  assert.ok(card.includes(maybe),path);
-  // Sandra's subject stays as sent, so families can find her email.
+  assert.ok(card.includes(confirmed),path);
+  assert.ok(card.includes(classroom),path);
+  assert.ok(card.includes(noTime),path);
+  assert.doesNotMatch(card,/Possiblement|Posiblemente|probably/,path);
+  // Sandra's subjects stay as sent, so families can find her emails.
+  assert.ok(card.includes('PORTES OBERTES DE PSICOMOTRICITAT'),path);
   assert.ok(card.includes('Cancel·lació de les portes obertes de psicomotricitat'),path);
   assert.ok(card.includes(where),path);
   assert.ok(card.includes(socks),path);
+  assert.ok(card.includes('href="#avis-vaga-educacio"'),path);
   assert.ok(card.includes('href="#avis-horari-llibres"'),path);
-  assert.doesNotMatch(card,/d’11 a 12\.30 h|de 11:00 a 12:30|from 11:00 to 12:30/);
-  // The strike is a key date: one all-day leaf and calendar entry for the 26th.
-  assert.match(card,/<p class="stamp"><time datetime="2026-11-26">/);
-  assert.ok(html.match(/<a class="upcoming-event classe" href="#avis-psicomotricitat-comenca" data-end="2026-11-27"[\s\S]*?<\/a>/)?.[0].includes(leaf),path);
+  // The open session is the date: the usual Thursday session, 9:00 to 10:30 in Barcelona.
+  assert.match(card,/<p class="stamp"><time datetime="2026-12-03T09:00:00\+01:00">/);
+  const row=html.match(/<a class="upcoming-event classe" href="#avis-psicomotricitat-comenca" data-end="2026-12-03T10:30:00\+01:00"[\s\S]*?<\/a>/)?.[0];
+  assert.ok(row?.includes(leaf),path);
+  assert.ok(row.includes(when),path);
   const ics=readFileSync(`dist/${path}calendar/psicomotricitat-comenca.ics`,'utf8').replace(/\r\n /g,'');
-  assert.match(ics,/DTSTART;VALUE=DATE:20261126/);
-  assert.match(ics,/DTEND;VALUE=DATE:20261127/);
+  assert.match(ics,/DTSTART:20261203T080000Z/);
+  assert.match(ics,/DTEND:20261203T093000Z/);
+  assert.ok(ics.includes('SUMMARY:'+leaf),path);
   // Its pop-up is the sports hall: wall bars, a beam, and the socks waiting on the bench.
   assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
   assert.match(card,/<rect x="6" y="29" width="17.6" height="1.1"/,path);
+ }
+});
+
+// The strike comes from Sandra's 12 November email; the school itself hasn't written about it yet.
+test('the education strike on Thursday 26 November is its own notice, says the school has not written yet, and points to the open session',()=>{
+ for(const [path,title,silent,sign,leaf] of [
+  ['','Dijous 26 de novembre, vaga al sector de l’educació','L’escola encara no ha enviat cap comunicat','Vaga a l’educació','Vaga del sector de l’educació'],
+  ['es/','Jueves 26 de noviembre, huelga en el sector de la educación','La escuela aún no ha enviado ningún comunicado','Huelga educativa','Huelga del sector de la educación'],
+  ['en/','Education sector strike on Thursday 26 November','The school has not yet sent any notice','Education strike','Education sector strike'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice escola" id="avis-vaga-educacio"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(title),path);
+  assert.ok(card.includes(silent),path);
+  assert.ok(card.includes('Cancel·lació de les portes obertes de psicomotricitat'),path);
+  assert.ok(card.includes('href="#avis-psicomotricitat-comenca"'),path);
+  assert.match(card,/<p class="stamp"><time datetime="2026-11-26">/);
+  assert.ok(html.match(/<a class="upcoming-event escola" href="#avis-vaga-educacio" data-end="2026-11-27"[\s\S]*?<\/a>/)?.[0].includes(leaf),path);
+  const ics=readFileSync(`dist/${path}calendar/vaga-educacio.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART;VALUE=DATE:20261126/);
+  assert.match(ics,/DTEND;VALUE=DATE:20261127/);
+  // The general strike's gate, with the education strike on the school's notice, and the buses running.
+  assert.ok(card.includes(`>${sign}</text>`),path);
+  assert.ok(card.includes('>4 min</text>'),path);
+  assert.doesNotMatch(card,/Vaga general|Huelga general|General strike|-- min/,path);
+ }
+});
+
+// The AFA's two emails of 16 November: the posters give the dates, but neither says how to sign up.
+test('the AFA Christmas volunteers notice gives the charity hot chocolate a one-hour calendar slot and lists the Oncle Buscall dates',()=>{
+ for(const [path,title,slot,leaf,when,where,sign] of [
+  ['','L’AFA busca voluntaris per Nadal: xocolatada solidària i Oncle Buscall','el cartell no indica l’hora d’acabada','Xocolatada solidària per La Marató','divendres, 16:30–17:30 h','porxo del pavelló','Xocolata'],
+  ['es/','La AFA busca voluntarios para Navidad: chocolatada solidaria y Oncle Buscall','el cartel no indica la hora de acabar','Chocolatada solidaria para La Marató','viernes, 16:30–17:30','porche del pabellón','Chocolate'],
+  ['en/','The AFA is looking for Christmas volunteers: a charity hot chocolate and Oncle Buscall','the poster does not give an end time','Charity hot chocolate for La Marató','Friday, 16:30–17:30','sports hall porch','Hot chocolate'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice afa" id="avis-voluntaris-nadal-afa"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(title),path);
+  assert.ok(card.includes(where),path);
+  for(const school of ['Escola Pere IV','Escola Les Acàcies','Escola Sant Martí']) assert.ok(card.includes(school),`${path}${school}`);
+  // The AFA's subjects stay as sent, so families can find the emails and reply.
+  assert.ok(card.includes('XOCOLATADA SOLIDÀRIA 18 DE DESEMBRE'),path);
+  assert.ok(card.includes('BUSQUEM VOLUNTARIES O VOLUNTARIS PER FER D’ONCLE BUSCALL'),path);
+  assert.match(card,/<a href="https:\/\/onclebuscall\.wordpress\.com\/" target="_blank" rel="noopener noreferrer">/);
+  assert.doesNotMatch(card,/mailto:|youtube\.com|<img /,path);
+  assert.match(card,/<p class="stamp"><time datetime="2026-12-18T16:30:00\+01:00">/);
+  const row=html.match(/<a class="upcoming-event afa" href="#avis-voluntaris-nadal-afa" data-end="2026-12-18T17:30:00\+01:00"[\s\S]*?<\/a>/)?.[0];
+  assert.ok(row?.includes(leaf),path);
+  assert.ok(row.includes(when),path);
+  const ics=readFileSync(`dist/${path}calendar/voluntaris-nadal-afa.ics`,'utf8').replace(/\r\n /g,'');
+  assert.match(ics,/DTSTART:20261218T153000Z/);
+  assert.match(ics,/DTEND:20261218T163000Z/);
+  assert.ok(ics.includes(slot),path);
+  // Its pop-up is the stall under the sports hall porch, with Oncle Buscall and the Tió arriving.
+  assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
+  assert.match(card,/<ellipse cx="24" cy="13\.6" rx="4\.8" ry="\.7"/,path);
+  assert.ok(card.includes(`>${sign}</text>`),path);
+ }
+});
+
+// The AFA's festivals infographic of 16 November: this year I4 organises Sant Jordi with I3.
+test('the AFA festivals notice gives I4 Sant Jordi with I3, asks for a Carnival class representative, and adds no date to the calendar',()=>{
+ for(const [path,title,santJordi,carnival] of [
+  ['','Festes de l’AFA: a I4 ens toca Sant Jordi, amb I3','Sant Jordi, el 16 d’abril: I3 i I4.','almenys un representant'],
+  ['es/','Fiestas de la AFA: a I4 nos toca Sant Jordi, con I3','Sant Jordi, el 16 de abril: I3 e I4.','al menos un representante'],
+  ['en/','AFA festivals: I4 organises Sant Jordi, with I3','Sant Jordi, on 16 April: I3 and I4.','at least one representative'],
+ ]){
+  const html=readFileSync(`dist/${path}index.html`,'utf8');
+  const card=html.match(/<article class="notice afa" id="avis-festes-afa-sant-jordi"[\s\S]*?<\/article>/)?.[0];
+  assert.ok(card?.includes(title),path);
+  assert.ok(card.includes(santJordi),path);
+  assert.ok(card.includes(carnival),path);
+  assert.ok(card.includes('INFORMACIÓ FESTES AFA ESCOLA LA MAR BELLA'),path);
+  assert.ok(card.includes('<a href="mailto:festes.lamarbellaampa@gmail.com">'),path);
+  // The infographic has photos of children, so it stays off this public page.
+  assert.doesNotMatch(card,/FESTES LA MAR BELLA|\.pdf"|class="stamp"|calendar-actions/,path);
+  // Its pop-up is a puppet theatre with the saint's name over the stage, books and roses beside it.
+  assert.equal((card.match(/<div class="piece"/g)||[]).length,5,path);
+  assert.match(card,/<rect x="10\.6" y="5\.2" width="24\.8" height="5\.2"/,path);
+  assert.ok(card.includes('>Sant Jordi</text>'),path);
+  assert.doesNotMatch(html,/<a class="upcoming-event[^>]*href="#avis-festes-afa-sant-jordi"/);
+  assert.equal(existsSync(`dist/${path}calendar/festes-afa-sant-jordi.ics`),false,path);
  }
 });
 
