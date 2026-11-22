@@ -40,11 +40,12 @@ test('all published languages include translated notices and calendar exports',(
  }
 });
 
+// The AFA's rules (point 10), repeated in its email of 20 November: no cancellations for December or June.
 test('AFA notice highlights the next cancellation deadline and retains the monthly application window in every language',()=>{
- for(const [path,opening,window] of [
-  ['','baixes de desembre fins al 20 de novembre','de l’1 al 20 de cada mes'],
-  ['es/','bajas de diciembre hasta el 20 de noviembre','del 1 al 20 de cada mes'],
-  ['en/','cancel for December by 20 November','from the 1st to the 20th of every month'],
+ for(const [path,opening,window,rule] of [
+  ['','baixes de gener fins al 20 de desembre','de l’1 al 20 de cada mes','no accepta baixes per als mesos de desembre i juny'],
+  ['es/','bajas de enero hasta el 20 de diciembre','del 1 al 20 de cada mes','no acepta bajas para los meses de diciembre y junio'],
+  ['en/','cancel for January by 20 December','from the 1st to the 20th of every month','do not accept cancellations for December or June'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.match(html,/data-filter="afa"[^>]*>.*?AFA<span class="filter-count"/);
@@ -52,25 +53,28 @@ test('AFA notice highlights the next cancellation deadline and retains the month
   assert.ok(card,'AFA notice has its own category');
   assert.ok(card.includes(opening));
   assert.ok(card.includes(window));
+  assert.ok(card.includes(rule),path);
+  assert.ok(card.includes('Recordatori de la normativa de les activitats extraescolars'),path);
+  assert.match(card,/<a href="https:\/\/afalamarbella\.cat\/wp-content\/uploads\/2026\/07\/Normativa_Extraescolars_AFA\.pdf" target="_blank" rel="noopener noreferrer">/);
  }
 });
 
 test('AFA calendar exports mark only the final day to cancel activities for the following month',()=>{
  for(const [path,title] of [
-  ['', 'Últim dia per donar de baixa extraescolars de desembre'],
-  ['es/', 'Último día para dar de baja extraescolares de diciembre'],
-  ['en/', 'Last day to cancel December extracurricular activities'],
+  ['', 'Últim dia per donar de baixa extraescolars de gener'],
+  ['es/', 'Último día para dar de baja extraescolares de enero'],
+  ['en/', 'Last day to cancel January extracurricular activities'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
-  assert.match(html,/<a class="upcoming-event afa" href="#avis-extraescolars-afa" data-end="2026-11-21"/);
+  assert.match(html,/<a class="upcoming-event afa" href="#avis-extraescolars-afa" data-end="2026-12-21"/);
   const ics=readFileSync(`dist/${path}calendar/extraescolars-afa.ics`,'utf8');
-  assert.match(ics,/DTSTART;VALUE=DATE:20261120/);
-  assert.match(ics,/DTEND;VALUE=DATE:20261121/);
+  assert.match(ics,/DTSTART;VALUE=DATE:20261220/);
+  assert.match(ics,/DTEND;VALUE=DATE:20261221/);
   assert.ok(ics.replace(/\r\n /g,'').includes('SUMMARY:'+title));
   const card=html.match(/<article class="notice afa" id="avis-extraescolars-afa"[\s\S]*?<\/article>/)?.[0];
   const google=card.match(/href="(https:\/\/calendar\.google\.com[^\"]+)"/)[1];
   const params=new URL(google.replaceAll('&amp;','&')).searchParams;
-  assert.equal(params.get('dates'),'20261120/20261121');
+  assert.equal(params.get('dates'),'20261220/20261221');
   assert.equal(params.get('text'),title);
   assert.ok(params.get('details').includes('23:55'));
  }
@@ -131,7 +135,7 @@ test('every child in the line has two arms, reaching halfway to join hands',()=>
 // The board runs from what families have to do, nearest first, to reference and voluntary notices.
 // This follows the notices on the board today: re-sort it, and this list, when one arrives or goes.
 test('the notices run from what to do next to what is voluntary',()=>{
- const order=['psicomotricitat-comenca','extraescolars-afa','vaga-educacio','proxim-dia-sense-escola','voluntaris-nadal-afa','acollida-desembre','festes-afa-sant-jordi','reunio-families-inscripcions','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
+ const order=['vaga-educacio','psicomotricitat-comenca','proxim-dia-sense-escola','voluntaris-nadal-afa','extraescolars-afa','acollida-desembre','festes-afa-sant-jordi','reunio-families-inscripcions','horari-llibres','reunio-menjador','club-catala-voluntaris','materials-infantil'];
  for(const path of ['','es/','en/']){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   assert.deepEqual(Array.from(html.matchAll(/<article class="notice [a-z]+" id="avis-([a-z0-9-]+)"/g),([,id])=>id),order,path);
@@ -168,11 +172,12 @@ test('the Cros de Sant Martí, the Punt Verd Mòbil and the general strike leave
  }
 });
 
-test('December childcare names Biosca and the announced hours without inventing prices, booking links or calendar exports',()=>{
- for(const [path,title,hours,unknown] of [
-  ['','Acollida del 21 de desembre: la gestionarà Biosca','15.30 a 16.30 h','no indica preus ni com reservar plaça'],
-  ['es/','Acogida del 21 de diciembre: la gestionará Biosca','15:30 a 16:30 h','no indica precios ni cómo reservar plaza'],
-  ['en/','Childcare on 21 December: Biosca will manage the service','15:30 to 16:30','does not give prices or booking instructions'],
+// The AFA's email of 20 November: charging for this childcare is Biosca's proposal, not the AFA's.
+test('December childcare names Biosca, the announced hours and whose proposal the charge is, without inventing prices, booking links or calendar exports',()=>{
+ for(const [path,title,hours,unknown,charge] of [
+  ['','Acollida del 21 de desembre: la gestionarà Biosca','15.30 a 16.30 h','no indica preus ni com reservar plaça','la proposta de cobrar aquesta acollida és de Biosca'],
+  ['es/','Acogida del 21 de diciembre: la gestionará Biosca','15:30 a 16:30 h','no indica precios ni cómo reservar plaza','la propuesta de cobrar esta acogida es de Biosca'],
+  ['en/','Childcare on 21 December: Biosca will manage the service','15:30 to 16:30','does not give prices or booking instructions','the proposal to charge for this childcare comes from Biosca'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   const card=html.match(/<article class="notice afa" id="avis-acollida-desembre"[\s\S]*?<\/article>/)?.[0];
@@ -181,6 +186,8 @@ test('December childcare names Biosca and the announced hours without inventing 
   assert.ok(card.includes(hours),path);
   assert.ok(card.includes(unknown),path);
   assert.ok(card.includes('JORNADA INTENSIVA 21/12/26'),path);
+  assert.ok(card.includes(charge),path);
+  assert.ok(card.includes('HORA ACOLLIDA DIA 21/12 JORNADA INTENSIVA'),path);
   assert.match(card,/<div class="popup" aria-hidden="true">/);
   assert.doesNotMatch(card,/calendar-actions|forms\.gle|mailto:|mail\.google/);
   assert.doesNotMatch(html,/<a class="upcoming-event[^>]*href="#avis-acollida-desembre"/);
@@ -211,18 +218,18 @@ test('the expired school meals meeting becomes a service reference, preserving i
 });
 
 // Sandra's emails of 12 and 16 November: the strike on the 26th moved the open session to 3 December,
-// and on 19 November the Llibres meet in the classroom while the other I4 group has the sports hall.
-test('psychomotricity leads with the open session on Thursday 3 December, the classroom on the 19th, and keeps the Thursday instructions',()=>{
- for(const [path,title,confirmed,classroom,noTime,where,socks,leaf,when] of [
-  ['','Portes obertes de psicomotricitat: dijous 3 de desembre','seran el <strong>dijous 3 de desembre</strong>','Aquest dijous 19 de novembre, ens trobem a l’aula a les 9 h','El correu no indica l’hora','al pavelló','posar-los els mitjons','Portes obertes de psicomotricitat d’I4B','dijous, 09:00–10:30 h'],
-  ['es/','Puertas abiertas de psicomotricidad: jueves 3 de diciembre','serán el <strong>jueves 3 de diciembre</strong>','Este jueves 19 de noviembre, nos encontramos en el aula a las 9 h','El correo no indica la hora','en el pabellón','ponerles los calcetines','Puertas abiertas de psicomotricidad de I4B','jueves, 09:00–10:30'],
-  ['en/','Psychomotricity open session: Thursday 3 December','on <strong>Thursday 3 December</strong>','This Thursday, 19 November, we meet in the classroom at 9:00','The email gives no time','at the sports hall','put their socks on','I4B psychomotricity open session','Thursday, 09:00–10:30'],
+// The 19 November classroom line went once that day had passed.
+test('psychomotricity leads with the open session on Thursday 3 December and keeps the Thursday instructions',()=>{
+ for(const [path,title,confirmed,noTime,where,socks,leaf,when] of [
+  ['','Portes obertes de psicomotricitat: dijous 3 de desembre','seran el <strong>dijous 3 de desembre</strong>','El correu no indica l’hora','al pavelló','posar-los els mitjons','Portes obertes de psicomotricitat d’I4B','dijous, 09:00–10:30 h'],
+  ['es/','Puertas abiertas de psicomotricidad: jueves 3 de diciembre','serán el <strong>jueves 3 de diciembre</strong>','El correo no indica la hora','en el pabellón','ponerles los calcetines','Puertas abiertas de psicomotricidad de I4B','jueves, 09:00–10:30'],
+  ['en/','Psychomotricity open session: Thursday 3 December','on <strong>Thursday 3 December</strong>','The email gives no time','at the sports hall','put their socks on','I4B psychomotricity open session','Thursday, 09:00–10:30'],
  ]){
   const html=readFileSync(`dist/${path}index.html`,'utf8');
   const card=html.match(/<article class="notice classe" id="avis-psicomotricitat-comenca"[\s\S]*?<\/article>/)?.[0];
   assert.ok(card?.includes(title),path);
   assert.ok(card.includes(confirmed),path);
-  assert.ok(card.includes(classroom),path);
+  assert.doesNotMatch(card,/19 de novembre|19 de noviembre|19 November/,path);
   assert.ok(card.includes(noTime),path);
   assert.doesNotMatch(card,/Possiblement|Posiblemente|probably/,path);
   // Sandra's subjects stay as sent, so families can find her emails.

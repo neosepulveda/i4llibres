@@ -4,7 +4,7 @@ description: "Divendres 18 de desembre, l’AFA i Biosca venen xocolata i melind
 category: afa
 scene: hot-chocolate
 date: "2026-12-18"
-order: 50
+order: 40
 note: "Dates i com apuntar-s’hi"
 event:
   title: "Xocolatada solidària per La Marató"

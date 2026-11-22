@@ -4,7 +4,7 @@ description: "Hi ha convocada una vaga del sector de l’educació. L’escola e
 category: escola
 scene: education-strike
 date: "2026-11-26"
-order: 30
+order: 10
 note: "Què sabem de la vaga?"
 event:
   title: "Vaga del sector de l’educació"
