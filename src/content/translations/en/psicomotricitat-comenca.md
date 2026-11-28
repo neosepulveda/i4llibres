@@ -7,7 +7,7 @@ event:
   location: "Escola La Mar Bella"
   description: "The Llibres’ psychomotricity session, open to families, moved from 26 November because of the education sector strike. The email gives no time: this is the usual Thursday session, from 9:00 to 10:30."
 ---
-Sandra has confirmed that the **psychomotricity open session** for families will be on **Thursday 3 December**. It was planned for 26 November but was cancelled because of the [education sector strike](#avis-vaga-educacio). The email gives no time; the usual Thursday session runs from 9:00 to 10:30.
+Sandra has confirmed that the **psychomotricity open session** for families will be on **Thursday 3 December**. It was planned for 26 November but was cancelled because of the education sector strike. The email gives no time; the usual Thursday session runs from 9:00 to 10:30.
 
 Sandra’s emails are “PORTES OBERTES DE PSICOMOTRICITAT”, of 16 November, and “Cancel·lació de les portes obertes de psicomotricitat”, of 12 November.
 
